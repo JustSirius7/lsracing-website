@@ -85,8 +85,19 @@
                                 <input type="number" id="etaOOC" required placeholder="Es. 20" min="14">
                             </div>
                             <div class="input-group">
-                                <label for="discordTag">ID Discord *</label>
-                                <input type="text" id="discordTag" required placeholder="Es. 289371289371298312">
+                                <label for="discordTag">ID Discord (Numerico) *</label>
+                                <input 
+                                    type="text" 
+                                    id="discordTag" 
+                                    required 
+                                    placeholder="Es. 289371289371298312"
+                                    pattern="[0-9]{17,20}"
+                                    title="Inserisci SOLO il tuo ID numerico di Discord (17-20 cifre). Non usare il nickname o la @"
+                                >
+                                <small style="color: #aaa; font-size: 0.8rem; margin-top: 5px; display: block; line-height: 1.4;">
+                                    ⚠️ <b>Inserisci solo numeri</b> (no nickname o @).<br>
+                                    💡 <b>Come trovare il tuo ID:</b> Vai su Discord in <i>Impostazioni > Avanzate</i> e attiva la <b>"Modalità Sviluppatore"</b>. Fai tasto destro sul tuo profilo e clicca <i>"Copia ID utente"</i>.
+                                </small>
                             </div>
                         </div>
                     </div>
