@@ -1,0 +1,172 @@
+/* ==========================================
+   NAVBAR BASE (DESKTOP) - FIERY ORANGE THEME
+========================================== */
+
+header {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(1450px, 92%);
+    height: 82px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 35px;
+    background: rgba(10, 10, 11, 0.55);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 85, 0, 0.2);
+    border-radius: 18px;
+    transition: all .35s ease;
+    z-index: 1000;
+}
+
+/* Scroll Header */
+header.scrolled {
+    background: rgba(8, 8, 9, 0.94);
+    border: 1px solid rgba(255, 85, 0, 0.4);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 35px rgba(255, 85, 0, 0.2);
+}
+
+/* Logo */
+.logo-navbar {
+    display: flex;
+    align-items: center;
+}
+
+.logo-navbar img {
+    height: 90px;
+    width: auto;
+    transition: .35s ease;
+    filter: drop-shadow(0 0 14px rgba(255, 85, 0, .4));
+}
+
+.logo-navbar img:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 22px rgba(255, 183, 0, .6));
+}
+
+/* Menu Link Desktop */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.nav-links a {
+    position: relative;
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: .5px;
+    transition: .3s;
+    text-decoration: none;
+}
+
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #FFB700, #FF5500);
+    transition: .35s;
+    box-shadow: 0 0 10px rgba(255, 85, 0, 0.8);
+}
+
+.nav-links a:hover {
+    color: #FFB700;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+/* Bottone Discord Desktop */
+.nav-highlight {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #FFB700 0%, #FF5500 50%, #D00000 100%);
+    color: #fff !important;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: .35s ease;
+    box-shadow: 0 0 20px rgba(255, 85, 0, .45);
+}
+
+.nav-highlight::after {
+    display: none !important; /* Disabilita la linea sotto al bottone */
+}
+
+.nav-highlight:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(255, 183, 0, .7), 0 0 45px rgba(255, 85, 0, .5);
+}
+
+/* Pulsante Hamburger (Nascosto su PC) */
+.nav-hamburger {
+    display: none;
+    font-size: 1.8rem;
+    color: #ffffff;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    outline: none;
+    transition: .3s;
+}
+
+.nav-hamburger:hover {
+    color: #FF5500;
+}
+
+
+/* ==========================================
+   NAVBAR RESPONSIVE (TABLET & SMARTPHONE)
+========================================== */
+
+@media screen and (max-width: 992px) {
+    header {
+        height: 70px;
+        padding: 0 20px;
+        top: 10px;
+        width: 95%;
+    }
+
+    .logo-navbar img {
+        height: 48px;
+    }
+
+    /* Mostra il pulsante Hamburger ☰ */
+    .nav-hamburger {
+        display: block;
+    }
+
+    /* Nasconde i link standard e crea il menu a tendina */
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        background: rgba(10, 10, 11, 0.97);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem 0;
+        gap: 1.5rem;
+        border: 1px solid rgba(255, 85, 0, 0.25);
+        border-radius: 18px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 0 25px rgba(255, 85, 0, 0.15);
+    }
+
+    /* Quando il menu si apre con il click */
+    .nav-links.active {
+        display: flex;
+    }
+}

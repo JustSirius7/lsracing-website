@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Principale -->
+    <title>Galleria Lavori | LS Racing</title>
+    <meta name="description" content="Sfoglia la galleria fotografica di LS Racing: le preparazioni uniche, i veicoli personalizzati, l'officina e gli eventi del nostro team.">
+    <meta name="keywords" content="Galleria Auto GTA RP, Tuning Foto, Veicoli Custom, LS Racing, Showroom FiveM">
+    <meta name="author" content="LS Racing">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Discord & Social Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://iltuosito.it/gallery.html">
+    <meta property="og:title" content="Galleria Lavori | LS Racing">
+    <meta property="og:description" content="Scopri i migliori progetti, gli eventi e i veicoli personalizzati realizzati dall'officina LS Racing.">
+    <meta property="og:image" content="assets/img/logo.webp">
+    <meta property="og:theme-color" content="#FF5500">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Galleria Lavori | LS Racing">
+    <meta name="twitter:description" content="Scopri i migliori progetti, gli eventi e i veicoli personalizzati dal LS Racing.">
+    <meta name="twitter:image" content="assets/img/logo.webp">
+
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+
+    <!-- CSS Generali e componenti -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/gallery.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
+
+    <!-- Fonts & Icone -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;800&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
+
+</head>
+
+<body class="gallery-page">
+
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox" class="lightbox">
+
+        <span class="lightbox-close">&times;</span>
+
+        <button class="lightbox-prev">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <img id="lightboxImage" alt="Foto Galleria">
+
+        <button class="lightbox-next">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <div class="lightbox-info">
+            <!-- CONTATORE NUMERICO -->
+            <p id="lightboxCounter" class="lightbox-counter"></p>
+
+            <!-- CATEGORIA -->
+            <span id="lightboxCategory" class="lightbox-category"></span>
+
+            <h2 id="lightboxTitle"></h2>
+
+            <p id="lightboxDescription"></p>
+        </div>
+
+    </div>
+
+    <!-- Navbar caricata dinamicamente -->
+    <div id="navbar"></div>
+
+    <main>
+
+        <!-- HERO CON VIDEO DI SFONDO -->
+        <section class="gallery-hero">
+
+            <!-- Video in Background -->
+            <video autoplay muted loop playsinline class="gallery-bg-video">
+                <source src="assets/video/gallery-bg.mp4" type="video/mp4">
+                Il tuo browser non supporta i video HTML5.
+            </video>
+
+            <div class="hero-overlay"></div>
+
+            <div class="container hero-content">
+
+                <img src="assets/img/logo.webp"
+                     alt="LS Racing Logo"
+                     class="main-logo">
+
+                <h1>Galleria</h1>
+
+                <p>
+                    Scopri la nostra officina, gli eventi,
+                    le preparazioni e i migliori veicoli
+                    dell'LS Racing.
+                </p>
+
+                <div class="gallery-counter">
+
+                    <i class="fa-solid fa-camera-retro"></i>
+
+                    <span id="photoCounter">0</span>
+
+                    <span>fotografie disponibili</span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- FILTRI -->
+        <section class="gallery-filters">
+
+            <button class="active" data-filter="tutorial">
+                Tutorial
+            </button>
+
+            <button data-filter="officina">
+                Officina
+            </button>
+
+            <button data-filter="showroom">
+                Showroom
+            </button>
+
+            <button data-filter="eventi">
+                Eventi
+            </button>
+
+            <button data-filter="veicoli">
+                Veicoli
+            </button>
+
+        </section>
+
+        <!-- GALLERIA -->
+        <section class="gallery-section">
+
+            <div id="galleryGrid"></div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer caricato dinamicamente -->
+    <div id="footer"></div>
+
+    <script src="assets/js/navbar.js"></script>
+    <script src="assets/js/footer.js"></script>
+    <script src="assets/js/gallery.js"></script>
+
+</body>
+
+</html>

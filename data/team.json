@@ -1,0 +1,26 @@
+[
+  {
+    "nome": "JustPino",
+    "ruolo": "Proprietario",
+    "sezione": "proprieta",
+    "foto": "assets/img/team/justpino.webp"
+  },
+  {
+    "nome": "Mario",
+    "ruolo": "Direttore",
+    "sezione": "direzione",
+    "foto": "assets/img/team/mario.webp"
+  },
+  {
+    "nome": "Luca",
+    "ruolo": "Vice Direttore",
+    "sezione": "direzione",
+    "foto": "assets/img/team/luca.webp"
+  },
+  {
+    "nome": "Andrea",
+    "ruolo": "Meccanico",
+    "sezione": "officina",
+    "foto": "assets/img/team/andrea.webp"
+  }
+]

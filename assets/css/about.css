@@ -1,0 +1,233 @@
+/* ==========================================
+   CHI SIAMO - FIERY ORANGE THEME
+========================================== */
+
+.about{
+
+    padding:160px 0;
+
+    background:linear-gradient(
+        180deg,
+        #141416 0%,
+        #0A0A0B 100%
+    );
+
+}
+
+.about .container{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:80px;
+
+    flex-wrap:wrap;
+
+}
+
+/* TESTO */
+
+.about-text{
+
+    flex:1;
+
+    min-width:380px;
+
+}
+
+.about-text h2{
+
+    margin-top:25px;
+
+    margin-bottom:35px;
+
+    font-size:52px;
+
+    line-height:1.2;
+
+}
+
+.about-text p{
+
+    color:#d8d8d8;
+
+    font-size:19px;
+
+    line-height:1.9;
+
+    margin-bottom:40px;
+
+}
+
+/* LISTA */
+
+.about-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+    margin-bottom:45px;
+
+}
+
+.about-list div{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    font-size:18px;
+
+    color:#f2f2f2;
+
+}
+
+/* Cerchio Arancione/Oro */
+
+.about-list span{
+
+    width:34px;
+
+    height:34px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:rgba(255,85,0,.15);
+
+    border:1px solid rgba(255,85,0,.4);
+
+    color:#FF5500;
+
+    font-weight:bold;
+
+}
+
+/* Pulsante */
+
+.about-btn{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:18px 36px;
+
+    border-radius:14px;
+
+    background:linear-gradient(135deg, #FFB700 0%, #FF5500 100%);
+
+    color:white;
+
+    font-weight:600;
+
+    transition:.35s ease;
+
+    box-shadow:
+    0 0 25px rgba(255,85,0,.3);
+
+}
+
+.about-btn:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:
+    0 15px 40px rgba(255,183,0,.5);
+
+}
+
+/* IMMAGINE */
+
+.about-image{
+
+    flex:1;
+
+    display:flex;
+
+    justify-content:center;
+
+    min-width:380px;
+
+    position:relative;
+
+    overflow:hidden;
+
+    border-radius:22px;
+
+}
+
+.about-image img{
+
+    width:100%;
+
+    max-width:620px;
+
+    display:block;
+
+    border-radius:22px;
+
+    border:1px solid rgba(255,85,0,.3);
+
+    box-shadow:
+        0 0 40px rgba(255,85,0,.12),
+        0 35px 70px rgba(0,0,0,.6);
+
+    transition:.45s ease;
+
+}
+
+.about-image:hover img{
+
+    transform:translateY(-8px) scale(1.03);
+
+    border-color:#FF5500;
+
+    box-shadow:
+        0 0 50px rgba(255,85,0,.3),
+        0 45px 90px rgba(0,0,0,.7);
+
+}
+
+.image-badge{
+
+    position:absolute;
+
+    bottom:20px;
+
+    left:20px;
+
+    background:rgba(10,10,11,.85);
+
+    backdrop-filter:blur(10px);
+
+    color:white;
+
+    padding:12px 18px;
+
+    border-radius:12px;
+
+    border:1px solid rgba(255,85,0,.4);
+
+    font-weight:600;
+
+    font-size:15px;
+
+    box-shadow: 0 0 20px rgba(0,0,0,.5);
+
+}

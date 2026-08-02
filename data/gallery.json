@@ -1,0 +1,58 @@
+[
+    {
+        "title": "Officina Principale",
+        "category": "officina",
+        "image": "assets/img/gallery/officina/officina1.webp",
+        "description": "La nostra officina principale."
+    },
+
+    {
+        "title": "Banco Motori",
+        "category": "officina",
+        "image": "assets/img/gallery/officina/officina2.webp",
+        "description": "Area elaborazioni."
+    },
+
+    {
+        "title": "BMW M4 Competition",
+        "category": "showroom",
+        "image": "assets/img/gallery/showroom/m4.webp",
+        "description": "Preparazione completa."
+    },
+
+    {
+        "title": "Car Meet",
+        "category": "eventi",
+        "image": "assets/img/gallery/eventi/evento1.webp",
+        "description": "Evento organizzato dal Los Santos Customs."
+    },
+
+    {
+        "title": "Elegy Retro Custom",
+        "category": "veicoli",
+        "image": "assets/img/gallery/veicoli/elegy.webp",
+        "description": "Una delle preparazioni più richieste."
+    },
+
+    {
+    "category": "tutorial",
+    "type": "video",
+    "title": "1. Come eseguire un FullKit",
+    "description": "Guida rapida passo-passo su come compilare il modulo e inviare la richiesta.",
+    "url": "https://vimeo.com/1214835833?fl=ip&fe=ec"
+  },
+  {
+    "category": "tutorial",
+    "type": "video",
+    "title": "2. Check materiali",
+    "description": "Tutte le informazioni essenziali per compilare il modulo di reclutamento.",
+    "url": "https://vimeo.com/1214836372?fl=ip&fe=ec"
+  },
+  {
+    "category": "tutorial",
+    "type": "video",
+    "title": "3. Elaborazione meccanico",
+    "description": "Una panoramica completa all'interno del Los Santos Customs.",
+    "url": "https://vimeo.com/1214837091?fl=ip&fe=ec"
+  }
+]

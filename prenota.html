@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Principale -->
+    <title>Prenota Appuntamento | LS Racing</title>
+    <meta name="description" content="Prenota online il tuo intervento meccanico, tuning o riparazione da LS Racing. Richiesta inviata in tempo reale al nostro team.">
+    <meta name="keywords" content="Prenota Meccanico, LS Racing, Tuning GTA RP, Officina FiveM, Riparazione Auto GTA">
+    <meta name="author" content="LS Racing">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Discord & Social Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="LS Racing">
+    <meta property="og:url" content="https://lsracing.top/prenota.html">
+    <meta property="og:title" content="Prenota Appuntamento | LS Racing">
+    <meta property="og:description" content="Compila il modulo online per prenotare un intervento in officina. Elaborazioni, verniciature e soccorso stradale in città.">
+    <meta property="og:image" content="assets/img/og-preview.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="theme-color" content="#FF5500">
+
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Prenota Appuntamento | LS Racing">
+    <meta name="twitter:description" content="Compila il modulo online per prenotare un intervento in officina in città.">
+    <meta name="twitter:image" content="assets/img/og-preview.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+
+    <!-- CSS Generali e componenti -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
+    <link rel="stylesheet" href="assets/css/prenota.css">
+
+    <!-- Font & Icone -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+
+<body class="booking-page">
+
+    <!-- Navbar caricata dinamicamente -->
+    <div id="navbar"></div>
+
+    <main class="booking-wrapper">
+        <div class="booking-container">
+            
+            <div class="booking-header">
+                <img src="assets/img/logo-navbar.webp" alt="LS Racing" class="booking-logo">
+                <h1>Prenota un Appuntamento</h1>
+                <p>Compila il modulo sottostante. La tua richiesta verrà inviata direttamente in tempo reale sul nostro server Discord!</p>
+            </div>
+
+            <!-- SEZIONE CONTROLLO DISCORD OAUTH2 -->
+            <div id="discord-auth-section" style="text-align: center; padding: 30px; background: rgba(88, 101, 242, 0.1); border: 1px solid #5865F2; border-radius: 12px; margin-bottom: 20px;">
+                <h3 style="color: #fff; margin-bottom: 10px;"><i class="fa-brands fa-discord"></i> Verifica Server Richiesta</h3>
+                <p style="color: #ccc; margin-bottom: 20px; font-size: 0.95rem;">Per sbloccare il modulo e prenotare un intervento, devi prima effettuare l'accesso con Discord e verificare di essere membro del nostro server.</p>
+                <a href="http://localhost:3000/login" id="login-btn" style="background-color: #5865F2; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; transition: background 0.3s;">
+                    Accedi con Discord
+                </a>
+            </div>
+
+            <!-- CONTAINER DEL FORM (Inizialmente nascosto) -->
+            <div id="form-container" style="display: none;">
+                <!-- FORM PRENOTAZIONE -->
+                <form id="bookingForm" class="booking-form">
+                    
+                    <!-- 1. DATI CLIENTE -->
+                    <div class="form-section">
+                        <h2><i class="fa-solid fa-user"></i> 1. Dati Cliente</h2>
+                        <div class="input-group">
+                            <label for="nomeCliente">Nome & Cognome / Nome Personaggio *</label>
+                            <input type="text" id="nomeCliente" required placeholder="Es. Mario Rossi">
+                        </div>
+                        <div class="input-group">
+                            <label for="discordTag">ID Discord *</label>
+                            <input type="text" id="discordTag" required placeholder="Es. 289371289371298312">
+                        </div>
+                    </div>
+
+                    <!-- 2. DATI VEICOLO -->
+                    <div class="form-section">
+                        <h2><i class="fa-solid fa-car"></i> 2. Dati Veicolo</h2>
+                        <div class="input-group-row">
+                            <div class="input-group">
+                                <label for="veicolo">Marca e Modello *</label>
+                                <input type="text" id="veicolo" required placeholder="Es. Pfister Comet S2">
+                            </div>
+                            <div class="input-group">
+                                <label for="targa">Targa *</label>
+                                <input type="text" id="targa" required placeholder="Es. 83ABC123">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. SERVIZIO E ORARIO -->
+                    <div class="form-section">
+                        <h2><i class="fa-solid fa-wrench"></i> 3. Servizio & Orario</h2>
+                        <div class="input-group">
+                            <label for="servizio">Tipo di Servizio *</label>
+                            <select id="servizio" required>
+                                <option value="" disabled selected>Seleziona un servizio...</option>
+                                <option value="Elaborazione Motore & Prestazioni">Elaborazione Motore & Prestazioni</option>
+                                <option value="Tuning Estetico & Verniciatura">Tuning Estetico & Verniciatura</option>
+                                <option value="Soccorso Stradale / Riparazione Danni">Soccorso Stradale / Riparazione Danni</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group-row">
+                            <div class="input-group">
+                                <label for="dataApp">Data Preferita *</label>
+                                <input type="date" id="dataApp" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="oraApp">Ora Preferita *</label>
+                                <input type="time" id="oraApp" required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="note">Note Aggiuntive / Richieste Particolari</label>
+                            <textarea id="note" rows="3" placeholder="Descrivi eventuali modifiche specifiche richieste..."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btnSubmit" class="btn-submit">
+                        <i class="fa-solid fa-paper-plane"></i> Invia Prenotazione
+                    </button>
+                </form>
+            </div>
+
+            <div id="statusMessage" class="status-message"></div>
+
+        </div>
+    </main>
+
+    <!-- Footer caricato dinamicamente -->
+    <div id="footer"></div>
+
+    <script src="assets/js/navbar.js"></script>
+    <script src="assets/js/footer.js"></script>
+    <script src="assets/js/prenota.js"></script>
+
+    <!-- Script gestione OAuth2 Discord -->
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const autenticato = urlParams.get('autenticato');
+        const errore = urlParams.get('errore');
+
+        const authSection = document.getElementById('discord-auth-section');
+        const formContainer = document.getElementById('form-container');
+
+        if (autenticato === 'true') {
+            authSection.style.display = 'none';
+            formContainer.style.display = 'block';
+        } else if (errore === 'non_nel_server') {
+            authSection.innerHTML = `
+                <h3 style="color: #ff4d4d; margin-bottom: 10px;"><i class="fa-solid fa-triangle-exclamation"></i> Accesso Negato</h3>
+                <p style="color: #ccc; margin-bottom: 20px; font-size: 0.95rem;">Risulti loggato con Discord, ma <b>non fai parte del server ufficiale di LS Racing</b>.</p>
+                <a href="https://discord.gg/MD9cJCPQsp" target="_blank" style="background-color: #57F287; color: #000; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin-right: 10px;">
+                    Unisciti al Server
+                </a>
+                <a href="https://lsracing.top/auth/callback" style="background-color: #5865F2; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+                    Riprova Login
+                </a>
+            `;
+        }
+    </script>
+</body>
+</html>

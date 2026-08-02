@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Principale -->
+    <title>Lavora con Noi - Candidature | LS Racing</title>
+    <meta name="description" content="Unisciti al team di LS Racing! Compila il modulo di candidatura online per entrare a far parte della nostra officina come meccanico o tuner RP.">
+    <meta name="keywords" content="Candidatura Meccanico, Lavora con noi GTA RP, LS Racing Reclutamento, FiveM Jobs, Officina RP">
+    <meta name="author" content="LS Racing">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Discord & Social Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="LS Racing">
+    <meta property="og:url" content="https://lsracing.top/candidati.html">
+    <meta property="og:title" content="Lavora con Noi - Candidature | LS Racing">
+    <meta property="og:description" content="Vuoi entrare a far parte del team di LS Racing? Compila il modulo online e invia subito la tua candidatura!">
+    <meta property="og:image" content="assets/img/og-preview.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="theme-color" content="#FF5500">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Lavora con Noi - Candidature | LS Racing">
+    <meta name="twitter:description" content="Vuoi entrare a far parte del team di LS Racing? Compila il modulo online e invia la tua candidatura.">
+    <meta name="twitter:image" content="assets/img/og-preview.jpg">
+
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+
+    <!-- CSS Generali e componenti -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
+    <link rel="stylesheet" href="assets/css/prenota.css">
+
+    <!-- Font & Icone -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+
+<body class="booking-page">
+
+    <!-- Navbar caricata dinamicamente -->
+    <div id="navbar"></div>
+
+    <main class="booking-wrapper">
+        <div class="booking-container">
+            
+            <div class="booking-header">
+                <img src="assets/img/logo-navbar.webp" alt="LS Racing" class="booking-logo">
+                <h1>Lavora con Noi</h1>
+                <p>Vuoi entrare a far parte del team di LS Racing? Compila il modulo per inviare la tua candidatura!</p>
+            </div>
+
+            <!-- SEZIONE CONTROLLO DISCORD OAUTH2 -->
+            <div id="discord-auth-section" style="text-align: center; padding: 30px; background: rgba(88, 101, 242, 0.1); border: 1px solid #5865F2; border-radius: 12px; margin-bottom: 20px;">
+                <h3 style="color: #fff; margin-bottom: 10px;"><i class="fa-brands fa-discord"></i> Verifica Server Richiesta</h3>
+                <p style="color: #ccc; margin-bottom: 20px; font-size: 0.95rem;">Per sbloccare il modulo e inviare la candidatura, devi prima effettuare l'accesso con Discord e verificare di essere membro del nostro server.</p>
+                <a href="http://localhost:3000/login" id="login-btn" style="background-color: #5865F2; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; transition: background 0.3s;">
+                    Accedi con Discord
+                </a>
+            </div>
+
+            <!-- CONTAINER DEL FORM (Inizialmente nascosto) -->
+            <div id="form-container" style="display: none;">
+                <!-- FORM CANDIDATURA -->
+                <form id="candidateForm" class="booking-form">
+                    
+                    <!-- 1. DATI PERSONALI OOC -->
+                    <div class="form-section">
+                        <h2><i class="fa-solid fa-user-gear"></i> 1. Dati Personali OOC</h2>
+                        <div class="input-group">
+                            <label for="nomeOOC">Nome *</label>
+                            <input type="text" id="nomeOOC" required placeholder="Es. Marco">
+                        </div>
+                        <div class="input-group-row">
+                            <div class="input-group">
+                                <label for="etaOOC">Età *</label>
+                                <input type="number" id="etaOOC" required placeholder="Es. 20" min="14">
+                            </div>
+                            <div class="input-group">
+                                <label for="discordTag">ID Discord *</label>
+                                <input type="text" id="discordTag" required placeholder="Es. 289371289371298312">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. DATI PERSONALI IC -->
+                    <div class="form-section">
+                        <h2><i class="fa-solid fa-id-card"></i> 2. Dati Personali IC</h2>
+                        <div class="input-group-row">
+                            <div class="input-group">
+                                <label for="nomeIC">Nome & Cognome Personaggio *</label>
+                                <input type="text" id="nomeIC" required placeholder="Es. Mario Rossi">
+                            </div>
+                            <div class="input-group">
+                                <label for="etaIC">Età Personaggio *</label>
+                                <input type="number" id="etaIC" required placeholder="Es. 25" min="18">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. ESPERIENZA & MOTIVAZIONE -->
+                    <div class="form-section">
+                        <h2><i class="fa-solid fa-brain"></i> 3. Esperienza & Motivazione</h2>
+                        <div class="input-group">
+                            <label for="esperienza">Hai già esperienza come meccanico/tuner in RP? *</label>
+                            <select id="esperienza" required>
+                                <option value="" disabled selected>Seleziona un'opzione...</option>
+                                <option value="Sì, molto esperto">Sì, molto esperto</option>
+                                <option value="Sì, esperienza base">Sì, esperienza base</option>
+                                <option value="No, prima esperienza (voglioso di imparare)">No, prima esperienza (voglioso di imparare)</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="motivazione">Perché vuoi entrare nel LS Racing? *</label>
+                            <textarea id="motivazione" rows="4" required placeholder="Spiegaci le tue motivazioni e perché dovremmo scegliere te..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 4. DISPONIBILITÀ -->
+                    <div class="form-section">
+                        <h2><i class="fa-solid fa-clock"></i> 4. Disponibilità</h2>
+                        
+                        <div class="input-group">
+                            <label>Fasce Orarie Disponibili (puoi selezionarne più di una) *</label>
+                            <div class="checkbox-group-grid">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="fasceOrarie" value="Mattina">
+                                    <span>Mattina</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="fasceOrarie" value="Pomeriggio">
+                                    <span>Pomeriggio</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="fasceOrarie" value="Sera">
+                                    <span>Sera</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="fasceOrarie" value="Notte">
+                                    <span>Notte</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="oreGiornaliere">Disponibilità Ore Giornaliere *</label>
+                            <input type="text" id="oreGiornaliere" required placeholder="Es. 2-3 ore al giorno, circa 15 ore a settimana">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btnSubmit" class="btn-submit">
+                        <i class="fa-solid fa-paper-plane"></i> Invia Candidatura
+                    </button>
+                </form>
+            </div>
+
+            <div id="statusMessage" class="status-message"></div>
+
+        </div>
+    </main>
+
+    <!-- Footer caricato dinamicamente -->
+    <div id="footer"></div>
+
+    <script src="assets/js/navbar.js"></script>
+    <script src="assets/js/footer.js"></script>
+    <script src="assets/js/candidati.js"></script>
+
+    <!-- Script gestione OAuth2 Discord -->
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const autenticato = urlParams.get('autenticato');
+        const errore = urlParams.get('errore');
+
+        const authSection = document.getElementById('discord-auth-section');
+        const formContainer = document.getElementById('form-container');
+
+        if (autenticato === 'true') {
+            authSection.style.display = 'none';
+            formContainer.style.display = 'block';
+        } else if (errore === 'non_nel_server') {
+            authSection.innerHTML = `
+                <h3 style="color: #ff4d4d; margin-bottom: 10px;"><i class="fa-solid fa-triangle-exclamation"></i> Accesso Negato</h3>
+                <p style="color: #ccc; margin-bottom: 20px; font-size: 0.95rem;">Risulti loggato con Discord, ma <b>non fai parte del server ufficiale di LS Racing</b>.</p>
+                <a href="https://discord.gg/MD9cJCPQsp" target="_blank" style="background-color: #57F287; color: #000; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin-right: 10px;">
+                    Unisciti al Server
+                </a>
+                <a href="https://lsracing.top/auth/callback" style="background-color: #5865F2; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+                    Riprova Login
+                </a>
+            `;
+        }
+    </script>
+</body>
+</html>
