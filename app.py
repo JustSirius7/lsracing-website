@@ -8,7 +8,7 @@ app.secret_key = os.getenv("SECRET_KEY", "LS_Racing_Super_Secret_Key_2026!")
 # Credenziali Discord
 CLIENT_ID = "1525515077283876994"
 CLIENT_SECRET = os.getenv("DISCORD_CLIENT_SECRET")
-REDIRECT_URI = "https://lsracing.top/callback"
+REDIRECT_URI = "https://lsracing.top/auth/callback"
 GUILD_ID = "1524524329566736474" 
 BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN") 
 
@@ -28,7 +28,7 @@ def login():
     discord_login_url = f"{API_ENDPOINT}/oauth2/authorize?client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&response_type=code&scope=identify%20guilds.members.read"
     return redirect(discord_login_url)
 
-@app.route("/callback")
+@app.route("/auth/callback")
 def auth_callback():
     code = request.args.get("code")
     target_page = session.pop('next_page', 'prenota.html')
