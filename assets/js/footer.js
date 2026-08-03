@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
             
             <!-- Colonna Info / Brand -->
             <div class="footer-col footer-brand">
-                <img src="assets/img/logo.webp" alt="LS Racing Logo" class="footer-logo">
+                <img src="assets/img/logo-navbar.webp" alt="LS Racing Logo" class="footer-logo">
                 <p>L'officina ufficiale e punto di riferimento per il tuning e l'elaborazione veicoli in città. Passione, qualità e performance senza compromessi.</p>
             </div>
 
