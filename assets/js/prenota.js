@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Struttura Embed elegante per Discord
         const discordPayload = {
             username: "Los Santos Customs - Prenotazioni",
-            avatar_url: "https://imgur.com/bubsL2s.png", // Opzionale: URL di un'icona/logo
+            avatar_url: "https://imgur.com/aThmXcC.png", // Opzionale: URL di un'icona/logo
             embeds: [
                 {
                     title: "🛠️ NUOVA PRENOTAZIONE OFFICINA",

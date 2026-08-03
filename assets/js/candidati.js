@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Payload Discord (Opzione A con menzione diretta)
         const discordPayload = {
             username: "Los Santos Customs - Candidature",
-            avatar_url: "https://imgur.com/bubsL2s.png",
+            avatar_url: "https://imgur.com/aThmXcC.png",
             // Se è un ID numerico, invia anche una notifica diretta sopra l'embed
             content: isNumericID ? `📩 **Nuova Candidatura da:** <@${discord}>` : null,
             embeds: [
