@@ -187,11 +187,21 @@ section {
         box-sizing: border-box;
     }
 
-    /* Indicatori di scorrimento */
+    /* Indicatori di scorrimento distanziati correttamente */
     .scroll-indicator {
-        position: absolute;
-        bottom: 25px;
-        left: 50%;
-        transform: translateX(-50%);
+        position: relative;
+        margin-top: 25px;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .scroll-indicator a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        color: var(--secondary);
+        font-size: 18px;
     }
 }
