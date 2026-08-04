@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 <ul class="footer-links">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="team.html">Il Team</a></li>
-                    <li><a href="faq.html">Termini & FAQ</a></li>
+                    <li><a href="FAQ.html">Termini & FAQ</a></li>
                     <li><a href="candidati.html">Lavora con Noi</a></li>
                     <li><a href="prenota.html">Prenota Appuntamento</a></li>
                 </ul>
