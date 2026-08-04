@@ -1,7 +1,7 @@
 /* ==========================================
    LOS SANTOS CUSTOMS WEBSITE
    Global Style
-   Versione 3.1 - Ottimizzata per Mobile 412x915
+   Versione 3.2 - Ottimizzata per Mobile 412x915 (Fix Freccia)
 ========================================== */
 
 /* RESET */
@@ -117,7 +117,7 @@ section {
         padding: 0 4px;
     }
 
-    /* Sezione Hero calibrata sull'altezza e larghezza 412x915 */
+    /* Sezione Hero calibrata sull'altezza e larghezza 412x915 con posizione relativa */
     .hero {
         min-height: 100vh;
         min-height: 915px; /* Forza l'altezza standard richiesta */
@@ -125,8 +125,9 @@ section {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding: 80px 20px 40px 20px;
+        padding: 80px 20px 60px 20px;
         text-align: center;
+        position: relative;
         overflow: hidden;
     }
 
@@ -137,6 +138,7 @@ section {
         display: flex;
         flex-direction: column;
         align-items: center;
+        margin-bottom: 20px;
     }
 
     /* Dimensionamento Logo all'interno dei 412px */
@@ -187,13 +189,15 @@ section {
         box-sizing: border-box;
     }
 
-    /* Indicatori di scorrimento distanziati correttamente */
+    /* Indicatore di scorrimento posizionato in modo assoluto in basso */
     .scroll-indicator {
-        position: relative;
-        margin-top: 25px;
+        position: absolute;
+        bottom: 25px;
+        left: 50%;
+        transform: translateX(-50%);
         display: flex;
         justify-content: center;
-        width: 100%;
+        z-index: 10;
     }
 
     .scroll-indicator a {
@@ -202,6 +206,6 @@ section {
         justify-content: center;
         padding: 10px;
         color: var(--secondary);
-        font-size: 18px;
+        font-size: 20px;
     }
 }
