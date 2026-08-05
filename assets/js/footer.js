@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 <ul class="footer-links">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="team.html">Il Team</a></li>
-                    <li><a href="FAQ.html">Termini & FAQ</a></li>
+                    <li><a href="domande.html">Termini & FAQ</a></li>
                     <li><a href="candidati.html">Lavora con Noi</a></li>
                     <li><a href="prenota.html">Prenota Appuntamento</a></li>
                 </ul>
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function() {
             <div class="footer-col">
                 <h3>Community</h3>
                 <p>Unisciti al nostro server Discord ufficiale per rimanere aggiornato sugli eventi e richiedere assistenza.</p>
-                <a href="https://discord.gg/tuolink" target="_blank" class="footer-discord-btn">
+                <a href="https://discord.gg/MD9cJCPQsp" target="_blank" class="footer-discord-btn">
                     <i class="fa-brands fa-discord"></i> Unisciti a Discord
                 </a>
             </div>
