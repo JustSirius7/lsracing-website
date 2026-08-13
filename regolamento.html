@@ -25,9 +25,10 @@
             padding: 40px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
             color: #ffffff;
+            background: rgba(14, 14, 16, 0.92); /* Sfondo scuro di base */
         }
 
-        /* Immagine di sfondo sfocata posizionata nella cartella regolamento */
+        /* Immagine di sfondo sfocata */
         .regolamento-container::before {
             content: "";
             position: absolute;
@@ -35,18 +36,16 @@
             background-image: url('assets/img/regolamento/sfondo-regolamento.jpg');
             background-size: cover;
             background-position: center;
-            filter: blur(10px);
+            filter: blur(3px);
             transform: scale(1.1);
-            z-index: -2;
+            opacity: 0.3; /* Regola la visibilità dell'immagine di sfondo */
+            z-index: 0;
         }
 
-        /* Overlay scuro per mantenere il testo perfettamente leggibile */
-        .regolamento-container::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: rgba(14, 14, 16, 0.85);
-            z-index: -1;
+        /* Forza tutto il contenuto testuale e i loghi a stare sopra lo sfondo */
+        .regolamento-container > * {
+            position: relative;
+            z-index: 1;
         }
 
         /* Logo centrale */
