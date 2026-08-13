@@ -65,9 +65,43 @@
         .back-btn:hover { background: #d14400; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Stile sicuro e autonomo per l'hamburger menu su mobile */
+        @media (max-width: 768px) {
+            #navbar .navbar-toggler, 
+            #navbar .menu-toggle, 
+            #navbar .hamburger, 
+            #navbar button {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 40px !important;
+                height: 40px !important;
+                background-color: transparent !important;
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23ff5500' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3.5' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+                background-repeat: no-repeat !important;
+                background-position: center !important;
+                background-size: 26px !important;
+                border: none !important;
+                cursor: pointer !important;
+            }
+            #navbar .navbar-toggler[aria-expanded="true"], 
+            #navbar .menu-toggle.active, 
+            #navbar .hamburger.active, 
+            #navbar button.active,
+            #navbar .navbar-toggler.active {
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3.5' d='M6 6l18 18M6 24L24 6'/%3e%3c/svg%3e") !important;
+            }
+            #navbar .navbar-toggler > *, 
+            #navbar .menu-toggle > *, 
+            #navbar .hamburger > *, 
+            #navbar button > * {
+                display: none !important;
+            }
+        }
     </style>
 </head>
-<body class="gallery-page">
+<body>
 
     <div id="navbar"></div>
 
@@ -233,7 +267,7 @@
             ✅ Il tuo biglietto sarà ritenuto valido solo dopo l'approvazione ufficiale da parte dello Staff.</p>
 
             <h2>⏰ 4. Check-in e Orari</h2>
-            <p>📍 Presentati all'evento puntuale, rispettando l'orario stabilito.<br>
+            <p>📍 Presentati al tuo evento puntuale, rispettando l'orario stabilito.<br>
             📝 Lo Staff provvederà a registrare ufficialmente il tuo check-in all'arrivo.</p>
 
             <h2>🎭 5. Comportamento durante gli Eventi</h2>
