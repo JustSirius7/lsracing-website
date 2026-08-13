@@ -66,7 +66,7 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Fix specifico per dispositivi mobili: rende visibile il menu hamburger e forza le 3 linee */
+        /* Fix robusto per le 3 linee del menu mobile */
         @media (max-width: 768px) {
             #navbar button, 
             #navbar .hamburger, 
@@ -74,31 +74,47 @@
             #navbar .nav-toggle, 
             #navbar .navbar-toggler {
                 display: flex !important;
-                flex-direction: column;
-                justify-content: center;
                 align-items: center;
-                width: 40px !important;
-                height: 40px !important;
-                background: rgba(255, 85, 0, 0.2) !important;
-                border: 1px solid #ff5500 !important;
-                border-radius: 6px !important;
+                justify-content: center;
+                width: 42px !important;
+                height: 42px !important;
+                background: rgba(255, 85, 0, 0.15) !important;
+                border: 1px solid rgba(255, 85, 0, 0.5) !important;
+                border-radius: 8px !important;
                 position: absolute !important;
                 right: 15px !important;
                 top: 15px !important;
                 z-index: 100000 !important;
                 cursor: pointer;
+                padding: 0 !important;
             }
 
-            #navbar button span, 
-            #navbar .hamburger span, 
-            #navbar .menu-toggle span,
-            #navbar .nav-toggle span,
-            #navbar .navbar-toggler span {
+            /* Nasconde eventuali elementi interni vuoti e disegna le 3 linee tramite CSS */
+            #navbar button > *, 
+            #navbar .hamburger > *, 
+            #navbar .menu-toggle > *,
+            #navbar .nav-toggle > *,
+            #navbar .navbar-toggler > * {
+                display: none !important;
+            }
+
+            #navbar button::before, 
+            #navbar .hamburger::before, 
+            #navbar .menu-toggle::before,
+            #navbar .nav-toggle::before,
+            #navbar .navbar-toggler::before {
+                content: "" !important;
                 display: block !important;
-                width: 22px !important;
-                height: 2px !important;
-                background-color: #ff5500 !important;
-                margin: 3px 0 !important;
+                width: 20px !important;
+                height: 14px !important;
+                background: linear-gradient(
+                    to bottom,
+                    #ff5500 0%, #ff5500 20%,
+                    transparent 20%, transparent 40%,
+                    #ff5500 40%, #ff5500 60%,
+                    transparent 60%, transparent 80%,
+                    #ff5500 80%, #ff5500 100%
+                ) !important;
             }
         }
     </style>
