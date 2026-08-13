@@ -24,7 +24,7 @@
             color: #ffffff;
         }
 
-        /* Logo centrale (centrato, ingrandito, senza bordi e con leggero bagliore) */
+        /* Logo centrale */
         .logo-section { 
             text-align: center; 
             margin-bottom: 35px; 
@@ -66,7 +66,7 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Fix definitivo per menu mobile: linee spesse arancioni e transizione a X arancione quando aperto */
+        /* Fix definitivo per menu mobile identico alle altre pagine */
         @media (max-width: 768px) {
             #navbar .navbar-toggler, 
             #navbar .menu-toggle, 
@@ -92,17 +92,18 @@
                 cursor: pointer;
             }
 
-            /* Quando il menu è aperto (mostra la X arancione) */
+            /* Stato Aperto: X bianca identica alla foto */
             #navbar .navbar-toggler[aria-expanded="true"], 
             #navbar .menu-toggle.active, 
             #navbar .hamburger.active, 
             #navbar button.active,
             #navbar .navbar-toggler.active,
-            #navbar button[aria-expanded="true"] {
-                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23ff5500' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M6 6l18 18M6 24L24 6'/%3e%3c/svg%3e") !important;
+            #navbar button[aria-expanded="true"],
+            #navbar button.is-open {
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M6 6l18 18M6 24L24 6'/%3e%3c/svg%3e") !important;
             }
 
-            /* Nasconde eventuali elementi interni creati dallo script della navbar */
+            /* Nasconde elementi interni generati dallo script */
             #navbar .navbar-toggler > *, 
             #navbar .menu-toggle > *, 
             #navbar .hamburger > *, 
@@ -318,6 +319,23 @@
             document.getElementById('menu-selector').style.display = 'flex';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        /* Script di sincronizzazione per forzare la X bianca all'apertura */
+        document.addEventListener('click', function(e) {
+            const toggler = e.target.closest('#navbar .navbar-toggler, #navbar .menu-toggle, #navbar .hamburger, #navbar button');
+            if (toggler) {
+                setTimeout(() => {
+                    const isOpen = toggler.getAttribute('aria-expanded') === 'true' || 
+                                   toggler.classList.contains('active') || 
+                                   toggler.classList.contains('open');
+                    if (isOpen) {
+                        toggler.classList.add('is-open');
+                    } else {
+                        toggler.classList.remove('is-open');
+                    }
+                }, 50);
+            }
+        });
     </script>
 </body>
 </html>
