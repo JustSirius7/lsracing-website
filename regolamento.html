@@ -11,6 +11,29 @@
     <link rel="stylesheet" href="assets/css/footer.css">
     
     <style>
+        /* Fix assoluto per la Navbar e il Menu Mobile (3 trattini) */
+        #navbar, .navbar, nav {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            z-index: 99999 !important;
+        }
+
+        /* Forza la visibilità, il colore e lo stile del bottone menu mobile */
+        .menu-toggle, .hamburger, .nav-toggle, nav button, .navbar-toggler {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            color: #ff5500 !important;
+            background: rgba(255, 85, 0, 0.15) !important;
+            border: 1px solid rgba(255, 85, 0, 0.4) !important;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            z-index: 100000 !important;
+        }
+
         /* Container principale */
         .regolamento-container {
             width: min(900px, 92%);
@@ -24,7 +47,7 @@
             color: #ffffff;
         }
 
-        /* Logo centrale (più grande e con leggero bagliore sullo sfondo) */
+        /* Logo centrale (centrato, ingrandito, senza bordi e con leggero bagliore) */
         .logo-section { 
             text-align: center; 
             margin-bottom: 35px; 
