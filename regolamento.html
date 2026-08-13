@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regolamenti Ufficiali | LS Racing & LS Events</title>
+    
+    <!-- Stili Globali -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
+    
+    <style>
+        /* Container principale */
+        .regolamento-container {
+            width: min(900px, 92%);
+            margin: 150px auto 60px auto;
+            background: rgba(14, 14, 16, 0.9);
+            border: 1px solid rgba(255, 85, 0, 0.25);
+            border-radius: 22px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
+            color: #ffffff;
+        }
+
+        /* Logo centrale (più grande e con leggero bagliore sullo sfondo) */
+        .logo-section { 
+            text-align: center; 
+            margin-bottom: 35px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo-section img { 
+            width: 300px; 
+            height: auto; 
+            border-radius: 0; 
+            border: none; 
+            box-shadow: none;
+            background: transparent;
+            filter: drop-shadow(0 0 22px rgba(255, 85, 0, 0.45));
+        }
+
+        /* Selettori */
+        .selector-section { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; flex-wrap: wrap; }
+        .selector-card { cursor: pointer; transition: transform 0.3s ease; }
+        .selector-card img { width: 300px; height: auto; border-radius: 12px; border: 2px solid rgba(255, 85, 0, 0.3); transition: 0.3s; }
+        .selector-card:hover img { transform: scale(1.05); border-color: #ff5500; box-shadow: 0 0 20px rgba(255, 85, 0, 0.3); }
+
+        /* Contenuti */
+        .reg-content { display: none; animation: fadeIn 0.4s ease; }
+        .reg-content.active { display: block; }
+        
+        h1 { color: #ff5500; text-align: center; font-family: 'Orbitron', sans-serif; margin-bottom: 20px; line-height: 1.3; }
+        h2 { color: #ffb700; margin-top: 35px; border-bottom: 1px solid #333; padding-bottom: 10px; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; }
+        p { margin-bottom: 15px; color: #d8d8d8; line-height: 1.6; }
+        ul { list-style-type: none; padding-left: 0; margin-bottom: 20px; }
+        li { margin-bottom: 10px; color: #d8d8d8; line-height: 1.5; }
+
+        .warning { background: rgba(255, 183, 0, 0.1); border-left: 4px solid #ffb700; padding: 15px; margin: 20px 0; color: #fff; font-weight: 500; border-radius: 0 5px 5px 0; line-height: 1.5; }
+        .footer-quote { font-style: italic; background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 10px; margin-top: 40px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.1); line-height: 1.6; }
+        
+        .back-btn { display: inline-block; margin-bottom: 20px; padding: 10px 20px; background: #ff5500; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+        .back-btn:hover { background: #d14400; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="navbar"></div>
+
+    <div class="regolamento-container">
+        <div class="logo-section">
+            <img src="assets/img/regolamento/logo-centrale.jpg" alt="Logo LS Racing">
+        </div>
+
+        <div id="menu-selector" class="selector-section">
+            <div class="selector-card" onclick="mostraRegolamento('racing')">
+                <img src="assets/img/regolamento/reg-ls-racing.jpg" alt="Regolamento LS Racing">
+            </div>
+            <div class="selector-card" onclick="mostraRegolamento('events')">
+                <img src="assets/img/regolamento/reg-ls-events.jpg" alt="Regolamento LS Events">
+            </div>
+        </div>
+
+        <!-- REGOLAMENTO RACING -->
+        <div id="reg-racing" class="reg-content">
+            <button class="back-btn" onclick="tornaAlMenu()">⬅ Torna alla scelta</button>
+            <h1>🔧 LOS SANTOS CUSTOMS<br>📜 REGOLAMENTO UFFICIALE</h1>
+            
+            <p>Benvenuti nel canale ufficiale del Regolamento Los Santos Customs. La lettura del presente regolamento è obbligatoria per tutto il personale. Il mancato rispetto delle norme riportate potrà comportare provvedimenti disciplinari, fino al licenziamento nei casi più gravi.</p>
+
+            <h2>👋 BENVENUTI AL LOS SANTOS CUSTOMS</h2>
+            <p>Il Los Santos Customs non è soltanto un'officina: è un punto di riferimento per tutta la città di Los Santos. Il nostro obiettivo è offrire un servizio professionale, organizzato e di qualità a tutti i cittadini di Los Santos.<br>
+            Ogni dipendente rappresenta l'immagine dell'azienda e dovrà mantenere un comportamento impeccabile sia all'interno dell'officina che all'esterno.</p>
+
+            <h2>🤝 ART. 1 • RISPETTO</h2>
+            <p>Tutti i dipendenti sono tenuti a:</p>
+            <ul>
+                <li>✅ Rispettare colleghi, clienti e superiori</li>
+                <li>✅ Evitare qualsiasi insulto, provocazione o comportamento tossico</li>
+                <li>✅ Mantenere sempre un linguaggio professionale</li>
+            </ul>
+            <div class="warning">⚠️ ATTENZIONE: Il mancato rispetto delle norme comporterà richiami disciplinari.</div>
+
+            <h2>🏢 ART. 2 • GERARCHIA</h2>
+            <p>La struttura aziendale deve essere rispettata.<br>Le indicazioni fornite dai responsabili devono essere seguite durante il servizio.<br>Eventuali dubbi o contestazioni potranno essere affrontati in un secondo momento con tranquillità.</p>
+
+            <h2>👔 ART. 3 • DIVISA</h2>
+            <p>Durante il servizio è obbligatorio:</p>
+            <ul>
+                <li>🟡 Indossare la divisa aziendale</li>
+                <li>🟡 Mantenere un aspetto ordinato</li>
+                <li>🟡 Non utilizzare abiti non autorizzati</li>
+                <li>🟡 Non utilizzare la divisa al di fuori del Los Santos Customs</li>
+            </ul>
+            <p>📌 L'uniforme rappresenta il Los Santos Customs.</p>
+
+            <h2>🔧 ART. 4 • SERVIZIO</h2>
+            <p>Ogni meccanico deve:</p>
+            <ul>
+                <li>✔ Accogliere il cliente con educazione</li>
+                <li>✔ Spiegare sempre gli interventi effettuati</li>
+                <li>✔ Consegnare il veicolo solo dopo aver terminato ogni lavorazione</li>
+            </ul>
+            <p>È vietato:</p>
+            <ul>
+                <li>❌ Ignorare i clienti</li>
+                <li>❌ Favorire amici e/o creare corsie preferenziali</li>
+                <li>❌ Lasciare veicoli incustoditi</li>
+                <li>❌ Abbandonare il servizio senza autorizzazione</li>
+            </ul>
+            <div class="warning">🚨 ATTENZIONE: È severamente vietato mantenere il turno attivo senza essere presenti in officina. I trasgressori saranno soggetti a provvedimenti disciplinari sia lato server che aziendale.</div>
+
+            <h2>🤝 ART. 5 • COLLABORAZIONE</h2>
+            <ul>
+                <li>• Ogni dipendente è tenuto a collaborare con i colleghi, offrendo supporto quando necessario e mantenendo sempre un clima sereno, rispettoso e professionale.</li>
+                <li>• È severamente vietato sottrarre o "rubare" i clienti a un collega già impegnato nella gestione del servizio. Ogni cliente deve essere rispettato e seguito dal meccanico che ha preso in carico il lavoro, salvo diversa autorizzazione o richiesta del collega interessato.</li>
+            </ul>
+            <div class="warning">⚠️ ATTENZIONE: La mancata osservanza di questa regola potrà comportare provvedimenti disciplinari a livello aziendale.</div>
+
+            <h2>💰 ART. 6 • CASSA</h2>
+            <p>È severamente vietato:</p>
+            <ul>
+                <li>❌ Concedere sconti personali</li>
+                <li>❌ Effettuare lavori gratuiti</li>
+                <li>❌ Modificare i prezzi senza autorizzazione</li>
+                <li>✔ Ogni pagamento deve essere registrato.</li>
+            </ul>
+            <div class="warning">🚨 ATTENZIONE: Chiunque venga sorpreso a rubare denaro, ricambi, materiali, veicoli o qualsiasi altro bene aziendale o appartenente ai colleghi verrà immediatamente licenziato.</div>
+
+            <h2>🚗 ART. 7 • VEICOLI AZIENDALI</h2>
+            <p>I mezzi del Los Santos Customs:</p>
+            <ul>
+                <li>✔ Devono essere utilizzati solo per motivi lavorativi e dal personale</li>
+                <li>✔ Devono essere parcheggiati negli spazi dedicati</li>
+                <li>✔ Devono essere riconsegnati integri</li>
+            </ul>
+
+            <h2>📻 ART. 8 • COMUNICAZIONI RADIO</h2>
+            <p>Durante il servizio:</p>
+            <ul>
+                <li>✔ Utilizzare la radio solo per comunicazioni lavorative</li>
+                <li>✔ Evitare spam</li>
+                <li>✔ Evitare musica o rumori inutili</li>
+            </ul>
+
+            <h2>📅 ART. 9 • ASSENZE</h2>
+            <p>Se impossibilitati a svolgere il turno:</p>
+            <ul>
+                <li>✔ Avvisare un responsabile</li>
+                <li>✔ Comunicare l'assenza con anticipo</li>
+            </ul>
+            <div class="warning">⚠️ ATTENZIONE: Le assenze ingiustificate potranno comportare provvedimenti disciplinari.</div>
+
+            <h2>🔒 ART. 10 • SEGRETO PROFESSIONALE</h2>
+            <p>Sono riservati:</p>
+            <ul>
+                <li>• Organizzazione interna</li>
+                <li>• Prezzi riservati</li>
+                <li>• Decisioni dello staff</li>
+                <li>• Piani relativi agli eventi</li>
+            </ul>
+            <p>Le decisioni interne dell'azienda e le informazioni riservate non devono essere divulgate senza autorizzazione.</p>
+
+            <h2>🎉 ART. 11 • EVENTI</h2>
+            <p>Durante eventi ufficiali:</p>
+            <ul>
+                <li>✔ Seguire sempre le indicazioni dello Staff Eventi</li>
+                <li>✔ Mantenere ordine</li>
+                <li>✔ Evitare discussioni con i partecipanti</li>
+                <li>✔ Rappresentare l'azienda con professionalità</li>
+            </ul>
+
+            <h2>⚖️ ART. 12 • SANZIONI</h2>
+            <p>Le violazioni potranno comportare:</p>
+            <ul>
+                <li>🔸 Richiamo 1</li>
+                <li>🔸 Richiamo 2</li>
+                <li>🔸 Last Chance</li>
+                <li>🔸 Licenziamento</li>
+            </ul>
+            <p>Le decisioni della Direzione saranno prese valutando la gravità dell'accaduto.</p>
+
+            <div class="footer-quote">
+                <p>"Un'officina non si costruisce con il ferro e gli attrezzi... si costruisce con la fiducia delle persone.<br>
+                Qui dentro non cerchiamo semplici meccanici.<br>
+                Cerchiamo uomini e donne che rispettino il proprio lavoro, i propri colleghi e ogni cliente che attraversa quel cancello.<br>
+                Se indossi questa divisa, rappresenti il nome del Los Santos Customs e il mio.<br>
+                La strada ti insegna più di qualsiasi scuola. Il rispetto te lo devi guadagnare."<br>
+                <strong>— Gabriel Mendoza "El Flaco"</strong>, Proprietario del Los Santos Customs</p>
+            </div>
+        </div>
+
+        <!-- REGOLAMENTO EVENTS -->
+        <div id="reg-events" class="reg-content">
+            <button class="back-btn" onclick="tornaAlMenu()">⬅ Torna alla scelta</button>
+            <h1>🎉 LSC EVENTS<br>📜 REGOLAMENTO EVENTI</h1>
+            <p>🌟 Benvenuto in LSC Events! Per garantirti un'esperienza straordinaria e un divertimento senza intoppi, ti chiediamo di rispettare poche e semplici regole.</p>
+            
+            <h2>🤝 1. Rispetto Reciproco</h2>
+            <p>💬 Mantieni sempre un comportamento educato e civile con chiunque.<br>
+            🚫 Vietato insultare, provocare o creare discussioni inutili che possano rovinare il clima della community.</p>
+
+            <h2>🎟️ 2. Regole di Iscrizione</h2>
+            <p>🤖 Ogni partecipante deve acquistare il proprio biglietto direttamente tramite il bot.<br>
+            🛑 È severamente vietato iscrivere altre persone utilizzando i propri dati personali.</p>
+
+            <h2>💳 3. Modalità di Pagamento</h2>
+            <p>💎 Il pagamento in RP dovrà essere effettuato esclusivamente allo Staff Eventi.<br>
+            ✅ Il tuo biglietto sarà ritenuto valido solo dopo l'approvazione ufficiale da parte dello Staff.</p>
+
+            <h2>⏰ 4. Check-in e Orari</h2>
+            <p>📍 Presentati all'evento puntuale, rispettando l'orario stabilito.<br>
+            📝 Lo Staff provvederà a registrare ufficialmente il tuo check-in all'arrivo.</p>
+
+            <h2>🎭 5. Comportamento durante gli Eventi</h2>
+            <p>🧭 Segui sempre le indicazioni fornite dagli organizzatori.<br>
+            🤫 È severamente vietato disturbare o intralciare lo svolgimento dell'evento.<br>
+            ⚠️ Eventuali comportamenti scorretti comporteranno l'immediata esclusione.</p>
+
+            <h2>💸 6. Politica Rimborsi</h2>
+            <p>❌ Salvo diversa comunicazione esplicita da parte dello Staff, le quote di iscrizione non sono rimborsabili.</p>
+
+            <h2>👑 7. Decisioni dello Staff</h2>
+            <p>⚖️ Le decisioni prese dagli organizzatori sono insindacabili e definitive.</p>
+
+            <div class="footer-quote">
+                <p>Grazie per aver scelto LSC Events e... buon divertimento! 🚀</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer"></div>
+
+    <script src="assets/js/navbar.js"></script>
+    <script src="assets/js/footer.js"></script>
+    <script>
+        function mostraRegolamento(tipo) {
+            document.getElementById('menu-selector').style.display = 'none';
+            if (tipo === 'racing') {
+                document.getElementById('reg-racing').classList.add('active');
+            } else if (tipo === 'events') {
+                document.getElementById('reg-events').classList.add('active');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function tornaAlMenu() {
+            document.getElementById('reg-racing').classList.remove('active');
+            document.getElementById('reg-events').classList.remove('active');
+            document.getElementById('menu-selector').style.display = 'flex';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

@@ -170,3 +170,75 @@ header.scrolled {
         display: flex;
     }
 }
+
+/* --- Stile Menu a Tendina (Dropdown) Corretto --- */
+.nav-item.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    cursor: pointer;
+    color: white !important;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: rgba(10, 10, 11, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 85, 0, 0.25);
+    border-radius: 12px;
+    padding: 10px 0;
+    min-width: 160px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    margin-top: 0; /* Azzerato per evitare il distacco */
+    z-index: 999;
+}
+
+/* TRUCCO DEL CUSCINETTO: Crea un ponte invisibile che impedisce al menu di chiudersi in volo */
+.nav-item.dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 15px; 
+}
+
+.dropdown-content a {
+    color: white !important;
+    padding: 10px 20px;
+    display: block;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.dropdown-content a:hover {
+    color: #FF5500 !important;
+    background: rgba(255, 255, 255, 0.05);
+    padding-left: 25px;
+}
+
+/* Mostra al passaggio del mouse */
+.nav-item.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Adattamento Mobile */
+@media screen and (max-width: 992px) {
+    .dropdown-content {
+        position: static;
+        background: rgba(255, 255, 255, 0.05);
+        border: none;
+        box-shadow: none;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .nav-item.dropdown::after {
+        display: none; /* Non serve su mobile */
+    }
+}
