@@ -66,19 +66,39 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Fix specifico per dispositivi mobili (hamburger menu) */
+        /* Fix specifico per dispositivi mobili: rende visibile il menu hamburger e forza le 3 linee */
         @media (max-width: 768px) {
-            .menu-toggle, .hamburger, .nav-toggle, nav button, .navbar-toggler {
+            #navbar button, 
+            #navbar .hamburger, 
+            #navbar .menu-toggle, 
+            #navbar .nav-toggle, 
+            #navbar .navbar-toggler {
                 display: flex !important;
-                align-items: center;
+                flex-direction: column;
                 justify-content: center;
-                color: #ff5500 !important;
-                background: rgba(255, 85, 0, 0.15) !important;
-                border: 1px solid rgba(255, 85, 0, 0.4) !important;
-                border-radius: 8px;
-                padding: 8px 12px;
-                cursor: pointer;
+                align-items: center;
+                width: 40px !important;
+                height: 40px !important;
+                background: rgba(255, 85, 0, 0.2) !important;
+                border: 1px solid #ff5500 !important;
+                border-radius: 6px !important;
+                position: absolute !important;
+                right: 15px !important;
+                top: 15px !important;
                 z-index: 100000 !important;
+                cursor: pointer;
+            }
+
+            #navbar button span, 
+            #navbar .hamburger span, 
+            #navbar .menu-toggle span,
+            #navbar .nav-toggle span,
+            #navbar .navbar-toggler span {
+                display: block !important;
+                width: 22px !important;
+                height: 2px !important;
+                background-color: #ff5500 !important;
+                margin: 3px 0 !important;
             }
         }
     </style>
