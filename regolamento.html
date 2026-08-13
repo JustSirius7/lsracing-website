@@ -14,17 +14,39 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
     
     <style>
-        /* Container principale del regolamento */
+        /* Container principale del regolamento con sfondo sfocato */
         .regolamento-container {
+            position: relative;
+            overflow: hidden;
             width: min(900px, 92%);
             margin: 150px auto 60px auto;
-            background: rgba(14, 14, 16, 0.9);
             border: 1px solid rgba(255, 85, 0, 0.25);
             border-radius: 22px;
             padding: 40px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(15px);
             color: #ffffff;
+        }
+
+        /* Immagine di sfondo sfocata posizionata nella cartella regolamento */
+        .regolamento-container::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url('assets/img/regolamento/sfondo-regolamento.jpg');
+            background-size: cover;
+            background-position: center;
+            filter: blur(10px);
+            transform: scale(1.1);
+            z-index: -2;
+        }
+
+        /* Overlay scuro per mantenere il testo perfettamente leggibile */
+        .regolamento-container::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(14, 14, 16, 0.85);
+            z-index: -1;
         }
 
         /* Logo centrale */
