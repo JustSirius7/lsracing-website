@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="assets/css/footer.css">
     
     <style>
-        /* Container principale */
+        /* Container principale del regolamento */
         .regolamento-container {
             width: min(900px, 92%);
             margin: 150px auto 60px auto;
@@ -65,56 +65,9 @@
         .back-btn:hover { background: #d14400; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Gestione Hamburger e X Mobile */
-        @media (max-width: 768px) {
-            #navbar .navbar-toggler, 
-            #navbar .menu-toggle, 
-            #navbar .hamburger, 
-            #navbar button {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                width: 36px !important;
-                height: 36px !important;
-                background-color: transparent !important;
-                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23ff5500' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
-                background-repeat: no-repeat !important;
-                background-position: center !important;
-                background-size: 24px !important;
-                border: none !important;
-                padding: 0 !important;
-                position: absolute !important;
-                right: 20px !important;
-                top: 50% !important;
-                transform: translateY(-50%) !important;
-                z-index: 10000 !important;
-                cursor: pointer;
-            }
-
-            /* Quando il menu è aperto (forzato tramite la classe JS .menu-aperto) */
-            #navbar .navbar-toggler.menu-aperto, 
-            #navbar .menu-toggle.menu-aperto, 
-            #navbar .hamburger.menu-aperto, 
-            #navbar button.menu-aperto,
-            #navbar .navbar-toggler[aria-expanded="true"], 
-            #navbar .menu-toggle.active, 
-            #navbar .hamburger.active, 
-            #navbar button.active {
-                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M6 6l18 18M6 24L24 6'/%3e%3c/svg%3e") !important;
-            }
-
-            /* Nasconde eventuali elementi interni */
-            #navbar .navbar-toggler > *, 
-            #navbar .menu-toggle > *, 
-            #navbar .hamburger > *, 
-            #navbar button > * {
-                display: none !important;
-            }
-        }
     </style>
 </head>
-<body>
+<body class="gallery-page">
 
     <div id="navbar"></div>
 
@@ -320,22 +273,6 @@
             document.getElementById('menu-selector').style.display = 'flex';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        /* Script di sincronizzazione intelligente in tempo reale */
-        setInterval(() => {
-            const togglers = document.querySelectorAll('#navbar .navbar-toggler, #navbar .menu-toggle, #navbar .hamburger, #navbar button');
-            togglers.forEach(btn => {
-                const isExpanded = btn.getAttribute('aria-expanded') === 'true' || 
-                                   btn.classList.contains('active') || 
-                                   btn.classList.contains('open') ||
-                                   document.querySelector('.navbar-collapse, .menu-collapse, .nav-menu')?.classList.contains('show');
-                if (isExpanded) {
-                    btn.classList.add('menu-aperto');
-                } else {
-                    btn.classList.remove('menu-aperto');
-                }
-            });
-        }, 100);
     </script>
 </body>
 </html>
