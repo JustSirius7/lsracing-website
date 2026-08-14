@@ -120,7 +120,7 @@ section {
     /* Sezione Hero calibrata sull'altezza e larghezza 412x915 con posizione relativa */
     .hero {
         min-height: 100vh;
-        min-height: 915px; /* Forza l'altezza standard richiesta */
+        min-height: 915px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -141,7 +141,6 @@ section {
         margin-bottom: 20px;
     }
 
-    /* Dimensionamento Logo all'interno dei 412px */
     .logo-glow-wrapper {
         width: 100%;
         display: flex;
@@ -153,9 +152,9 @@ section {
         width: 180px;
         max-width: 100%;
         height: auto;
+        margin-top: 30px;
     }
 
-    /* Testo descrittivo pulito e leggibile */
     .hero-subtitle {
         font-size: 15px;
         line-height: 1.5;
@@ -164,7 +163,6 @@ section {
         padding: 0 10px;
     }
 
-    /* Box dei pulsanti perfettamente centrato e dimensionato */
     .hero .buttons {
         display: flex;
         flex-direction: column;
@@ -189,7 +187,6 @@ section {
         box-sizing: border-box;
     }
 
-    /* Indicatore di scorrimento posizionato in modo assoluto in basso */
     .scroll-indicator {
         position: absolute;
         bottom: 25px;
@@ -208,9 +205,8 @@ section {
         color: var(--secondary);
         font-size: 20px;
     }
-}
 
-/* Fix centraggio sezione Chi Siamo su mobile */
+    /* Fix sezione Chi Siamo esclusivamente per mobile */
     .about {
         padding: 40px 0;
         overflow: hidden;
@@ -242,8 +238,6 @@ section {
         width: 100%;
         max-width: 100%;
         margin-top: 25px;
-        display: flex;
-        justify-content: center;
         position: relative;
     }
 
@@ -251,5 +245,5 @@ section {
         width: 100%;
         height: auto;
         border-radius: var(--radius);
-        transform: translateX(-10px);
     }
+}
