@@ -109,7 +109,7 @@ section {
 /* ==========================================
    OTTIMIZZAZIONE SPECIFICA PER MOBILE (412x915)
 ========================================== */
-@media screen and (max-width: 430px) {
+@media screen and (max-width: 500px) {
 
     /* Adattamento generale container per schermi stretti */
     .container {
@@ -239,7 +239,7 @@ section {
         max-width: 100%;
         margin-top: 25px;
         position: relative;
-        transform: translateX(-8px);
+        transform: translateX(-18px);
     }
 
     .about-image img {
