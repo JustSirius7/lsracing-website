@@ -8,7 +8,7 @@ exports.handler = async (event, context) => {
   const API_ENDPOINT = "https://discord.com/api/v10";
 
   if (!code) {
-    return { statusCode: 302, headers: { Location: "https://lsracing.top/prenota.html?errore=no_code" }, body: "" };
+    return { statusCode: 302, headers: { Location: "https://lsracing.top/candidati.html?errore=no_code" }, body: "" };
   }
 
   try {
@@ -26,7 +26,7 @@ exports.handler = async (event, context) => {
     const tokenData = await tokenRes.json();
 
     if (!tokenData.access_token) {
-      return { statusCode: 302, headers: { Location: "https://lsracing.top/prenota.html?errore=token_fallito" }, body: "" };
+      return { statusCode: 302, headers: { Location: "https://lsracing.top/candidati.html?errore=token_fallito" }, body: "" };
     }
 
     const userRes = await fetch(`${API_ENDPOINT}/users/@me`, {
@@ -39,11 +39,11 @@ exports.handler = async (event, context) => {
     });
 
     if (memberRes.status === 200) {
-      return { statusCode: 302, headers: { Location: "https://lsracing.top/prenota.html?autenticato=true" }, body: "" };
+      return { statusCode: 302, headers: { Location: "https://lsracing.top/candidati.html?autenticato=true" }, body: "" };
     } else {
       return { statusCode: 302, headers: { Location: "https://lsracing.top/candidati.html?errore=non_nel_server" }, body: "" };
     }
   } catch (err) {
-    return { statusCode: 302, headers: { Location: "https://lsracing.top/prenota.html?errore=server" }, body: "" };
+    return { statusCode: 302, headers: { Location: "https://lsracing.top/candidati.html?errore=server" }, body: "" };
   }
 };
