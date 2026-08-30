@@ -41,7 +41,7 @@ exports.handler = async (event, context) => {
     if (memberRes.status === 200) {
       return { statusCode: 302, headers: { Location: "https://lsracing.top/prenota.html?autenticato=true" }, body: "" };
     } else {
-      return { statusCode: 302, headers: { Location: "https://lsracing.top/prenota.html?errore=non_nel_server" }, body: "" };
+      return { statusCode: 302, headers: { Location: "https://lsracing.top/candidati.html?errore=non_nel_server" }, body: "" };
     }
   } catch (err) {
     return { statusCode: 302, headers: { Location: "https://lsracing.top/prenota.html?errore=server" }, body: "" };
