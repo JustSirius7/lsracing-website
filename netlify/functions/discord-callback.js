@@ -1,5 +1,8 @@
 exports.handler = async (event, context) => {
   const code = event.queryStringParameters.code;
+  const state = event.queryStringParameters.state || 'prenota'; // Di default va a prenota
+  const targetPage = state === 'candidati' ? 'candidati.html' : 'prenota.html';
+
   const CLIENT_ID = "1525515077283876994";
   const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
   const REDIRECT_URI = "https://lsracing.top/.netlify/functions/discord-callback";
@@ -8,7 +11,7 @@ exports.handler = async (event, context) => {
   const API_ENDPOINT = "https://discord.com/api/v10";
 
   if (!code) {
-    return { statusCode: 302, headers: { Location: "https://lsracing.top/candidati.html?errore=no_code" }, body: "" };
+    return { statusCode: 302, headers: { Location: `https://lsracing.top/${targetPage}?errore=no_code` }, body: "" };
   }
 
   try {
@@ -26,7 +29,7 @@ exports.handler = async (event, context) => {
     const tokenData = await tokenRes.json();
 
     if (!tokenData.access_token) {
-      return { statusCode: 302, headers: { Location: "https://lsracing.top/candidati.html?errore=token_fallito" }, body: "" };
+      return { statusCode: 302, headers: { Location: `https://lsracing.top/${targetPage}?errore=token_fallito` }, body: "" };
     }
 
     const userRes = await fetch(`${API_ENDPOINT}/users/@me`, {
@@ -39,11 +42,11 @@ exports.handler = async (event, context) => {
     });
 
     if (memberRes.status === 200) {
-      return { statusCode: 302, headers: { Location: "https://lsracing.top/candidati.html?autenticato=true" }, body: "" };
+      return { statusCode: 302, headers: { Location: `https://lsracing.top/${targetPage}?autenticato=true` }, body: "" };
     } else {
-      return { statusCode: 302, headers: { Location: "https://lsracing.top/candidati.html?errore=non_nel_server" }, body: "" };
+      return { statusCode: 302, headers: { Location: `https://lsracing.top/${targetPage}?errore=non_nel_server` }, body: "" };
     }
   } catch (err) {
-    return { statusCode: 302, headers: { Location: "https://lsracing.top/candidati.html?errore=server" }, body: "" };
+    return { statusCode: 302, headers: { Location: `https://lsracing.top/${targetPage}?errore=server` }, body: "" };
   }
 };
