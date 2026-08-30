@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 exports.handler = async (event, context) => {
   const code = event.queryStringParameters.code;
   const CLIENT_ID = "1525515077283876994";
