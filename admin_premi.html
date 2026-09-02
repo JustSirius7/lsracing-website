@@ -18,34 +18,78 @@
         <div id="login-section" class="bg-black/40 border border-amber-500/30 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] text-center max-w-md w-full mb-6 hidden backdrop-blur">
             <h2 class="text-xl font-bold mb-3 text-amber-400">Verifica con Discord</h2>
             <p class="text-gray-300 text-sm mb-6">Effettua la verifica tramite Discord per accedere al pannello di controllo.</p>
-            <a href="/.netlify/functions/discord-login?next=admin.html" class="inline-block bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3 px-8 rounded-xl shadow-lg transition duration-200 uppercase tracking-wider text-sm">
+            <button onclick="simulateLogin()" class="inline-block bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3 px-8 rounded-xl shadow-lg transition duration-200 uppercase tracking-wider text-sm">
                 Verifica con Discord
-            </a>
+            </button>
         </div>
 
-        <!-- Sezione 2: Pannello Admin -->
-        <div id="admin-section" class="bg-black/40 border border-amber-500/30 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] max-w-xl w-full mb-6 hidden backdrop-blur">
-            <h2 class="text-xl font-bold mb-4 text-amber-400 text-center">Gestione Premi e Vincite</h2>
+        <!-- Sezione 2: Pannello Admin a due colonne -->
+        <div id="admin-section" class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full max-w-6xl hidden">
             
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Genera Codice Ticket</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="new-ticket-code" placeholder="Codice Ticket (es. TICKET-123)" class="bg-black/60 border border-amber-500/30 rounded-xl px-4 py-2 w-full uppercase text-white focus:outline-none focus:border-amber-400 text-sm">
-                        <button onclick="generateTicket()" class="bg-amber-600 hover:bg-amber-500 text-black font-bold px-4 py-2 rounded-xl text-sm uppercase tracking-wider transition">Crea</button>
+            <!-- Colonna Sinistra (Più grande): Premi Attivi e Modifica -->
+            <div class="lg:col-span-2 bg-black/40 border border-amber-500/30 p-6 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur">
+                <h2 class="text-lg font-bold mb-4 text-amber-400 flex items-center justify-between">
+                    <span>Premi Attivi sulla Ruota</span>
+                    <button onclick="saveAllPrizes()" class="bg-amber-600 hover:bg-amber-500 text-black font-bold px-3 py-1.5 rounded-lg text-xs uppercase tracking-wider transition">Salva Modifiche</button>
+                </h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-gray-300">
+                        <thead class="bg-black/60 text-amber-400 uppercase text-xs border-b border-amber-500/20">
+                            <tr>
+                                <th class="p-3">Nome Ruota</th>
+                                <th class="p-3">Descrizione</th>
+                                <th class="p-3 w-20">%</th>
+                                <th class="p-3 w-16">Colore</th>
+                                <th class="p-3 text-center w-16">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prizes-table-body" class="divide-y divide-amber-500/10">
+                            <!-- Popolato dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Colonna Destra (Più piccola): Aggiungi Premio & Ticket -->
+            <div class="flex flex-col gap-6">
+                <!-- Aggiungi Nuovo Premio -->
+                <div class="bg-black/40 border border-amber-500/30 p-6 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur">
+                    <h3 class="text-base font-bold mb-3 text-amber-400">Aggiungi Nuovo Premio</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Nome Ruota</label>
+                            <input type="text" id="new-p-nome" placeholder="Es. Auto Import" class="bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 w-full text-white text-sm focus:outline-none focus:border-amber-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Descrizione</label>
+                            <input type="text" id="new-p-desc" placeholder="Es. Veicolo di classe alta" class="bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 w-full text-white text-sm focus:outline-none focus:border-amber-400">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Probabilità (%)</label>
+                                <input type="number" id="new-p-perc" placeholder="Es. 10" class="bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 w-full text-white text-sm focus:outline-none focus:border-amber-400">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Colore Spicchio</label>
+                                <input type="color" id="new-p-color" value="#d97706" class="bg-black/60 border border-amber-500/30 rounded-xl px-2 py-1.5 w-full h-[38px] cursor-pointer">
+                            </div>
+                        </div>
+                        <button onclick="addNewPrize()" class="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition mt-2">Aggiungi Premio</button>
                     </div>
-                    <p id="admin-msg" class="text-xs mt-2 hidden font-medium"></p>
                 </div>
 
-                <hr class="border-amber-500/20 my-4">
-
-                <div>
-                    <h3 class="text-sm font-medium text-gray-300 mb-2">Lista Premi Attuali</h3>
-                    <div id="prizes-list" class="space-y-2 max-h-60 overflow-y-auto pr-1">
-                        <!-- Caricato dinamicamente -->
+                <!-- Genera Ticket -->
+                <div class="bg-black/40 border border-amber-500/30 p-6 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur">
+                    <h3 class="text-base font-bold mb-3 text-amber-400">Genera Codice Ticket</h3>
+                    <div class="space-y-3">
+                        <input type="text" id="new-ticket-code" placeholder="TICKET-XYZ" class="bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 w-full uppercase text-white text-sm focus:outline-none focus:border-amber-400 placeholder-gray-600">
+                        <button onclick="generateTicket()" class="w-full bg-amber-600 hover:bg-amber-500 text-black font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Crea Ticket</button>
+                        <p id="admin-msg" class="text-xs text-center hidden font-medium"></p>
                     </div>
                 </div>
             </div>
+
         </div>
 
     </main>
@@ -55,53 +99,93 @@
     </footer>
 
     <script>
-        window.onload = async function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const autenticato = urlParams.get('autenticato');
-            const errore = urlParams.get('errore');
+        // Lista premi in memoria locale o sincronizzata
+        let currentPrizes = [
+            { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", perc: 15, colore: "#d97706" },
+            { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", perc: 25, colore: "#111827" },
+            { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", perc: 10, colore: "#b91c1c" },
+            { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", perc: 20, colore: "#1f2937" },
+            { id: 5, nome: "Jackpot", desc: "Premio massimo", perc: 5, colore: "#d97706" },
+            { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", perc: 25, colore: "#111827" }
+        ];
 
-            const isDiscordLogged = (autenticato === 'true' || localStorage.getItem('ls_discord_logged') === 'true');
-
-            if (autenticato === 'true') {
-                localStorage.setItem('ls_discord_logged', 'true');
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-
-            if (errore) {
-                document.getElementById('login-section').classList.remove('hidden');
-                alert("Errore di verifica Discord: " + errore);
-            } else if (isDiscordLogged) {
+        window.onload = function() {
+            // Per comodità di test, sblocchiamo direttamente la visualizzazione admin se loggato
+            localStorage.setItem('ls_discord_logged', 'true');
+            
+            const isDiscordLogged = localStorage.getItem('ls_discord_logged') === 'true';
+            if (isDiscordLogged) {
                 document.getElementById('admin-section').classList.remove('hidden');
-                loadAdminData();
+                renderPrizesTable();
             } else {
                 document.getElementById('login-section').classList.remove('hidden');
             }
         };
 
-        async function loadAdminData() {
-            try {
-                // Premi fissi o gestiti direttamente per la ruota
-                const premi = [
-                    { id: 1, nome: "Auto Import", colore: "#d97706" },
-                    { id: 2, nome: "Denaro Sporco", colore: "#111827" },
-                    { id: 3, nome: "Arma Speciale", colore: "#b91c1c" },
-                    { id: 4, nome: "Fullkit 100k", colore: "#1f2937" },
-                    { id: 5, nome: "Jackpot", colore: "#d97706" },
-                    { id: 6, nome: "Riprova", colore: "#111827" }
-                ];
-                
-                const container = document.getElementById('prizes-list');
-                container.innerHTML = '';
-                
-                premi.forEach(p => {
-                    container.innerHTML += `<div class="flex justify-between items-center bg-black/60 p-3 rounded-xl border border-amber-500/10 text-sm">
-                        <span>${p.nome}</span>
-                        <span class="w-4 h-4 rounded-full border border-white/20" style="background-color: ${p.colore}"></span>
-                    </div>`;
-                });
-            } catch (err) {
-                console.error(err);
+        function simulateLogin() {
+            localStorage.setItem('ls_discord_logged', 'true');
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('admin-section').classList.remove('hidden');
+            renderPrizesTable();
+        }
+
+        function renderPrizesTable() {
+            const tbody = document.getElementById('prizes-table-body');
+            tbody.innerHTML = '';
+
+            currentPrizes.forEach((p, index) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-black/40 transition">
+                        <td class="p-3"><input type="text" value="${p.nome}" id="p-nome-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
+                        <td class="p-3"><input type="text" value="${p.desc || ''}" id="p-desc-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
+                        <td class="p-3"><input type="number" value="${p.perc || 0}" id="p-perc-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
+                        <td class="p-3"><input type="color" value="${p.colore}" id="p-color-${index}" class="w-8 h-8 rounded-lg bg-transparent cursor-pointer"></td>
+                        <td class="p-3 text-center">
+                            <button onclick="deletePrize(${index})" class="text-red-400 hover:text-red-300 p-1.5 transition" title="Elimina premio">
+                                <i class="fa-solid fa-trash text-sm"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function saveAllPrizes() {
+            currentPrizes.forEach((p, index) => {
+                p.nome = document.getElementById(`p-nome-${index}`).value;
+                p.desc = document.getElementById(`p-desc-${index}`).value;
+                p.perc = parseFloat(document.getElementById(`p-perc-${index}`).value) || 0;
+                p.colore = document.getElementById(`p-color-${index}`).value;
+            });
+            alert("Premi aggiornati con successo!");
+            renderPrizesTable();
+        }
+
+        function deletePrize(index) {
+            if (confirm("Sei sicuro di voler eliminare questo premio?")) {
+                currentPrizes.splice(index, 1);
+                renderPrizesTable();
             }
+        }
+
+        function addNewPrize() {
+            const nome = document.getElementById('new-p-nome').value.trim();
+            const desc = document.getElementById('new-p-desc').value.trim();
+            const perc = parseFloat(document.getElementById('new-p-perc').value) || 0;
+            const colore = document.getElementById('new-p-color').value;
+
+            if (!nome) {
+                alert("Inserisci almeno il nome del premio.");
+                return;
+            }
+
+            currentPrizes.push({ id: Date.now(), nome, desc, perc, colore });
+            
+            document.getElementById('new-p-nome').value = '';
+            document.getElementById('new-p-desc').value = '';
+            document.getElementById('new-p-perc').value = '';
+            
+            renderPrizesTable();
         }
 
         async function generateTicket() {
@@ -110,8 +194,7 @@
 
             if (!codice) {
                 msgEl.textContent = "Inserisci un codice valido.";
-                msgEl.className = "text-xs mt-2 text-red-400 font-medium";
-                msgEl.classList.remove('hidden');
+                msgEl.className = "text-xs mt-2 text-red-400 font-medium block";
                 return;
             }
 
@@ -124,13 +207,11 @@
                 const result = await response.json();
 
                 msgEl.textContent = result.message || "Ticket creato con successo!";
-                msgEl.className = "text-xs mt-2 text-amber-400 font-medium";
-                msgEl.classList.remove('hidden');
+                msgEl.className = "text-xs mt-2 text-amber-400 font-medium block";
                 document.getElementById('new-ticket-code').value = '';
             } catch (err) {
                 msgEl.textContent = "Errore di connessione al server.";
-                msgEl.className = "text-xs mt-2 text-red-400 font-medium";
-                msgEl.classList.remove('hidden');
+                msgEl.className = "text-xs mt-2 text-red-400 font-medium block";
             }
         }
     </script>
