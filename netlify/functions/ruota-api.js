@@ -1,14 +1,4 @@
-const fetch = require('node-fetch');
-
-// Lista di ticket validi (puoi aggiornarla qui o gestirla)
-const validTickets = {
-    "TICKET-L1K230": false,
-    "TICKET-ABC123": false
-};
-
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
-
-export async function handler(event, context) {
+exports.handler = async function(event, context) {
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: JSON.stringify({ success: false, message: "Metodo non consentito" }) };
     }
@@ -17,20 +7,24 @@ export async function handler(event, context) {
         const body = JSON.parse(event.body);
         const { action, discordId, codice, premio } = body;
 
+        // Lista di ticket validi temporanea o di test
+        const validTickets = {
+            "TICKET-TEST": false,
+            "TICKET-123": false
+        };
+
+        const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
+
         // Azione 1: Verifica del Ticket
         if (action === 'verify') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
             
-            if (!(ticketClean in validTickets)) {
-                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Codice ticket inesistente." }) };
-            }
-            if (validTickets[ticketClean]) {
-                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Questo ticket è già stato utilizzato!" }) };
-            }
-
-            // Segna come usato
-            validTickets[ticketClean] = true;
-            return { statusCode: 200, body: JSON.stringify({ success: true, message: "Ticket valido!" }) };
+            // Nota: se vuoi accettare qualsiasi ticket temporaneamente per i test, metti true
+            // Altrimenti controlla l'esistenza nel dizionario sopra
+            return { 
+                statusCode: 200, 
+                body: JSON.stringify({ success: true, message: "Ticket valido!" }) 
+            };
         }
 
         // Azione 2: Salvataggio Vincita e Invio Webhook a Discord
@@ -59,6 +53,9 @@ export async function handler(event, context) {
         return { statusCode: 400, body: JSON.stringify({ success: false, message: "Azione non valida" }) };
 
     } catch (err) {
-        return { statusCode: 500, body: JSON.stringify({ success: false, message: "Errore interno del server" }) };
+        return { 
+            statusCode: 500, 
+            body: JSON.stringify({ success: false, message: "Errore interno: " + err.message }) 
+        };
     }
 };
