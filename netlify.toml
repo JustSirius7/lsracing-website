@@ -1,0 +1,7 @@
+[build]
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/admin/premi"
+  to = "/admin_premi.html"
+  status = 200
