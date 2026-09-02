@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LS Racing - Admin Ruota</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="text-white font-sans min-h-screen flex flex-col justify-between bg-[#0b0b0e]">
+
+    <header class="bg-black/60 backdrop-blur border-b border-amber-500/20 p-4 text-center">
+        <h1 class="text-xl font-black tracking-widest text-amber-400">LS RACING • ADMIN RUOTA</h1>
+    </header>
+
+    <main class="container mx-auto px-4 py-6 flex flex-col items-center justify-center flex-grow">
+        
+        <!-- Sezione 1: Verifica con Discord -->
+        <div id="login-section" class="bg-black/40 border border-amber-500/30 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] text-center max-w-md w-full mb-6 hidden backdrop-blur">
+            <h2 class="text-xl font-bold mb-3 text-amber-400">Verifica con Discord</h2>
+            <p class="text-gray-300 text-sm mb-6">Effettua la verifica tramite Discord per accedere al pannello di controllo.</p>
+            <a href="/.netlify/functions/discord-login?next=admin.html" class="inline-block bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3 px-8 rounded-xl shadow-lg transition duration-200 uppercase tracking-wider text-sm">
+                Verifica con Discord
+            </a>
+        </div>
+
+        <!-- Sezione 2: Pannello Admin -->
+        <div id="admin-section" class="bg-black/40 border border-amber-500/30 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] max-w-xl w-full mb-6 hidden backdrop-blur">
+            <h2 class="text-xl font-bold mb-4 text-amber-400 text-center">Gestione Premi e Vincite</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Genera Codice Ticket</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-ticket-code" placeholder="Codice Ticket (es. TICKET-123)" class="bg-black/60 border border-amber-500/30 rounded-xl px-4 py-2 w-full uppercase text-white focus:outline-none focus:border-amber-400 text-sm">
+                        <button onclick="generateTicket()" class="bg-amber-600 hover:bg-amber-500 text-black font-bold px-4 py-2 rounded-xl text-sm uppercase tracking-wider transition">Crea</button>
+                    </div>
+                    <p id="admin-msg" class="text-xs mt-2 hidden font-medium"></p>
+                </div>
+
+                <hr class="border-amber-500/20 my-4">
+
+                <div>
+                    <h3 class="text-sm font-medium text-gray-300 mb-2">Lista Premi Attuali</h3>
+                    <div id="prizes-list" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                        <!-- Caricato dinamicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-black/60 backdrop-blur border-t border-amber-500/20 p-4 text-center text-xs text-amber-500/50">
+        &copy; 2026 LS Racing • Luxury Edition
+    </footer>
+
+    <script>
+        window.onload = async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const autenticato = urlParams.get('autenticato');
+            const errore = urlParams.get('errore');
+
+            const isDiscordLogged = (autenticato === 'true' || localStorage.getItem('ls_discord_logged') === 'true');
+
+            if (autenticato === 'true') {
+                localStorage.setItem('ls_discord_logged', 'true');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            if (errore) {
+                document.getElementById('login-section').classList.remove('hidden');
+                alert("Errore di verifica Discord: " + errore);
+            } else if (isDiscordLogged) {
+                document.getElementById('admin-section').classList.remove('hidden');
+                loadAdminData();
+            } else {
+                document.getElementById('login-section').classList.remove('hidden');
+            }
+        };
+
+        async function loadAdminData() {
+            try {
+                const response = await fetch('/api/premi');
+                const data = await response.json();
+                const container = document.getElementById('prizes-list');
+                container.innerHTML = '';
+                
+                if (data.success && data.premi.length > 0) {
+                    data.premi.forEach(p => {
+                        container.innerHTML += `<div class="flex justify-between items-center bg-black/60 p-3 rounded-xl border border-amber-500/10 text-sm">
+                            <span>${p.nome}</span>
+                            <span class="w-4 h-4 rounded-full border border-white/20" style="background-color: ${p.colore}"></span>
+                        </div>`;
+                    });
+                } else {
+                    container.innerHTML = '<p class="text-gray-400 text-xs text-center py-2">Nessun premio configurato.</p>';
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function generateTicket() {
+            const codice = document.getElementById('new-ticket-code').value.trim();
+            const msgEl = document.getElementById('admin-msg');
+
+            if (!codice) {
+                msgEl.textContent = "Inserisci un codice valido.";
+                msgEl.className = "text-xs mt-2 text-red-400 font-medium";
+                msgEl.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/create-ticket', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ codice: codice })
+                });
+                const result = await response.json();
+
+                msgEl.textContent = result.message || "Ticket creato con successo!";
+                msgEl.className = "text-xs mt-2 text-amber-400 font-medium";
+                msgEl.classList.remove('hidden');
+                document.getElementById('new-ticket-code').value = '';
+            } catch (err) {
+                msgEl.textContent = "Errore di connessione al server.";
+                msgEl.className = "text-xs mt-2 text-red-400 font-medium";
+                msgEl.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
