@@ -80,21 +80,25 @@
 
         async function loadAdminData() {
             try {
-                const response = await fetch('/api/premi');
-                const data = await response.json();
+                // Premi fissi o gestiti direttamente per la ruota
+                const premi = [
+                    { id: 1, nome: "Auto Import", colore: "#d97706" },
+                    { id: 2, nome: "Denaro Sporco", colore: "#111827" },
+                    { id: 3, nome: "Arma Speciale", colore: "#b91c1c" },
+                    { id: 4, nome: "Fullkit 100k", colore: "#1f2937" },
+                    { id: 5, nome: "Jackpot", colore: "#d97706" },
+                    { id: 6, nome: "Riprova", colore: "#111827" }
+                ];
+                
                 const container = document.getElementById('prizes-list');
                 container.innerHTML = '';
                 
-                if (data.success && data.premi.length > 0) {
-                    data.premi.forEach(p => {
-                        container.innerHTML += `<div class="flex justify-between items-center bg-black/60 p-3 rounded-xl border border-amber-500/10 text-sm">
-                            <span>${p.nome}</span>
-                            <span class="w-4 h-4 rounded-full border border-white/20" style="background-color: ${p.colore}"></span>
-                        </div>`;
-                    });
-                } else {
-                    container.innerHTML = '<p class="text-gray-400 text-xs text-center py-2">Nessun premio configurato.</p>';
-                }
+                premi.forEach(p => {
+                    container.innerHTML += `<div class="flex justify-between items-center bg-black/60 p-3 rounded-xl border border-amber-500/10 text-sm">
+                        <span>${p.nome}</span>
+                        <span class="w-4 h-4 rounded-full border border-white/20" style="background-color: ${p.colore}"></span>
+                    </div>`;
+                });
             } catch (err) {
                 console.error(err);
             }
@@ -112,10 +116,10 @@
             }
 
             try {
-                const response = await fetch('/api/create-ticket', {
+                const response = await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ codice: codice })
+                    body: JSON.stringify({ action: 'create-ticket', codice: codice })
                 });
                 const result = await response.json();
 

@@ -1,6 +1,5 @@
-// Memoria temporanea dei ticket usati (Nota: sulle serverless function viene resettata se il server si spegne, 
-// per renderla permanente a lungo termine si usa un database o un file JSON sul repo)
 const usedTicketsStore = new Set();
+const validTicketsStore = new Set(["TICKET-TEST", "TICKET-123"]); // Inserisci qui o gestisci i ticket validi
 
 exports.handler = async function(event, context) {
     if (event.httpMethod !== 'POST') {
@@ -13,29 +12,34 @@ exports.handler = async function(event, context) {
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
+        // Azione Admin: Creazione nuovo ticket
+        if (action === 'create-ticket') {
+            const ticketClean = codice ? codice.trim().toUpperCase() : '';
+            if (!ticketClean) {
+                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Codice non valido." }) };
+            }
+            
+            validTicketsStore.add(ticketClean);
+            return { statusCode: 200, body: JSON.stringify({ success: true, message: `Ticket ${ticketClean} creato con successo!` }) };
+        }
+
         // Azione 1: Verifica del Ticket (Monouso)
         if (action === 'verify') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
             
-            if (!ticketClean) {
-                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Inserisci un codice valido." }) };
+            if (!validTicketsStore.has(ticketClean)) {
+                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Codice ticket inesistente." }) };
             }
 
-            // Controlla se il ticket è già stato usato
             if (usedTicketsStore.has(ticketClean)) {
                 return { statusCode: 200, body: JSON.stringify({ success: false, message: "Questo ticket è già stato utilizzato!" }) };
             }
 
-            // Segna il ticket come usato
             usedTicketsStore.add(ticketClean);
-
-            return { 
-                statusCode: 200, 
-                body: JSON.stringify({ success: true, message: "Ticket valido!" }) 
-            };
+            return { statusCode: 200, body: JSON.stringify({ success: true, message: "Ticket valido!" }) };
         }
 
-        // Azione 2: Salvataggio Vincita e Invio Webhook nel canale Discord
+        // Azione 2: Salvataggio Vincita e Invio Webhook
         if (action === 'win') {
             const payload = {
                 embeds: [{
@@ -43,7 +47,7 @@ exports.handler = async function(event, context) {
                     "description": `L'utente con ID <@${discordId}> ha girato la ruota e ha vinto:`,
                     "color": 16753920,
                     "fields": [
-                        {"name": "🎁 Premio Ottenuto", "value": `**${premio}**`, "inline": false}
+                        {"name": "🎁 Premio Ottenuto", "value": `**{premio}**`, "inline": false}
                     ],
                     "footer": {"text": "LS Racing • Sistema Automatico Officina"}
                 }]
@@ -61,9 +65,6 @@ exports.handler = async function(event, context) {
         return { statusCode: 400, body: JSON.stringify({ success: false, message: "Azione non valida" }) };
 
     } catch (err) {
-        return { 
-            statusCode: 500, 
-            body: JSON.stringify({ success: false, message: "Errore interno: " + err.message }) 
-        };
+        return { statusCode: 500, body: JSON.stringify({ success: false, message: "Errore interno: " + err.message }) };
     }
 };
