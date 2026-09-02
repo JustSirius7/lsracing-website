@@ -192,6 +192,15 @@ def delete_premio(premio_id):
 
 # --- ROTTE PER LA RUOTA DELLA FORTUNA ---
 
+@app.route('/api/check-session', methods=['GET'])
+def check_session():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"logged_in": False, "ticket_verified": False})
+    
+    ticket_verified = session.get('ticket_verified', False)
+    return jsonify({"logged_in": True, "ticket_verified": ticket_verified})
+
 @app.route('/api/verify-ticket', methods=['POST'])
 def verify_ticket():
     data = request.json
@@ -225,6 +234,8 @@ def verify_ticket():
     conn.commit()
     conn.close()
     
+    session['ticket_verified'] = True
+    
     return jsonify({"success": True, "message": "Ticket valido! Gira la ruota."})
 
 @app.route('/api/save-win', methods=['POST'])
@@ -234,8 +245,8 @@ def save_win():
     user_id = session.get('user_id')
     username = session.get('username', 'Utente')
     
-    if not user_id:
-        return jsonify({"success": False, "message": "Utente non autenticato."}), 401
+    if not user_id or not session.get('ticket_verified'):
+        return jsonify({"success": False, "message": "Accesso non autorizzato o nessun ticket attivo."}), 401
 
     # 1. Invio Webhook al canale log eventi
     payload = {
@@ -257,7 +268,6 @@ def save_win():
         
     # 2. Invio Messaggio Privato (DM) all'utente tramite Bot
     try:
-        # Crea il canale DM con l'utente
         dm_channel_res = requests.post(
             f"{API_ENDPOINT}/users/@me/channels",
             headers={"Authorization": f"Bot {BOT_TOKEN}", "Content-Type": "application/json"},
@@ -265,7 +275,6 @@ def save_win():
         )
         if dm_channel_res.status_code == 200:
             channel_id = dm_channel_res.json().get("id")
-            # Invia il messaggio nel canale DM
             requests.post(
                 f"{API_ENDPOINT}/channels/{channel_id}/messages",
                 headers={"Authorization": f"Bot {BOT_TOKEN}", "Content-Type": "application/json"},
@@ -274,4 +283,10 @@ def save_win():
     except Exception as e:
         print("Errore invio DM:", e)
     
+    # 3. Rimuove il flag del ticket dalla sessione per renderlo monouso
+    session.pop('ticket_verified', None)
+    
     return jsonify({"success": True})
+
+if __name__ == "__main__":
+    app.run(port=3000, debug=True)
