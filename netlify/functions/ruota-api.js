@@ -1,3 +1,7 @@
+// Memoria temporanea dei ticket usati (Nota: sulle serverless function viene resettata se il server si spegne, 
+// per renderla permanente a lungo termine si usa un database o un file JSON sul repo)
+const usedTicketsStore = new Set();
+
 exports.handler = async function(event, context) {
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: JSON.stringify({ success: false, message: "Metodo non consentito" }) };
@@ -7,27 +11,31 @@ exports.handler = async function(event, context) {
         const body = JSON.parse(event.body);
         const { action, discordId, codice, premio } = body;
 
-        // Lista di ticket validi temporanea o di test
-        const validTickets = {
-            "TICKET-TEST": false,
-            "TICKET-123": false
-        };
-
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
-        // Azione 1: Verifica del Ticket
+        // Azione 1: Verifica del Ticket (Monouso)
         if (action === 'verify') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
             
-            // Nota: se vuoi accettare qualsiasi ticket temporaneamente per i test, metti true
-            // Altrimenti controlla l'esistenza nel dizionario sopra
+            if (!ticketClean) {
+                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Inserisci un codice valido." }) };
+            }
+
+            // Controlla se il ticket è già stato usato
+            if (usedTicketsStore.has(ticketClean)) {
+                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Questo ticket è già stato utilizzato!" }) };
+            }
+
+            // Segna il ticket come usato
+            usedTicketsStore.add(ticketClean);
+
             return { 
                 statusCode: 200, 
                 body: JSON.stringify({ success: true, message: "Ticket valido!" }) 
             };
         }
 
-        // Azione 2: Salvataggio Vincita e Invio Webhook a Discord
+        // Azione 2: Salvataggio Vincita e Invio Webhook nel canale Discord
         if (action === 'win') {
             const payload = {
                 embeds: [{
