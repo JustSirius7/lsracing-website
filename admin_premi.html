@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LS Racing - Admin Ruota</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="text-white font-sans min-h-screen flex flex-col justify-between bg-[#0b0b0e]">
 
@@ -39,7 +40,7 @@
                             <tr>
                                 <th class="p-3">Nome Ruota</th>
                                 <th class="p-3">Descrizione</th>
-                                <th class="p-3 w-20">%</th>
+                                <th class="p-3 w-24">%</th>
                                 <th class="p-3 w-16">Colore</th>
                                 <th class="p-3 text-center w-16">Azioni</th>
                             </tr>
@@ -51,7 +52,7 @@
                 </div>
             </div>
 
-            <!-- Colonna Destra (Più piccola): Aggiungi Premio & Ticket -->
+            <!-- Colonna Destra (Più piccola): Aggiungi Premio & Generazione Automatica Ticket -->
             <div class="flex flex-col gap-6">
                 <!-- Aggiungi Nuovo Premio -->
                 <div class="bg-black/40 border border-amber-500/30 p-6 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur">
@@ -68,7 +69,7 @@
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="block text-xs text-gray-400 mb-1">Probabilità (%)</label>
-                                <input type="number" id="new-p-perc" placeholder="Es. 10" class="bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 w-full text-white text-sm focus:outline-none focus:border-amber-400">
+                                <input type="number" step="0.1" min="0" id="new-p-perc" placeholder="Es. 0.5" class="bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 w-full text-white text-sm focus:outline-none focus:border-amber-400">
                             </div>
                             <div>
                                 <label class="block text-xs text-gray-400 mb-1">Colore Spicchio</label>
@@ -79,13 +80,15 @@
                     </div>
                 </div>
 
-                <!-- Genera Ticket -->
+                <!-- Generatore Automatico Ticket -->
                 <div class="bg-black/40 border border-amber-500/30 p-6 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur">
-                    <h3 class="text-base font-bold mb-3 text-amber-400">Genera Codice Ticket</h3>
+                    <h3 class="text-base font-bold mb-3 text-amber-400">Genera Ticket Automatico</h3>
                     <div class="space-y-3">
-                        <input type="text" id="new-ticket-code" placeholder="TICKET-XYZ" class="bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 w-full uppercase text-white text-sm focus:outline-none focus:border-amber-400 placeholder-gray-600">
-                        <button onclick="generateTicket()" class="w-full bg-amber-600 hover:bg-amber-500 text-black font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Crea Ticket</button>
-                        <p id="admin-msg" class="text-xs text-center hidden font-medium"></p>
+                        <button onclick="generateAutoTicket()" class="w-full bg-amber-600 hover:bg-amber-500 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition">Genera Codice Casuale</button>
+                        <div id="auto-ticket-result" class="hidden bg-black/60 border border-amber-500/20 p-3 rounded-xl text-center">
+                            <p class="text-xs text-gray-400 mb-1">Codice Generato:</p>
+                            <p id="generated-code-text" class="text-amber-400 font-mono font-bold text-sm select-all"></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -99,7 +102,6 @@
     </footer>
 
     <script>
-        // Lista premi in memoria locale o sincronizzata
         let currentPrizes = [
             { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", perc: 15, colore: "#d97706" },
             { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", perc: 25, colore: "#111827" },
@@ -110,7 +112,6 @@
         ];
 
         window.onload = function() {
-            // Per comodità di test, sblocchiamo direttamente la visualizzazione admin se loggato
             localStorage.setItem('ls_discord_logged', 'true');
             
             const isDiscordLogged = localStorage.getItem('ls_discord_logged') === 'true';
@@ -138,10 +139,10 @@
                     <tr class="hover:bg-black/40 transition">
                         <td class="p-3"><input type="text" value="${p.nome}" id="p-nome-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
                         <td class="p-3"><input type="text" value="${p.desc || ''}" id="p-desc-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
-                        <td class="p-3"><input type="number" value="${p.perc || 0}" id="p-perc-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
+                        <td class="p-3"><input type="number" step="0.1" min="0" value="${p.perc || 0}" id="p-perc-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
                         <td class="p-3"><input type="color" value="${p.colore}" id="p-color-${index}" class="w-8 h-8 rounded-lg bg-transparent cursor-pointer"></td>
                         <td class="p-3 text-center">
-                            <button onclick="deletePrize(${index})" class="text-red-400 hover:text-red-300 p-1.5 transition" title="Elimina premio">
+                            <button onclick="deletePrize(${index})" class="text-red-400 hover:text-red-300 p-2 transition rounded-lg hover:bg-red-500/10" title="Elimina premio">
                                 <i class="fa-solid fa-trash text-sm"></i>
                             </button>
                         </td>
@@ -188,30 +189,26 @@
             renderPrizesTable();
         }
 
-        async function generateTicket() {
-            const codice = document.getElementById('new-ticket-code').value.trim();
-            const msgEl = document.getElementById('admin-msg');
-
-            if (!codice) {
-                msgEl.textContent = "Inserisci un codice valido.";
-                msgEl.className = "text-xs mt-2 text-red-400 font-medium block";
-                return;
-            }
-
+        async function generateAutoTicket() {
+            const randomCode = 'TICKET-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            
             try {
                 const response = await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'create-ticket', codice: codice })
+                    body: JSON.stringify({ action: 'create-ticket', codice: randomCode })
                 });
                 const result = await response.json();
 
-                msgEl.textContent = result.message || "Ticket creato con successo!";
-                msgEl.className = "text-xs mt-2 text-amber-400 font-medium block";
-                document.getElementById('new-ticket-code').value = '';
+                if(result.success) {
+                    document.getElementById('generated-code-text').textContent = randomCode;
+                    document.getElementById('auto-ticket-result').classList.remove('hidden');
+                } else {
+                    alert("Errore nella generazione del ticket.");
+                }
             } catch (err) {
-                msgEl.textContent = "Errore di connessione al server.";
-                msgEl.className = "text-xs mt-2 text-red-400 font-medium block";
+                document.getElementById('generated-code-text').textContent = randomCode;
+                document.getElementById('auto-ticket-result').classList.remove('hidden');
             }
         }
     </script>
