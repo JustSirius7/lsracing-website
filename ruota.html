@@ -158,7 +158,9 @@
 
         window.onload = async function() {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('autenticato') || urlParams.has('errore')) {
+            const appenaAutenticato = urlParams.has('autenticato');
+
+            if (appenaAutenticato || urlParams.has('errore')) {
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
@@ -166,16 +168,28 @@
                 const res = await fetch('/api/check-session');
                 const sessionData = await res.json();
 
-                if (!sessionData.logged_in) {
+                if (!sessionData.logged_in && !appenaAutenticato) {
                     document.getElementById('login-section').classList.remove('hidden');
-                } else if (!sessionData.ticket_verified) {
+                } else if (!sessionData.ticket_verified && !appenaAutenticato) {
                     document.getElementById('ticket-section').classList.remove('hidden');
                 } else {
-                    document.getElementById('wheel-section').classList.remove('hidden');
+                    if (appenaAutenticato || sessionData.logged_in) {
+                        if (sessionData.ticket_verified) {
+                            document.getElementById('wheel-section').classList.remove('hidden');
+                        } else {
+                            document.getElementById('ticket-section').classList.remove('hidden');
+                        }
+                    } else {
+                        document.getElementById('login-section').classList.remove('hidden');
+                    }
                 }
             } catch (err) {
                 console.error("Errore controllo sessione:", err);
-                document.getElementById('login-section').classList.remove('hidden');
+                if (appenaAutenticato) {
+                    document.getElementById('ticket-section').classList.remove('hidden');
+                } else {
+                    document.getElementById('login-section').classList.remove('hidden');
+                }
             }
 
             await loadPrizes();
