@@ -112,10 +112,26 @@
         ];
 
         window.onload = function() {
-            localStorage.setItem('ls_discord_logged', 'true');
-            
+            const urlParams = new URLSearchParams(window.location.search);
+            const autenticato = urlParams.get('autenticato');
+            const errore = urlParams.get('errore');
+
+            if (autenticato === 'true') {
+                localStorage.setItem('ls_discord_logged', 'true');
+                // Pulisce l'URL dai parametri di autenticazione
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
             const isDiscordLogged = localStorage.getItem('ls_discord_logged') === 'true';
-            if (isDiscordLogged) {
+
+            if (errore) {
+                document.getElementById('login-section').classList.remove('hidden');
+                if (errore === 'unauthorized') {
+                    alert("Accesso negato: Non possiedi i ruoli Discord autorizzati per accedere al pannello admin.");
+                } else {
+                    alert("Errore durante l'autenticazione Discord.");
+                }
+            } else if (isDiscordLogged) {
                 document.getElementById('admin-section').classList.remove('hidden');
                 renderPrizesTable();
             } else {
@@ -124,10 +140,8 @@
         };
 
         function simulateLogin() {
-            localStorage.setItem('ls_discord_logged', 'true');
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('admin-section').classList.remove('hidden');
-            renderPrizesTable();
+            // Reindirizza al flusso OAuth di Discord specificando next=admin per controllare i ruoli
+            window.location.href = '/.netlify/functions/discord-login?next=admin';
         }
 
         function renderPrizesTable() {
