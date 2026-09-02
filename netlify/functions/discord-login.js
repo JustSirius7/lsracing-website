@@ -3,7 +3,10 @@ exports.handler = async (event, context) => {
   const REDIRECT_URI = "https://lsracing.top/.netlify/functions/discord-callback";
   const API_ENDPOINT = "https://discord.com/api/v10";
 
-  const discordUrl = `${API_ENDPOINT}/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify%20guilds.members.read&state=prenota`;
+  // Legge il parametro 'next' dalla query string (es. ?next=ruota), altrimenti usa 'ruota' di default
+  const nextParam = event.queryStringParameters && event.queryStringParameters.next ? event.queryStringParameters.next : "ruota";
+
+  const discordUrl = `${API_ENDPOINT}/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify%20guilds.members.read&state=${nextParam}`;
 
   return {
     statusCode: 302,
