@@ -131,6 +131,10 @@
                 Gira la Ruota!
             </button>
             <div id="win-result" class="mt-6 text-2xl font-black text-amber-400 text-center drop-shadow-[0_2px_8px_rgba(245,158,11,0.4)] min-h-[2rem]"></div>
+
+            <button id="new-ticket-btn" onclick="resetForNewTicket()" class="mt-4 bg-gray-800 hover:bg-gray-700 text-amber-400 font-bold py-2 px-6 rounded-xl border border-amber-500/30 text-sm hidden">
+                Inserisci un altro ticket
+            </button>
         </div>
 
     </main>
@@ -149,23 +153,29 @@
             const autenticato = urlParams.get('autenticato');
             const errore = urlParams.get('errore');
 
-            const isDiscordLogged = (autenticato === 'true' || localStorage.getItem('ls_discord_logged') === 'true');
-            const isTicketValid = (localStorage.getItem('ls_ticket_verified') === 'true');
-
             if (autenticato === 'true') {
                 localStorage.setItem('ls_discord_logged', 'true');
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
             if (errore) {
+                localStorage.removeItem('ls_discord_logged');
+                localStorage.removeItem('ls_ticket_verified');
                 document.getElementById('login-section').classList.remove('hidden');
                 alert("Errore di verifica Discord: " + errore);
-            } else if (isTicketValid && isDiscordLogged) {
-                document.getElementById('wheel-section').classList.remove('hidden');
-            } else if (isDiscordLogged) {
+                await loadPrizes();
+                return;
+            }
+
+            const isDiscordLogged = localStorage.getItem('ls_discord_logged') === 'true';
+            const isTicketValid = localStorage.getItem('ls_ticket_verified') === 'true';
+
+            if (!isDiscordLogged) {
+                document.getElementById('login-section').classList.remove('hidden');
+            } else if (!isTicketValid) {
                 document.getElementById('ticket-section').classList.remove('hidden');
             } else {
-                document.getElementById('login-section').classList.remove('hidden');
+                document.getElementById('wheel-section').classList.remove('hidden');
             }
 
             await loadPrizes();
@@ -273,16 +283,9 @@
                 }
             } catch (err) {
                 console.error(err);
-                msgEl.textContent = "Ticket verificato con successo! (Offline Mode)";
-                msgEl.className = "text-sm mt-4 text-amber-400 font-medium";
+                msgEl.textContent = "Errore di connessione al server.";
+                msgEl.className = "text-sm mt-4 text-red-400 font-medium";
                 msgEl.classList.remove('hidden');
-                
-                localStorage.setItem('ls_ticket_verified', 'true');
-
-                setTimeout(() => {
-                    document.getElementById('ticket-section').classList.add('hidden');
-                    document.getElementById('wheel-section').classList.remove('hidden');
-                }, 1000);
             }
         }
 
@@ -298,9 +301,8 @@
 
             canvas.style.transform = `rotate(${currentRotation}deg)`;
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 isSpinning = false;
-                document.getElementById('spin-btn').disabled = false;
                 
                 const numSegments = prizesData.length;
                 const segmentDegree = 360 / numSegments;
@@ -312,7 +314,15 @@
                 const wonPrize = prizesData[winningIndex].nome;
                 document.getElementById('win-result').textContent = `✨ Hai vinto: ${wonPrize} ✨`;
 
-                saveWinToServer(wonPrize);
+                // Consuma il ticket in memoria locale
+                localStorage.removeItem('ls_ticket_verified');
+
+                // Salva la vincita e invia i log/DM
+                await saveWinToServer(wonPrize);
+
+                // Nasconde il tasto giro e mostra opzione per un nuovo ticket
+                document.getElementById('spin-btn').classList.add('hidden');
+                document.getElementById('new-ticket-btn').classList.remove('hidden');
 
             }, 4000);
         }
@@ -327,6 +337,17 @@
             } catch (err) {
                 console.error("Errore salvataggio vincita:", err);
             }
+        }
+
+        function resetForNewTicket() {
+            document.getElementById('wheel-section').classList.add('hidden');
+            document.getElementById('spin-btn').classList.remove('hidden');
+            document.getElementById('spin-btn').disabled = false;
+            document.getElementById('new-ticket-btn').classList.add('hidden');
+            document.getElementById('win-result').textContent = "";
+            document.getElementById('ticket-code').value = "";
+            document.getElementById('ticket-message').classList.add('hidden');
+            document.getElementById('ticket-section').classList.remove('hidden');
         }
     </script>
 </body>
