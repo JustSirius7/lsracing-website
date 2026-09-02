@@ -5,16 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LS Racing - Ruota della Fortuna</title>
 
-    <!-- Stylesheets -->
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/navbar.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
-
-    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="icon" type="image/png" href="assets/img/favicon.png?v=2">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -56,17 +52,6 @@
             filter: drop-shadow(0 3px 4px rgba(0,0,0,0.8));
             z-index: 20;
         }
-        .pointer::after {
-            content: '';
-            position: absolute;
-            top: -32px;
-            left: -8px;
-            width: 0;
-            height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 20px solid #fef3c7;
-        }
         .center-hub {
             position: absolute;
             top: 50%;
@@ -96,33 +81,28 @@
 </head>
 <body class="text-white font-sans min-h-screen flex flex-col justify-between">
 
-    <!-- Navbar dinamica gestita dal sistema del sito -->
     <div id="navbar"></div>
 
     <main class="container mx-auto px-4 py-6 flex flex-col items-center justify-center flex-grow">
         
-        <!-- Sezione 1: Verifica con Discord -->
-        <div id="login-section" class="bg-black/40 border border-amber-500/30 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] text-center max-w-md w-full mb-6 hidden backdrop-blur">
-            <h2 class="text-xl font-bold mb-3 text-amber-400">Verifica con Discord</h2>
-            <p class="text-gray-300 text-sm mb-6">Effettua la verifica tramite Discord per confermare la tua presenza nel server e sbloccare la funzionalità.</p>
-            <a href="/.netlify/functions/discord-login-ruota" class="inline-block bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3 px-8 rounded-xl shadow-lg transition duration-200 uppercase tracking-wider text-sm">
-                Verifica con Discord
-            </a>
-        </div>
-
-        <!-- Sezione 2: Inserimento Ticket -->
-        <div id="ticket-section" class="bg-black/40 border border-amber-500/30 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] text-center max-w-md w-full mb-6 hidden backdrop-blur">
-            <h2 class="text-xl font-bold mb-3 text-amber-400">Inserisci il tuo Ticket</h2>
-            <p class="text-gray-300 text-sm mb-6">Inserisci il codice univoco fornito dallo staff per sbloccare un giro.</p>
-            <div class="flex gap-2">
-                <input type="text" id="ticket-code" placeholder="ES: TICKET-XYZ" class="bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 w-full uppercase text-white focus:outline-none focus:border-amber-400 placeholder-gray-600">
-                <button onclick="verifyTicket()" class="bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold px-6 py-3 rounded-xl transition duration-200 uppercase tracking-wider text-sm shadow">Verifica</button>
+        <!-- Sezione Inserimento ID Discord e Ticket -->
+        <div id="ticket-section" class="bg-black/40 border border-amber-500/30 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] text-center max-w-md w-full mb-6 backdrop-blur">
+            <h2 class="text-xl font-bold mb-3 text-amber-400">Ruota della Fortuna</h2>
+            <p class="text-gray-300 text-sm mb-6">Inserisci il tuo ID Discord e il codice ticket fornito dallo staff per procedere.</p>
+            
+            <div class="flex flex-col gap-3">
+                <input type="text" id="discord-id" placeholder="ID Discord (es. 123456789012345678)" class="bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 w-full text-white focus:outline-none focus:border-amber-400 placeholder-gray-600">
+                <input type="text" id="ticket-code" placeholder="Codice Ticket (es. TICKET-XYZ)" class="bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 w-full uppercase text-white focus:outline-none focus:border-amber-400 placeholder-gray-600">
+                <button onclick="verifyAndStart()" class="bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold px-6 py-3 rounded-xl transition duration-200 uppercase tracking-wider text-sm shadow mt-2">Verifica e Gira</button>
             </div>
             <p id="ticket-message" class="text-sm mt-4 hidden font-medium"></p>
         </div>
 
-        <!-- Sezione 3: Gioco / Ruota -->
+        <!-- Sezione Gioco / Ruota -->
         <div id="wheel-section" class="flex flex-col items-center hidden">
+            <div class="text-center mb-4">
+                <p class="text-sm text-gray-400">Utente verificato: <span id="display-user" class="text-amber-400 font-bold"></span></p>
+            </div>
             <div class="wheel-outer-ring mb-8">
                 <div class="pointer"></div>
                 <div class="wheel-container">
@@ -149,74 +129,24 @@
         &copy; 2026 LS Racing • Luxury Edition
     </footer>
 
-    <!-- Script della Navbar identico a index.html -->
     <script src="assets/js/navbar.js"></script>
     <script>
-        let prizesData = [];
+        const prizesData = [
+            { id: 1, nome: "Auto Import", colore: "#d97706" },
+            { id: 2, nome: "Denaro Sporco", colore: "#111827" },
+            { id: 3, nome: "Arma Speciale", colore: "#b91c1c" },
+            { id: 4, nome: "Fullkit 100k", colore: "#1f2937" },
+            { id: 5, nome: "Jackpot", colore: "#d97706" },
+            { id: 6, nome: "Riprova", colore: "#111827" }
+        ];
+
         let currentRotation = 0;
         let isSpinning = false;
+        let activeDiscordId = "";
 
-        window.onload = async function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const appenaAutenticato = urlParams.has('autenticato');
-
-            if (appenaAutenticato || urlParams.has('errore')) {
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-
-            try {
-                const res = await fetch('/api/check-session');
-                const sessionData = await res.json();
-
-                if (!sessionData.logged_in && !appenaAutenticato) {
-                    document.getElementById('login-section').classList.remove('hidden');
-                } else if (!sessionData.ticket_verified && !appenaAutenticato) {
-                    document.getElementById('ticket-section').classList.remove('hidden');
-                } else {
-                    if (appenaAutenticato || sessionData.logged_in) {
-                        if (sessionData.ticket_verified) {
-                            document.getElementById('wheel-section').classList.remove('hidden');
-                        } else {
-                            document.getElementById('ticket-section').classList.remove('hidden');
-                        }
-                    } else {
-                        document.getElementById('login-section').classList.remove('hidden');
-                    }
-                }
-            } catch (err) {
-                console.error("Errore controllo sessione:", err);
-                if (appenaAutenticato) {
-                    document.getElementById('ticket-section').classList.remove('hidden');
-                } else {
-                    document.getElementById('login-section').classList.remove('hidden');
-                }
-            }
-
-            await loadPrizes();
-        };
-
-        async function loadPrizes() {
-            try {
-                const response = await fetch('/api/premi');
-                if (!response.ok) throw new Error("Server offline");
-                const data = await response.json();
-                if (data.success && data.premi.length > 0) {
-                    prizesData = data.premi;
-                } else {
-                    prizesData = [{ id: 1, nome: "Nessun premio", colore: "#1f2937" }];
-                }
-            } catch (err) {
-                prizesData = [
-                    { id: 1, nome: "Auto Import", colore: "#d97706" },
-                    { id: 2, nome: "Denaro Sporco", colore: "#111827" },
-                    { id: 3, nome: "Arma Speciale", colore: "#b91c1c" },
-                    { id: 4, nome: "Fullkit 100k", colore: "#1f2937" },
-                    { id: 5, nome: "Jackpot", colore: "#d97706" },
-                    { id: 6, nome: "Riprova", colore: "#111827" }
-                ];
-            }
+        window.onload = function() {
             drawWheel();
-        }
+        };
 
         function drawWheel() {
             const canvas = document.getElementById("wheel");
@@ -232,7 +162,7 @@
             for (let i = 0; i < numSegments; i++) {
                 const premio = prizesData[i];
                 ctx.beginPath();
-                ctx.fillStyle = premio.colore || (i % 2 === 0 ? '#1f2937' : '#d97706');
+                ctx.fillStyle = premio.colore;
                 ctx.moveTo(center, center);
                 ctx.arc(center, center, radius, i * arc, (i + 1) * arc);
                 ctx.lineTo(center, center);
@@ -255,41 +185,44 @@
             }
         }
 
-        async function verifyTicket() {
+        async function verifyAndStart() {
+            const discordId = document.getElementById('discord-id').value.trim();
             const codice = document.getElementById('ticket-code').value.trim();
             const msgEl = document.getElementById('ticket-message');
 
+            if (!discordId || discordId.length < 16) {
+                msgEl.textContent = "Inserisci un ID Discord valido.";
+                msgEl.className = "text-sm mt-4 text-red-400 font-medium";
+                msgEl.classList.remove('hidden');
+                return;
+            }
+
             if (!codice) {
-                msgEl.textContent = "Inserisci un codice valido.";
+                msgEl.textContent = "Inserisci il codice del ticket.";
                 msgEl.className = "text-sm mt-4 text-red-400 font-medium";
                 msgEl.classList.remove('hidden');
                 return;
             }
 
             try {
-                const response = await fetch('/api/verify-ticket', {
+                const response = await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ codice: codice })
+                    body: JSON.stringify({ action: 'verify', codice: codice })
                 });
                 const result = await response.json();
 
                 if (result.success) {
-                    msgEl.textContent = result.message;
-                    msgEl.className = "text-sm mt-4 text-amber-400 font-medium";
-                    msgEl.classList.remove('hidden');
-
-                    setTimeout(() => {
-                        document.getElementById('ticket-section').classList.add('hidden');
-                        document.getElementById('wheel-section').classList.remove('hidden');
-                    }, 1000);
+                    activeDiscordId = discordId;
+                    document.getElementById('display-user').textContent = `<@${discordId}>`;
+                    document.getElementById('ticket-section').classList.add('hidden');
+                    document.getElementById('wheel-section').classList.remove('hidden');
                 } else {
                     msgEl.textContent = result.message;
                     msgEl.className = "text-sm mt-4 text-red-400 font-medium";
                     msgEl.classList.remove('hidden');
                 }
             } catch (err) {
-                console.error(err);
                 msgEl.textContent = "Errore di connessione al server.";
                 msgEl.className = "text-sm mt-4 text-red-400 font-medium";
                 msgEl.classList.remove('hidden');
@@ -297,7 +230,7 @@
         }
 
         function spinWheel() {
-            if (isSpinning || prizesData.length === 0) return;
+            if (isSpinning) return;
             isSpinning = true;
             document.getElementById('spin-btn').disabled = true;
             document.getElementById('win-result').textContent = "";
@@ -321,6 +254,7 @@
                 const wonPrize = prizesData[winningIndex].nome;
                 document.getElementById('win-result').textContent = `✨ Hai vinto: ${wonPrize} ✨`;
 
+                // Invia la vincita e il webhook tramite la Netlify Function
                 await saveWinToServer(wonPrize);
 
             }, 4000);
@@ -328,17 +262,13 @@
 
         async function saveWinToServer(premio) {
             try {
-                const res = await fetch('/api/save-win', {
+                await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ premio: premio })
+                    body: JSON.stringify({ action: 'win', discordId: activeDiscordId, premio: premio })
                 });
-                const data = await res.json();
-                if (!data.success) {
-                    console.error(data.message);
-                }
             } catch (err) {
-                console.error("Errore salvataggio vincita:", err);
+                console.error("Errore invio vincita:", err);
             }
         }
     </script>
