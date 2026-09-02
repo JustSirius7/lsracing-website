@@ -1,5 +1,5 @@
 const usedTicketsStore = new Set();
-const validTicketsStore = new Set(["TICKET-TEST", "TICKET-123"]); // Inserisci qui o gestisci i ticket validi
+const validTicketsStore = new Set(["TICKET-TEST", "TICKET-123"]);
 
 exports.handler = async function(event, context) {
     if (event.httpMethod !== 'POST') {
@@ -27,7 +27,14 @@ exports.handler = async function(event, context) {
         if (action === 'verify') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
             
-            if (!validTicketsStore.has(ticketClean)) {
+            if (!ticketClean) {
+                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Inserisci un codice valido." }) };
+            }
+
+            // Accetta sia i ticket salvati nello store che qualsiasi codice che inizi per TICKET-
+            const isValido = ticketClean.startsWith("TICKET-") || validTicketsStore.has(ticketClean);
+
+            if (!isValido) {
                 return { statusCode: 200, body: JSON.stringify({ success: false, message: "Codice ticket inesistente." }) };
             }
 
@@ -47,7 +54,7 @@ exports.handler = async function(event, context) {
                     "description": `L'utente con ID <@${discordId}> ha girato la ruota e ha vinto:`,
                     "color": 16753920,
                     "fields": [
-                        {"name": "🎁 Premio Ottenuto", "value": `**{premio}**`, "inline": false}
+                        {"name": "🎁 Premio Ottenuto", "value": `**${premio}**`, "inline": false}
                     ],
                     "footer": {"text": "LS Racing • Sistema Automatico Officina"}
                 }]
