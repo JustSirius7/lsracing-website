@@ -237,6 +237,7 @@ def save_win():
     if not user_id:
         return jsonify({"success": False, "message": "Utente non autenticato."}), 401
 
+    # 1. Invio Webhook al canale log eventi
     payload = {
         "embeds": [{
             "title": "🎡 Ruota della Fortuna - Nuova Vincita!",
@@ -251,10 +252,26 @@ def save_win():
     
     try:
         requests.post(DISCORD_WEBHOOK_URL, json=payload)
-    except Exception:
-        pass
+    except Exception as e:
+        print("Errore invio webhook:", e)
+        
+    # 2. Invio Messaggio Privato (DM) all'utente tramite Bot
+    try:
+        # Crea il canale DM con l'utente
+        dm_channel_res = requests.post(
+            f"{API_ENDPOINT}/users/@me/channels",
+            headers={"Authorization": f"Bot {BOT_TOKEN}", "Content-Type": "application/json"},
+            json={"recipient_id": user_id}
+        )
+        if dm_channel_res.status_code == 200:
+            channel_id = dm_channel_res.json().get("id")
+            # Invia il messaggio nel canale DM
+            requests.post(
+                f"{API_ENDPOINT}/channels/{channel_id}/messages",
+                headers={"Authorization": f"Bot {BOT_TOKEN}", "Content-Type": "application/json"},
+                json={"content": f"🎉 Complimenti! Hai girato la ruota della fortuna di LS Racing e hai vinto: **{premio}**!"}
+            )
+    except Exception as e:
+        print("Errore invio DM:", e)
     
     return jsonify({"success": True})
-
-if __name__ == "__main__":
-    app.run(port=3000, debug=True)
