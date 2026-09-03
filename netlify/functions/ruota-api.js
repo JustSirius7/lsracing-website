@@ -9,7 +9,13 @@ exports.handler = async function(event, context) {
     }
 
     try {
-        const store = getStore("ruota-config");
+        // Inizializzazione corretta dello store passando il contesto di Netlify
+        const store = getStore({
+            name: "ruota-config",
+            siteID: context.site?.id || process.env.NETLIFY_SITE_ID,
+            token: context.token || process.env.NETLIFY_API_TOKEN
+        });
+
         const body = JSON.parse(event.body);
         const { action, discordId, codice, premio, descrizione, premi } = body;
 
