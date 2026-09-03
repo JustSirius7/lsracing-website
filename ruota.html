@@ -281,11 +281,10 @@
             }
 
             // Calcolo corretto per allineare perfettamente il centro dello spicchio vincente sotto la freccia in alto
-            const targetAngle = 360 - (winningIndex * segmentDegree) - (segmentDegree / 2) + 90;
+            const targetAngle = (winningIndex * segmentDegree) + (segmentDegree / 2);
             const extraSpins = 360 * 6;
-            
             const currentMod = currentRotation % 360;
-            let degreesToRotate = extraSpins + targetAngle - currentMod;
+            let degreesToRotate = extraSpins + (360 - targetAngle) - currentMod;
             if (degreesToRotate < extraSpins) {
                 degreesToRotate += 360;
             }
