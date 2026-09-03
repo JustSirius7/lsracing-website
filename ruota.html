@@ -280,14 +280,22 @@
                 }
             }
 
-            const winningAngle = 360 - (winningIndex * segmentDegree + segmentDegree / 2);
+            // Calcolo corretto per allineare perfettamente il centro dello spicchio vincente sotto la freccia in alto
+            const targetAngle = 360 - (winningIndex * segmentDegree) - (segmentDegree / 2) + 90;
             const extraSpins = 360 * 6;
-            currentRotation = extraSpins + winningAngle + (currentRotation % 360);
+            
+            const currentMod = currentRotation % 360;
+            let degreesToRotate = extraSpins + targetAngle - currentMod;
+            if (degreesToRotate < extraSpins) {
+                degreesToRotate += 360;
+            }
+            currentRotation += degreesToRotate;
 
             canvas.style.transform = `rotate(${currentRotation}deg)`;
 
             setTimeout(async () => {
                 isSpinning = false;
+                document.getElementById('spin-btn').disabled = false;
                 
                 const wonPrizeObj = prizesData[winningIndex];
                 const wonPrizeName = wonPrizeObj.nome;
