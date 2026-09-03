@@ -279,7 +279,11 @@
                 const wonPrizeName = wonPrizeObj.nome;
                 const wonPrizeDesc = wonPrizeObj.desc || "";
 
-                document.getElementById('win-result').textContent = `✨ Hai vinto: ${wonPrizeName} ✨`;
+                let winHtml = `✨ Hai vinto: ${wonPrizeName} ✨`;
+                if (wonPrizeDesc) {
+                    winHtml += `<div class="text-sm text-amber-300/80 mt-1 font-normal">${wonPrizeDesc}</div>`;
+                }
+                document.getElementById('win-result').innerHTML = winHtml;
 
                 await saveWinToServer(wonPrizeName, wonPrizeDesc);
 
