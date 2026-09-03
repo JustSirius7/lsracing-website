@@ -191,13 +191,23 @@
             });
         }
 
-        async function saveAllPrizes() {
+        // Funzione di supporto per sincronizzare i dati scritti nei campi della tabella con l'array JS
+        function syncTableToMemory() {
             currentPrizes.forEach((p, index) => {
-                p.nome = document.getElementById(`p-nome-${index}`).value;
-                p.desc = document.getElementById(`p-desc-${index}`).value;
-                p.perc = parseFloat(document.getElementById(`p-perc-${index}`).value) || 0;
-                p.colore = document.getElementById(`p-color-${index}`).value;
+                const nomeInput = document.getElementById(`p-nome-${index}`);
+                const descInput = document.getElementById(`p-desc-${index}`);
+                const percInput = document.getElementById(`p-perc-${index}`);
+                const colorInput = document.getElementById(`p-color-${index}`);
+
+                if (nomeInput) p.nome = nomeInput.value;
+                if (descInput) p.desc = descInput.value;
+                if (percInput) p.perc = parseFloat(percInput.value) || 0;
+                if (colorInput) p.colore = colorInput.value;
             });
+        }
+
+        async function saveAllPrizes() {
+            syncTableToMemory();
 
             try {
                 const response = await fetch('/.netlify/functions/ruota-api', {
@@ -219,14 +229,37 @@
             renderPrizesTable();
         }
 
+        async function saveSinglePrize(index) {
+            syncTableToMemory();
+
+            try {
+                const response = await fetch('/.netlify/functions/ruota-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert("Premio salvato con successo!");
+                } else {
+                    alert("Errore: " + result.message);
+                }
+            } catch (err) {
+                alert("Errore di connessione.");
+            }
+            renderPrizesTable();
+        }
+
         function deletePrize(index) {
             if (confirm("Sei sicuro di voler eliminare questo premio?")) {
+                syncTableToMemory();
                 currentPrizes.splice(index, 1);
                 renderPrizesTable();
             }
         }
 
-        function addNewPrize() {
+        async function addNewPrize() {
             const nome = document.getElementById('new-p-nome').value.trim();
             const desc = document.getElementById('new-p-desc').value.trim();
             const perc = parseFloat(document.getElementById('new-p-perc').value) || 0;
@@ -237,13 +270,35 @@
                 return;
             }
 
+            // Prima di aggiungere, salva lo stato corrente dei campi a sinistra
+            syncTableToMemory();
+
+            // Aggiungi il nuovo premio all'array esistente
             currentPrizes.push({ id: Date.now(), nome, desc, perc, colore });
-            
-            document.getElementById('new-p-nome').value = '';
-            document.getElementById('new-p-desc').value = '';
-            document.getElementById('new-p-perc').value = '';
-            
-            renderPrizesTable();
+
+            // Invia immediatamente la lista aggiornata al server
+            try {
+                const response = await fetch('/.netlify/functions/ruota-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    // Pulisci i campi del form di destra
+                    document.getElementById('new-p-nome').value = '';
+                    document.getElementById('new-p-desc').value = '';
+                    document.getElementById('new-p-perc').value = '';
+                    
+                    alert("Nuovo premio aggiunto con successo!");
+                    renderPrizesTable();
+                } else {
+                    alert("Errore durante l'aggiunta: " + result.message);
+                }
+            } catch (err) {
+                alert("Errore di connessione al server.");
+            }
         }
 
         async function generateAutoTicket() {
