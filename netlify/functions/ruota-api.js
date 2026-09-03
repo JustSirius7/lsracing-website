@@ -1,12 +1,5 @@
-// Versione autonoma senza dipendenze esterne da configurare
-let memoryStorage = [
-    { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", perc: 15, colore: "#d97706" },
-    { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", perc: 25, colore: "#111827" },
-    { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", perc: 10, colore: "#b91c1c" },
-    { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", perc: 20, colore: "#1f2937" },
-    { id: 5, nome: "Jackpot", desc: "Premio massimo", perc: 5, colore: "#d97706" },
-    { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", perc: 25, colore: "#111827" }
-];
+// Versione autonoma senza premi di default
+let memoryStorage = [];
 
 const usedTicketsStore = new Set();
 const validTicketsStore = new Set(["TICKET-TEST", "TICKET-123"]);
@@ -30,9 +23,9 @@ exports.handler = async function(event, context) {
             };
         }
 
-        // Azione Admin: Salvataggio dei premi
+        // Azione Admin: Salvataggio dei premi (consentito anche se vuoto)
         if (action === 'update-premi') {
-            if (!Array.isArray(premi) || premi.length === 0) {
+            if (!Array.isArray(premi)) {
                 return { statusCode: 200, body: JSON.stringify({ success: false, message: "Lista premi non valida." }) };
             }
             memoryStorage = premi;
