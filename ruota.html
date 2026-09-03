@@ -163,12 +163,12 @@
 
         function loadDefaultPrizes() {
             prizesData = [
-                { id: 1, nome: "Auto Import", colore: "#d97706" },
-                { id: 2, nome: "Denaro Sporco", colore: "#111827" },
-                { id: 3, nome: "Arma Speciale", colore: "#b91c1c" },
-                { id: 4, nome: "Fullkit 100k", colore: "#1f2937" },
-                { id: 5, nome: "Jackpot", colore: "#d97706" },
-                { id: 6, nome: "Riprova", colore: "#111827" }
+                { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", colore: "#d97706" },
+                { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", colore: "#111827" },
+                { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", colore: "#b91c1c" },
+                { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", colore: "#1f2937" },
+                { id: 5, nome: "Jackpot", desc: "Premio massimo", colore: "#d97706" },
+                { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", colore: "#111827" }
             ];
         }
 
@@ -275,20 +275,28 @@
                 const pointerAngle = (360 - (normalizedRotation % 360) + 270) % 360;
                 const winningIndex = Math.floor(pointerAngle / segmentDegree) % numSegments;
                 
-                const wonPrize = prizesData[winningIndex].nome;
-                document.getElementById('win-result').textContent = `✨ Hai vinto: ${wonPrize} ✨`;
+                const wonPrizeObj = prizesData[winningIndex];
+                const wonPrizeName = wonPrizeObj.nome;
+                const wonPrizeDesc = wonPrizeObj.desc || "";
 
-                await saveWinToServer(wonPrize);
+                document.getElementById('win-result').textContent = `✨ Hai vinto: ${wonPrizeName} ✨`;
+
+                await saveWinToServer(wonPrizeName, wonPrizeDesc);
 
             }, 4000);
         }
 
-        async function saveWinToServer(premio) {
+        async function saveWinToServer(premio, descrizione) {
             try {
                 await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'win', discordId: activeDiscordId, premio: premio })
+                    body: JSON.stringify({ 
+                        action: 'win', 
+                        discordId: activeDiscordId, 
+                        premio: premio, 
+                        descrizione: descrizione 
+                    })
                 });
             } catch (err) {
                 console.error("Errore invio vincita:", err);
