@@ -286,7 +286,7 @@
             const currentMod = currentRotation % 360;
             
             // Sottraendo l'indice moltiplicato per i gradi del segmento, agganciamo millimetricamente il centro dello spicchio sotto la freccia in alto
-            let targetAngle = 270 - (winningIndex * segmentDegree);
+            let targetAngle = 270 - (winningIndex * segmentDegree) - (segmentDegree / 2);
             
             let degreesToRotate = extraSpins + targetAngle - currentMod;
             while (degreesToRotate < extraSpins) {
