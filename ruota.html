@@ -131,22 +131,46 @@
 
     <script src="assets/js/navbar.js"></script>
     <script>
-        const prizesData = [
-            { id: 1, nome: "Auto Import", colore: "#d97706" },
-            { id: 2, nome: "Denaro Sporco", colore: "#111827" },
-            { id: 3, nome: "Arma Speciale", colore: "#b91c1c" },
-            { id: 4, nome: "Fullkit 100k", colore: "#1f2937" },
-            { id: 5, nome: "Jackpot", colore: "#d97706" },
-            { id: 6, nome: "Riprova", colore: "#111827" }
-        ];
-
+        let prizesData = [];
         let currentRotation = 0;
         let isSpinning = false;
         let activeDiscordId = "";
 
-        window.onload = function() {
-            drawWheel();
+        window.onload = async function() {
+            await fetchPrizes();
         };
+
+        async function fetchPrizes() {
+            try {
+                const response = await fetch('/.netlify/functions/ruota-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get-premi' })
+                });
+                const result = await response.json();
+
+                if (result.success && result.premi && result.premi.length > 0) {
+                    prizesData = result.premi;
+                } else {
+                    loadDefaultPrizes();
+                }
+            } catch (err) {
+                console.warn("Impossibile caricare i premi dal server, uso i predefiniti.", err);
+                loadDefaultPrizes();
+            }
+            drawWheel();
+        }
+
+        function loadDefaultPrizes() {
+            prizesData = [
+                { id: 1, nome: "Auto Import", colore: "#d97706" },
+                { id: 2, nome: "Denaro Sporco", colore: "#111827" },
+                { id: 3, nome: "Arma Speciale", colore: "#b91c1c" },
+                { id: 4, nome: "Fullkit 100k", colore: "#1f2937" },
+                { id: 5, nome: "Jackpot", colore: "#d97706" },
+                { id: 6, nome: "Riprova", colore: "#111827" }
+            ];
+        }
 
         function drawWheel() {
             const canvas = document.getElementById("wheel");
@@ -162,7 +186,7 @@
             for (let i = 0; i < numSegments; i++) {
                 const premio = prizesData[i];
                 ctx.beginPath();
-                ctx.fillStyle = premio.colore;
+                ctx.fillStyle = premio.colore || "#d97706";
                 ctx.moveTo(center, center);
                 ctx.arc(center, center, radius, i * arc, (i + 1) * arc);
                 ctx.lineTo(center, center);
@@ -254,7 +278,6 @@
                 const wonPrize = prizesData[winningIndex].nome;
                 document.getElementById('win-result').textContent = `✨ Hai vinto: ${wonPrize} ✨`;
 
-                // Invia la vincita e il webhook tramite la Netlify Function
                 await saveWinToServer(wonPrize);
 
             }, 4000);

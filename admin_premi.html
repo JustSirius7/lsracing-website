@@ -102,23 +102,15 @@
     </footer>
 
     <script>
-        let currentPrizes = [
-            { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", perc: 15, colore: "#d97706" },
-            { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", perc: 25, colore: "#111827" },
-            { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", perc: 10, colore: "#b91c1c" },
-            { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", perc: 20, colore: "#1f2937" },
-            { id: 5, nome: "Jackpot", desc: "Premio massimo", perc: 5, colore: "#d97706" },
-            { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", perc: 25, colore: "#111827" }
-        ];
+        let currentPrizes = [];
 
-        window.onload = function() {
+        window.onload = async function() {
             const urlParams = new URLSearchParams(window.location.search);
             const autenticato = urlParams.get('autenticato');
             const errore = urlParams.get('errore');
 
             if (autenticato === 'true') {
                 localStorage.setItem('ls_discord_logged', 'true');
-                // Pulisce l'URL dai parametri di autenticazione
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
@@ -133,14 +125,45 @@
                 }
             } else if (isDiscordLogged) {
                 document.getElementById('admin-section').classList.remove('hidden');
-                renderPrizesTable();
+                await loadAdminPrizes();
             } else {
                 document.getElementById('login-section').classList.remove('hidden');
             }
         };
 
+        async function loadAdminPrizes() {
+            try {
+                const response = await fetch('/.netlify/functions/ruota-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get-premi' })
+                });
+                const result = await response.json();
+
+                if (result.success && result.premi) {
+                    currentPrizes = result.premi;
+                } else {
+                    loadDefaultPrizes();
+                }
+            } catch (err) {
+                console.warn("Impossibile caricare i premi dal server, uso i predefiniti.", err);
+                loadDefaultPrizes();
+            }
+            renderPrizesTable();
+        }
+
+        function loadDefaultPrizes() {
+            currentPrizes = [
+                { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", perc: 15, colore: "#d97706" },
+                { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", perc: 25, colore: "#111827" },
+                { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", perc: 10, colore: "#b91c1c" },
+                { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", perc: 20, colore: "#1f2937" },
+                { id: 5, nome: "Jackpot", desc: "Premio massimo", perc: 5, colore: "#d97706" },
+                { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", perc: 25, colore: "#111827" }
+            ];
+        }
+
         function simulateLogin() {
-            // Reindirizza al flusso OAuth di Discord specificando next=admin per controllare i ruoli
             window.location.href = '/.netlify/functions/discord-login?next=admin';
         }
 
@@ -154,7 +177,7 @@
                         <td class="p-3"><input type="text" value="${p.nome}" id="p-nome-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
                         <td class="p-3"><input type="text" value="${p.desc || ''}" id="p-desc-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
                         <td class="p-3"><input type="number" step="0.1" min="0" value="${p.perc || 0}" id="p-perc-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
-                        <td class="p-3"><input type="color" value="${p.colore}" id="p-color-${index}" class="w-8 h-8 rounded-lg bg-transparent cursor-pointer"></td>
+                        <td class="p-3"><input type="color" value="${p.colore || '#d97706'}" id="p-color-${index}" class="w-8 h-8 rounded-lg bg-transparent cursor-pointer"></td>
                         <td class="p-3 text-center">
                             <button onclick="deletePrize(${index})" class="text-red-400 hover:text-red-300 p-2 transition rounded-lg hover:bg-red-500/10" title="Elimina premio">
                                 <i class="fa-solid fa-trash text-sm"></i>
@@ -165,14 +188,31 @@
             });
         }
 
-        function saveAllPrizes() {
+        async function saveAllPrizes() {
             currentPrizes.forEach((p, index) => {
                 p.nome = document.getElementById(`p-nome-${index}`).value;
                 p.desc = document.getElementById(`p-desc-${index}`).value;
                 p.perc = parseFloat(document.getElementById(`p-perc-${index}`).value) || 0;
                 p.colore = document.getElementById(`p-color-${index}`).value;
             });
-            alert("Premi aggiornati con successo!");
+
+            try {
+                const response = await fetch('/.netlify/functions/ruota-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert("Premi salvati e aggiornati con successo sulla ruota!");
+                } else {
+                    alert("Errore durante il salvataggio: " + result.message);
+                }
+            } catch (err) {
+                alert("Errore di connessione al server durante il salvataggio.");
+            }
+
             renderPrizesTable();
         }
 

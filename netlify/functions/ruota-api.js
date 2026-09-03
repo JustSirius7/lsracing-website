@@ -1,6 +1,16 @@
 const usedTicketsStore = new Set();
 const validTicketsStore = new Set(["TICKET-TEST", "TICKET-123"]);
 
+// Lista predefinita dei premi della ruota (modificabile via admin)
+let currentPremiStore = [
+    { id: 1, nome: "Auto Import", colore: "#d97706" },
+    { id: 2, nome: "Denaro Sporco", colore: "#111827" },
+    { id: 3, nome: "Arma Speciale", colore: "#b91c1c" },
+    { id: 4, nome: "Fullkit 100k", colore: "#1f2937" },
+    { id: 5, nome: "Jackpot", colore: "#d97706" },
+    { id: 6, nome: "Riprova", colore: "#111827" }
+];
+
 exports.handler = async function(event, context) {
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: JSON.stringify({ success: false, message: "Metodo non consentito" }) };
@@ -8,9 +18,26 @@ exports.handler = async function(event, context) {
 
     try {
         const body = JSON.parse(event.body);
-        const { action, discordId, codice, premio } = body;
+        const { action, discordId, codice, premio, premi } = body;
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
+
+        // Azione: Restituisce l'elenco dei premi attuali alla pagina della ruota
+        if (action === 'get-premi') {
+            return { 
+                statusCode: 200, 
+                body: JSON.stringify({ success: true, premi: currentPremiStore }) 
+            };
+        }
+
+        // Azione Admin: Aggiornamento dei premi della ruota
+        if (action === 'update-premi') {
+            if (!Array.isArray(premi) || premi.length === 0) {
+                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Lista premi non valida." }) };
+            }
+            currentPremiStore = premi;
+            return { statusCode: 200, body: JSON.stringify({ success: true, message: "Premi aggiornati con successo!" }) };
+        }
 
         // Azione Admin: Creazione nuovo ticket
         if (action === 'create-ticket') {
