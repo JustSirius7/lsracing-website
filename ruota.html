@@ -265,6 +265,7 @@
             const numSegments = prizesData.length;
             const segmentDegree = 360 / numSegments;
 
+            // 1. Estrazione in base alle percentuali (Invariata)
             let totalWeight = prizesData.reduce((sum, p) => sum + (p.perc || 0), 0);
             if (totalWeight <= 0) totalWeight = numSegments;
 
@@ -280,17 +281,19 @@
                 }
             }
 
-            // Calcolo corretto per allineare perfettamente il centro dello spicchio vincente sotto la freccia in alto
-            const targetAngle = 360 - (winningIndex * segmentDegree) + (segmentDegree / 2) + 90;
-            const extraSpins = 360 * 6;
-            
+            // 2. Correzione geometrica definitiva per allineare il centro dello spicchio alla freccia in alto (ore 12)
+            const extraSpins = 360 * 5;
             const currentMod = currentRotation % 360;
+            
+            // Usiamo il più (+) per sincronizzare il senso di rotazione con la direzione in cui vengono disegnati gli spicchi sul canvas
+            let targetAngle = 270 - (winningIndex * segmentDegree) + (segmentDegree / 2);
+            
             let degreesToRotate = extraSpins + targetAngle - currentMod;
-            if (degreesToRotate < extraSpins) {
+            while (degreesToRotate < extraSpins) {
                 degreesToRotate += 360;
             }
+            
             currentRotation += degreesToRotate;
-
             canvas.style.transform = `rotate(${currentRotation}deg)`;
 
             setTimeout(async () => {
