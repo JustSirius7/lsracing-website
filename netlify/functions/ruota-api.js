@@ -9,7 +9,7 @@ exports.handler = async function(event, context) {
     }
 
     try {
-        // Inizializzazione corretta dello store passando il contesto di Netlify
+        // Inizializzazione dello store con fallback automatico e recupero sicuro dal contesto
         const store = getStore({
             name: "ruota-config",
             siteID: context.site?.id || process.env.NETLIFY_SITE_ID,
