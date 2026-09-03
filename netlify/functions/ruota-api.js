@@ -1,15 +1,7 @@
+const { getStore } = require('@netlify/blobs');
+
 const usedTicketsStore = new Set();
 const validTicketsStore = new Set(["TICKET-TEST", "TICKET-123"]);
-
-// Lista predefinita dei premi della ruota (modificabile via admin)[cite: 11]
-let currentPremiStore = [
-    { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", colore: "#d97706" },
-    { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", colore: "#111827" },
-    { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", colore: "#b91c1c" },
-    { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", colore: "#1f2937" },
-    { id: 5, nome: "Jackpot", desc: "Premio massimo", colore: "#d97706" },
-    { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", colore: "#111827" }
-];
 
 exports.handler = async function(event, context) {
     if (event.httpMethod !== 'POST') {
@@ -17,29 +9,41 @@ exports.handler = async function(event, context) {
     }
 
     try {
+        const store = getStore("ruota-config");
         const body = JSON.parse(event.body);
         const { action, discordId, codice, premio, descrizione, premi } = body;
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
-        // Azione: Restituisce l'elenco dei premi attuali alla pagina della ruota[cite: 11]
+        // Azione: Restituisce l'elenco dei premi salvati o quelli di default
         if (action === 'get-premi') {
+            let savedPremi = await store.json("premi_attivi");
+            if (!savedPremi) {
+                savedPremi = [
+                    { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", perc: 15, colore: "#d97706" },
+                    { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", perc: 25, colore: "#111827" },
+                    { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", perc: 10, colore: "#b91c1c" },
+                    { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", perc: 20, colore: "#1f2937" },
+                    { id: 5, nome: "Jackpot", desc: "Premio massimo", perc: 5, colore: "#d97706" },
+                    { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", perc: 25, colore: "#111827" }
+                ];
+            }
             return { 
                 statusCode: 200, 
-                body: JSON.stringify({ success: true, premi: currentPremiStore }) 
+                body: JSON.stringify({ success: true, premi: savedPremi }) 
             };
         }
 
-        // Azione Admin: Aggiornamento dei premi della ruota[cite: 11]
+        // Azione Admin: Salvataggio permanente dei premi sul cloud
         if (action === 'update-premi') {
             if (!Array.isArray(premi) || premi.length === 0) {
                 return { statusCode: 200, body: JSON.stringify({ success: false, message: "Lista premi non valida." }) };
             }
-            currentPremiStore = premi;
-            return { statusCode: 200, body: JSON.stringify({ success: true, message: "Premi aggiornati con successo!" }) };
+            await store.setJSON("premi_attivi", premi);
+            return { statusCode: 200, body: JSON.stringify({ success: true, message: "Premi salvati con successo!" }) };
         }
 
-        // Azione Admin: Creazione nuovo ticket[cite: 11]
+        // Azione Admin: Creazione nuovo ticket
         if (action === 'create-ticket') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
             if (!ticketClean) {
@@ -50,7 +54,7 @@ exports.handler = async function(event, context) {
             return { statusCode: 200, body: JSON.stringify({ success: true, message: `Ticket ${ticketClean} creato con successo!` }) };
         }
 
-        // Azione 1: Verifica del Ticket (Monouso)[cite: 11]
+        // Azione 1: Verifica del Ticket (Monouso)
         if (action === 'verify') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
             
@@ -58,7 +62,6 @@ exports.handler = async function(event, context) {
                 return { statusCode: 200, body: JSON.stringify({ success: false, message: "Inserisci un codice valido." }) };
             }
 
-            // Accetta sia i ticket salvati nello store che qualsiasi codice che inizi per TICKET-[cite: 11]
             const isValido = ticketClean.startsWith("TICKET-") || validTicketsStore.has(ticketClean);
 
             if (!isValido) {
