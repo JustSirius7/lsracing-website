@@ -126,7 +126,7 @@
     </main>
 
     <footer class="bg-black/60 backdrop-blur border-t border-amber-500/20 p-4 text-center text-xs text-amber-500/50">
-        &copy; 2026 LS Racing • Luxury Edition[cite: 7]
+        &copy; 2026 LS Racing • Luxury Edition
     </footer>
 
     <script src="assets/js/navbar.js"></script>
@@ -141,6 +141,19 @@
         };
 
         async function fetchPrizes() {
+            // Legge prima i premi salvati nel browser
+            const localSaved = localStorage.getItem('ls_saved_prizes');
+            if (localSaved) {
+                try {
+                    prizesData = JSON.parse(localSaved);
+                    drawWheel();
+                    return;
+                } catch (e) {
+                    console.error("Errore parsing localStorage", e);
+                }
+            }
+
+            // Altrimenti li richiede al server
             try {
                 const response = await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
@@ -152,30 +165,19 @@
                 if (result.success && result.premi && result.premi.length > 0) {
                     prizesData = result.premi;
                 } else {
-                    loadDefaultPrizes();
+                    prizesData = [];
                 }
             } catch (err) {
-                console.warn("Impossibile caricare i premi dal server, uso i predefiniti.", err);
-                loadDefaultPrizes();
+                prizesData = [];
             }
             drawWheel();
-        }
-
-        function loadDefaultPrizes() {
-            prizesData = [
-                { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", perc: 15, colore: "#d97706" },
-                { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", perc: 25, colore: "#111827" },
-                { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", perc: 10, colore: "#b91c1c" },
-                { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", perc: 20, colore: "#1f2937" },
-                { id: 5, nome: "Jackpot", desc: "Premio massimo", perc: 5, colore: "#d97706" },
-                { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", perc: 25, colore: "#111827" }
-            ];
         }
 
         function drawWheel() {
             const canvas = document.getElementById("wheel");
             const ctx = canvas.getContext("2d");
             const numSegments = prizesData.length;
+            if (numSegments === 0) return;
             const arc = Math.PI * 2 / numSegments;
             const size = 356;
             const center = size / 2;
@@ -254,7 +256,7 @@
         }
 
         function spinWheel() {
-            if (isSpinning) return;
+            if (isSpinning || prizesData.length === 0) return;
             isSpinning = true;
             document.getElementById('spin-btn').disabled = true;
             document.getElementById('win-result').textContent = "";
@@ -263,7 +265,6 @@
             const numSegments = prizesData.length;
             const segmentDegree = 360 / numSegments;
 
-            // Calcolo ponderato basato sulle percentuali (perc) configurate nel pannello admin
             let totalWeight = prizesData.reduce((sum, p) => sum + (p.perc || 0), 0);
             if (totalWeight <= 0) totalWeight = numSegments;
 
@@ -279,7 +280,6 @@
                 }
             }
 
-            // Calcolo preciso dei gradi per fermare la ruota esattamente sullo spicchio vincente
             const winningAngle = 360 - (winningIndex * segmentDegree + segmentDegree / 2);
             const extraSpins = 360 * 6;
             currentRotation = extraSpins + winningAngle + (currentRotation % 360);

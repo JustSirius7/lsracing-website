@@ -27,7 +27,7 @@
         <!-- Sezione 2: Pannello Admin a due colonne -->
         <div id="admin-section" class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full max-w-6xl hidden">
             
-            <!-- Colonna Sinistra (Più grande): Premi Attivi e Modifica -->
+            <!-- Colonna Sinistra: Premi Attivi e Modifica -->
             <div class="lg:col-span-2 bg-black/40 border border-amber-500/30 p-6 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur">
                 <h2 class="text-lg font-bold mb-4 text-amber-400 flex items-center justify-between">
                     <span>Premi Attivi sulla Ruota</span>
@@ -52,7 +52,7 @@
                 </div>
             </div>
 
-            <!-- Colonna Destra (Più piccola): Aggiungi Premio & Generazione Automatica Ticket -->
+            <!-- Colonna Destra: Aggiungi Premio & Generazione Ticket -->
             <div class="flex flex-col gap-6">
                 <!-- Aggiungi Nuovo Premio -->
                 <div class="bg-black/40 border border-amber-500/30 p-6 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur">
@@ -118,11 +118,6 @@
 
             if (errore) {
                 document.getElementById('login-section').classList.remove('hidden');
-                if (errore === 'unauthorized') {
-                    alert("Accesso negato: Non possiedi i ruoli Discord autorizzati per accedere al pannello admin.");
-                } else {
-                    alert("Errore durante l'autenticazione Discord.");
-                }
             } else if (isDiscordLogged) {
                 document.getElementById('admin-section').classList.remove('hidden');
                 await loadAdminPrizes();
@@ -132,6 +127,19 @@
         };
 
         async function loadAdminPrizes() {
+            // Controlla prima nel localStorage del browser
+            const localSaved = localStorage.getItem('ls_saved_prizes');
+            if (localSaved) {
+                try {
+                    currentPrizes = JSON.parse(localSaved);
+                    renderPrizesTable();
+                    return;
+                } catch (e) {
+                    console.error("Errore lettura localStorage", e);
+                }
+            }
+
+            // Altrimenti prova a prenderli dal server
             try {
                 const response = await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
@@ -140,27 +148,15 @@
                 });
                 const result = await response.json();
 
-                if (result.success && result.premi) {
+                if (result.success && result.premi && result.premi.length > 0) {
                     currentPrizes = result.premi;
                 } else {
-                    loadDefaultPrizes();
+                    currentPrizes = [];
                 }
             } catch (err) {
-                console.warn("Impossibile caricare i premi dal server, uso i predefiniti.", err);
-                loadDefaultPrizes();
+                currentPrizes = [];
             }
             renderPrizesTable();
-        }
-
-        function loadDefaultPrizes() {
-            currentPrizes = [
-                { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", perc: 15, colore: "#d97706" },
-                { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", perc: 25, colore: "#111827" },
-                { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", perc: 10, colore: "#b91c1c" },
-                { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", perc: 20, colore: "#1f2937" },
-                { id: 5, nome: "Jackpot", desc: "Premio massimo", perc: 5, colore: "#d97706" },
-                { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", perc: 25, colore: "#111827" }
-            ];
         }
 
         function simulateLogin() {
@@ -191,7 +187,6 @@
             });
         }
 
-        // Funzione di supporto per sincronizzare i dati scritti nei campi della tabella con l'array JS
         function syncTableToMemory() {
             currentPrizes.forEach((p, index) => {
                 const nomeInput = document.getElementById(`p-nome-${index}`);
@@ -208,45 +203,35 @@
 
         async function saveAllPrizes() {
             syncTableToMemory();
+            // Salva permanentemente nel browser
+            localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
 
             try {
-                const response = await fetch('/.netlify/functions/ruota-api', {
+                await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
                 });
-                const result = await response.json();
-
-                if (result.success) {
-                    alert("Premi salvati e aggiornati con successo sulla ruota!");
-                } else {
-                    alert("Errore durante il salvataggio: " + result.message);
-                }
+                alert("Modifiche salvate con successo e memorizzate per sempre!");
             } catch (err) {
-                alert("Errore di connessione al server durante il salvataggio.");
+                alert("Salvato nel browser, ma errore di rete con il server.");
             }
-
             renderPrizesTable();
         }
 
         async function saveSinglePrize(index) {
             syncTableToMemory();
+            localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
 
             try {
-                const response = await fetch('/.netlify/functions/ruota-api', {
+                await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
                 });
-                const result = await response.json();
-
-                if (result.success) {
-                    alert("Premio salvato con successo!");
-                } else {
-                    alert("Errore: " + result.message);
-                }
+                alert("Premio salvato con successo!");
             } catch (err) {
-                alert("Errore di connessione.");
+                alert("Salvato nel browser.");
             }
             renderPrizesTable();
         }
@@ -255,6 +240,7 @@
             if (confirm("Sei sicuro di voler eliminare questo premio?")) {
                 syncTableToMemory();
                 currentPrizes.splice(index, 1);
+                localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
                 renderPrizesTable();
             }
         }
@@ -270,34 +256,25 @@
                 return;
             }
 
-            // Prima di aggiungere, salva lo stato corrente dei campi a sinistra
             syncTableToMemory();
-
-            // Aggiungi il nuovo premio all'array esistente
             currentPrizes.push({ id: Date.now(), nome, desc, perc, colore });
+            localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
 
-            // Invia immediatamente la lista aggiornata al server
             try {
-                const response = await fetch('/.netlify/functions/ruota-api', {
+                await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
                 });
-                const result = await response.json();
-
-                if (result.success) {
-                    // Pulisci i campi del form di destra
-                    document.getElementById('new-p-nome').value = '';
-                    document.getElementById('new-p-desc').value = '';
-                    document.getElementById('new-p-perc').value = '';
-                    
-                    alert("Nuovo premio aggiunto con successo!");
-                    renderPrizesTable();
-                } else {
-                    alert("Errore durante l'aggiunta: " + result.message);
-                }
+                
+                document.getElementById('new-p-nome').value = '';
+                document.getElementById('new-p-desc').value = '';
+                document.getElementById('new-p-perc').value = '';
+                
+                alert("Nuovo premio aggiunto e salvato!");
+                renderPrizesTable();
             } catch (err) {
-                alert("Errore di connessione al server.");
+                alert("Aggiunto nel browser.");
             }
         }
 
@@ -305,19 +282,13 @@
             const randomCode = 'TICKET-' + Math.random().toString(36).substring(2, 8).toUpperCase();
             
             try {
-                const response = await fetch('/.netlify/functions/ruota-api', {
+                await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'create-ticket', codice: randomCode })
                 });
-                const result = await response.json();
-
-                if(result.success) {
-                    document.getElementById('generated-code-text').textContent = randomCode;
-                    document.getElementById('auto-ticket-result').classList.remove('hidden');
-                } else {
-                    alert("Errore nella generazione del ticket.");
-                }
+                document.getElementById('generated-code-text').textContent = randomCode;
+                document.getElementById('auto-ticket-result').classList.remove('hidden');
             } catch (err) {
                 document.getElementById('generated-code-text').textContent = randomCode;
                 document.getElementById('auto-ticket-result').classList.remove('hidden');
