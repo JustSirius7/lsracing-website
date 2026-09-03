@@ -22,6 +22,8 @@
             <button onclick="simulateLogin()" class="inline-block bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3 px-8 rounded-xl shadow-lg transition duration-200 uppercase tracking-wider text-sm">
                 Verifica con Discord
             </button>
+            <!-- Box messaggio di errore -->
+            <p id="error-message-box" class="text-red-400 text-xs mt-4 hidden bg-red-500/10 border border-red-500/20 p-3 rounded-xl"></p>
         </div>
 
         <!-- Sezione 2: Pannello Admin a due colonne -->
@@ -118,6 +120,15 @@
 
             if (errore) {
                 document.getElementById('login-section').classList.remove('hidden');
+                const errorBox = document.getElementById('error-message-box');
+                
+                // Gestione personalizzata dei messaggi in base al tipo di errore passato dal server
+                if (errore === 'ruoli_insufficienti' || errore === 'unauthorized') {
+                    errorBox.textContent = "Accesso Negato: L'utente connesso non possiede i ruoli richiesti (Direzione o Staff Eventi) per accedere al pannello.";
+                } else {
+                    errorBox.textContent = "Errore durante l'autenticazione con Discord. Assicurati di fare l'accesso con l'account corretto.";
+                }
+                errorBox.classList.remove('hidden');
             } else if (isDiscordLogged) {
                 document.getElementById('admin-section').classList.remove('hidden');
                 await loadAdminPrizes();
@@ -127,7 +138,6 @@
         };
 
         async function loadAdminPrizes() {
-            // Controlla prima nel localStorage del browser
             const localSaved = localStorage.getItem('ls_saved_prizes');
             if (localSaved) {
                 try {
@@ -139,7 +149,6 @@
                 }
             }
 
-            // Altrimenti prova a prenderli dal server
             try {
                 const response = await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
@@ -203,7 +212,6 @@
 
         async function saveAllPrizes() {
             syncTableToMemory();
-            // Salva permanentemente nel browser
             localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
 
             try {
