@@ -117,7 +117,7 @@
                 </div>
             </div>
 
-            <button id="spin-btn" onclick="spinWheel()" class="bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-black font-black text-lg py-3.5 px-10 rounded-full shadow-[0_0_25px_rgba(245,158,11,0.5)] transition duration-200 uppercase tracking-wider border border-yellow-300">
+            <button id="spin-btn" onclick="spinWheel()" class="bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 text-black font-black text-lg py-3.5 px-10 rounded-full shadow-[0_0_25px_rgba(245,158,11,0.5)] transition duration-200 uppercase tracking-wider border border-yellow-300">
                 Gira la Ruota!
             </button>
             <div id="win-result" class="mt-6 text-2xl font-black text-amber-400 text-center drop-shadow-[0_2px_8px_rgba(245,158,11,0.4)] min-h-[2rem]"></div>
@@ -126,7 +126,7 @@
     </main>
 
     <footer class="bg-black/60 backdrop-blur border-t border-amber-500/20 p-4 text-center text-xs text-amber-500/50">
-        &copy; 2026 LS Racing • Luxury Edition
+        &copy; 2026 LS Racing • Luxury Edition[cite: 7]
     </footer>
 
     <script src="assets/js/navbar.js"></script>
@@ -163,12 +163,12 @@
 
         function loadDefaultPrizes() {
             prizesData = [
-                { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", colore: "#d97706" },
-                { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", colore: "#111827" },
-                { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", colore: "#b91c1c" },
-                { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", colore: "#1f2937" },
-                { id: 5, nome: "Jackpot", desc: "Premio massimo", colore: "#d97706" },
-                { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", colore: "#111827" }
+                { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", perc: 15, colore: "#d97706" },
+                { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", perc: 25, colore: "#111827" },
+                { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", perc: 10, colore: "#b91c1c" },
+                { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", perc: 20, colore: "#1f2937" },
+                { id: 5, nome: "Jackpot", desc: "Premio massimo", perc: 5, colore: "#d97706" },
+                { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", perc: 25, colore: "#111827" }
             ];
         }
 
@@ -260,20 +260,34 @@
             document.getElementById('win-result').textContent = "";
 
             const canvas = document.getElementById("wheel");
-            const randomExtra = Math.floor(Math.random() * 360) + 2160;
-            currentRotation += randomExtra;
+            const numSegments = prizesData.length;
+            const segmentDegree = 360 / numSegments;
+
+            // Calcolo ponderato basato sulle percentuali (perc) configurate nel pannello admin
+            let totalWeight = prizesData.reduce((sum, p) => sum + (p.perc || 0), 0);
+            if (totalWeight <= 0) totalWeight = numSegments;
+
+            let randomWeight = Math.random() * totalWeight;
+            let cumulativeWeight = 0;
+            let winningIndex = 0;
+
+            for (let i = 0; i < numSegments; i++) {
+                cumulativeWeight += (prizesData[i].perc || 1);
+                if (randomWeight <= cumulativeWeight) {
+                    winningIndex = i;
+                    break;
+                }
+            }
+
+            // Calcolo preciso dei gradi per fermare la ruota esattamente sullo spicchio vincente
+            const winningAngle = 360 - (winningIndex * segmentDegree + segmentDegree / 2);
+            const extraSpins = 360 * 6;
+            currentRotation = extraSpins + winningAngle + (currentRotation % 360);
 
             canvas.style.transform = `rotate(${currentRotation}deg)`;
 
             setTimeout(async () => {
                 isSpinning = false;
-                
-                const numSegments = prizesData.length;
-                const segmentDegree = 360 / numSegments;
-                
-                const normalizedRotation = currentRotation % 360;
-                const pointerAngle = (360 - (normalizedRotation % 360) + 270) % 360;
-                const winningIndex = Math.floor(pointerAngle / segmentDegree) % numSegments;
                 
                 const wonPrizeObj = prizesData[winningIndex];
                 const wonPrizeName = wonPrizeObj.nome;
