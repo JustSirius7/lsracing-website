@@ -1,4 +1,12 @@
-const { getStore } = require('@netlify/blobs');
+// Versione autonoma senza dipendenze esterne da configurare
+let memoryStorage = [
+    { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", perc: 15, colore: "#d97706" },
+    { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", perc: 25, colore: "#111827" },
+    { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", perc: 10, colore: "#b91c1c" },
+    { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", perc: 20, colore: "#1f2937" },
+    { id: 5, nome: "Jackpot", desc: "Premio massimo", perc: 5, colore: "#d97706" },
+    { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", perc: 25, colore: "#111827" }
+];
 
 const usedTicketsStore = new Set();
 const validTicketsStore = new Set(["TICKET-TEST", "TICKET-123"]);
@@ -9,43 +17,25 @@ exports.handler = async function(event, context) {
     }
 
     try {
-        // Inizializzazione dello store con fallback automatico e recupero sicuro dal contesto
-        const store = getStore({
-            name: "ruota-config",
-            siteID: context.site?.id || process.env.NETLIFY_SITE_ID,
-            token: context.token || process.env.NETLIFY_API_TOKEN
-        });
-
         const body = JSON.parse(event.body);
         const { action, discordId, codice, premio, descrizione, premi } = body;
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
-        // Azione: Restituisce l'elenco dei premi salvati o quelli di default
+        // Azione: Restituisce l'elenco dei premi attivi
         if (action === 'get-premi') {
-            let savedPremi = await store.json("premi_attivi");
-            if (!savedPremi) {
-                savedPremi = [
-                    { id: 1, nome: "Auto Import", desc: "Veicolo di classe alta", perc: 15, colore: "#d97706" },
-                    { id: 2, nome: "Denaro Sporco", desc: "Contanti sporchi", perc: 25, colore: "#111827" },
-                    { id: 3, nome: "Arma Speciale", desc: "Arma esclusiva", perc: 10, colore: "#b91c1c" },
-                    { id: 4, nome: "Fullkit 100k", desc: "Kit riparazione completo", perc: 20, colore: "#1f2937" },
-                    { id: 5, nome: "Jackpot", desc: "Premio massimo", perc: 5, colore: "#d97706" },
-                    { id: 6, nome: "Riprova", desc: "Ritenta sarai più fortunato", perc: 25, colore: "#111827" }
-                ];
-            }
             return { 
                 statusCode: 200, 
-                body: JSON.stringify({ success: true, premi: savedPremi }) 
+                body: JSON.stringify({ success: true, premi: memoryStorage }) 
             };
         }
 
-        // Azione Admin: Salvataggio permanente dei premi sul cloud
+        // Azione Admin: Salvataggio dei premi
         if (action === 'update-premi') {
             if (!Array.isArray(premi) || premi.length === 0) {
                 return { statusCode: 200, body: JSON.stringify({ success: false, message: "Lista premi non valida." }) };
             }
-            await store.setJSON("premi_attivi", premi);
+            memoryStorage = premi;
             return { statusCode: 200, body: JSON.stringify({ success: true, message: "Premi salvati con successo!" }) };
         }
 
