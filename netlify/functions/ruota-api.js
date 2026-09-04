@@ -11,7 +11,7 @@ export default async (req) => {
     try {
         const store = getStore({ name: "fortuna-rp-store", consistency: "strong" });
         const body = await req.json();
-        const { action, discordId, discordName, codice, premio, descrizione, premi, tickets, vincite, operatori, ticket } = body;
+        const { action, discordId, discordName, codice, premio, descrizione, premi, tickets, vincite, operatori, ticket, operatore } = body;
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
@@ -199,6 +199,17 @@ export default async (req) => {
                 await store.setJSON("vincite", vincite);
             }
             return new Response(JSON.stringify({ success: true, message: "Vincite aggiornate!" }), {
+                status: 200, headers: { "Content-Type": "application/json" }
+            });
+        }
+
+        if (action === 'create-operatore') {
+            let savedOperatori = await store.get("operatori", { type: "json" }) || [];
+            if (operatore) {
+                savedOperatori.unshift(operatore);
+                await store.setJSON("operatori", savedOperatori);
+            }
+            return new Response(JSON.stringify({ success: true, message: "Operatore creato con successo!", operatori: savedOperatori }), {
                 status: 200, headers: { "Content-Type": "application/json" }
             });
         }
