@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FORTUNA RP • Pannello Operatori</title>
+    <title>Ruota della Fortuna • Area Operatori</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -19,8 +19,8 @@
                 <i class="fa-solid fa-dice"></i>
             </div>
             <div>
-                <h1 class="font-black tracking-wider text-amber-400 text-sm">FORTUNA RP</h1>
-                <p class="text-[11px] text-gray-400">Pannello Operatori</p>
+                <h1 class="font-black tracking-wider text-amber-400 text-sm">Ruota della Fortuna</h1>
+                <p class="text-[11px] text-gray-400">Area Operatori</p>
             </div>
         </div>
 
@@ -133,11 +133,11 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Numero di Giri</label>
-                            <input type="number" id="gen-giri" value="3" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                            <input type="number" id="gen-giri" value="3" min="1" oninput="if(this.value < 1) this.value = 1;" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Giorni di validità</label>
-                            <input type="number" id="gen-giorni" value="7" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                            <input type="number" id="gen-giorni" value="7" min="1" oninput="if(this.value < 1) this.value = 1;" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Nota (Opzionale)</label>
@@ -245,7 +245,7 @@
 
     <!-- Footer -->
     <footer class="border-t border-[#1f1f2e] bg-[#0b0b0e]/80 py-4 text-center text-xs text-gray-500">
-        &copy; 2026 FORTUNA RP • Pannello Operatori
+        &copy; 2026 Ruota della Fortuna • Area Operatori
     </footer>
 
     <script>
@@ -479,8 +479,11 @@
         }
 
         async function generateNewTicket() {
-            const giri = parseInt(document.getElementById('gen-giri').value) || 1;
-            const giorni = document.getElementById('gen-giorni').value;
+            let giri = parseInt(document.getElementById('gen-giri').value) || 1;
+            if (giri < 1) giri = 1;
+            let giorni = parseInt(document.getElementById('gen-giorni').value) || 1;
+            if (giorni < 1) giorni = 1;
+
             const nota = document.getElementById('gen-nota').value.trim();
             const codice = 'TICKET-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
