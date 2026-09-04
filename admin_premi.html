@@ -293,8 +293,8 @@
 
                 if (matchedOp) {
                     currentOperatorName = matchedOp.nome;
-                } else if (operatoriList.length > 0) {
-                    currentOperatorName = operatoriList[0].nome;
+                } else if (savedId) {
+                    currentOperatorName = `Utente (${savedId})`;
                 } else {
                     currentOperatorName = "Amministratore";
                 }
@@ -346,8 +346,11 @@
                         let match = operatoriList.find(op => op.discordId === savedId);
                         if (match) {
                             currentOperatorName = match.nome;
-                            localStorage.setItem('ls_logged_operator_name', currentOperatorName);
+                        } else {
+                            currentOperatorName = `Utente (${savedId})`;
                         }
+                        localStorage.setItem('ls_logged_operator_name', currentOperatorName);
+                        document.getElementById('current-operator-badge').innerHTML = `<i class="fa-solid fa-user-shield mr-1.5"></i> ${currentOperatorName}`;
                     }
                 }
             } catch (err) {
@@ -643,7 +646,7 @@
                 container.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Nessun operatore registrato.</p>';
                 return;
             }
-            operatoriList.exports = operatoriList.forEach((op, idx) => {
+            operatoriList.forEach((op, idx) => {
                 container.innerHTML += `
                     <div class="bg-[#0b0b0e] border border-[#232333] p-4 rounded-2xl flex items-center justify-between">
                         <div>
