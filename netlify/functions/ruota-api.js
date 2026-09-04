@@ -187,6 +187,13 @@ export default async (req) => {
             });
         }
 
+        if (action === 'get-vincite') {
+            const savedVincite = await store.get("vincite", { type: "json" }) || [];
+            return new Response(JSON.stringify({ success: true, vincite: savedVincite }), {
+                status: 200, headers: { "Content-Type": "application/json" }
+            });
+        }
+
         if (action === 'update-vincite') {
             if (Array.isArray(vincite)) {
                 await store.setJSON("vincite", vincite);
