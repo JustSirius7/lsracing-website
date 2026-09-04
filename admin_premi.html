@@ -552,9 +552,9 @@
 
         function copyTicketCode(code) {
             navigator.clipboard.writeText(code).then(() => {
-                alert("Codice ticket copiato negli appunti: " + code);
+            // Copia effettuata silenziosamente senza alert
             }).catch(err => {
-                console.error("Errore durante la copia", err);
+            console.error("Errore durante la copia", err);
             });
         }
 
