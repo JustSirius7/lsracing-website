@@ -609,12 +609,44 @@
         }
 
         async function markAsRitirato(vincitaIndex) {
-            vinciteList[vincitaIndex].stato = 'RITIRATO';
-            vinciteList[vincitaIndex].operatore = currentOperatorName;
+            const vincita = vinciteList[vincitaIndex];
+            
+            if (vincita.stato === 'RITIRATO') {
+                alert(`Errore: Questo premio è stato già ritirato da ${vincita.operatore || 'un altro operatore'}.`);
+                return;
+            }
 
-            await sendUpdateToServer('update-vincite', { vincite: vinciteList });
-            renderVinciteUI();
-            updateStats();
+            if (!confirm(`Confermi la consegna del premio a ${vincita.player || 'questo giocatore'}?`)) return;
+
+            try {
+                const response = await fetch('/.netlify/functions/ruota-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'mark-ritirato', 
+                        codiceVincita: vincita.codice || vincita.ticketUsato,
+                        index: vincitaIndex,
+                        operatore: currentOperatorName 
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok || data.error) {
+                    alert(`Errore: ${data.error || "Operazione non consentita. Il premio potrebbe essere già stato confermato."}`);
+                    await loadAllDataFromServer();
+                    return;
+                }
+
+                vinciteList = data.vincite;
+                renderVinciteUI();
+                updateStats();
+                alert("Premio contrassegnato come ritirato con successo!");
+
+            } catch (err) {
+                console.error("Errore di rete:", err);
+                alert("Errore di connessione durante la conferma del premio.");
+            }
         }
 
         async function createOperator() {

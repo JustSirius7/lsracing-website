@@ -11,7 +11,7 @@ export default async (req) => {
     try {
         const store = getStore({ name: "fortuna-rp-store", consistency: "strong" });
         const body = await req.json();
-        const { action, discordId, discordName, codice, premio, descrizione, premi, tickets, vincite, operatori, ticket, operatore } = body;
+        const { action, discordId, discordName, codice, premio, descrizione, premi, tickets, vincite, operatori, ticket, operatore, codiceVincita, index, operatore: opName } = body;
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
@@ -199,6 +199,38 @@ export default async (req) => {
                 await store.setJSON("vincite", vincite);
             }
             return new Response(JSON.stringify({ success: true, message: "Vincite aggiornate!" }), {
+                status: 200, headers: { "Content-Type": "application/json" }
+            });
+        }
+
+        if (action === 'mark-ritirato') {
+            let savedVincite = await store.get("vincite", { type: "json" }) || [];
+            let targetIndex = index;
+
+            if (targetIndex === undefined || targetIndex < 0 || targetIndex >= savedVincite.length) {
+                if (codiceVincita) {
+                    targetIndex = savedVincite.findIndex(v => (v.codice && v.codice.toUpperCase() === codiceVincita.toUpperCase()) || (v.ticketUsato && v.ticketUsato.toUpperCase() === codiceVincita.toUpperCase()));
+                }
+            }
+
+            if (targetIndex === undefined || targetIndex < 0 || targetIndex >= savedVincite.length) {
+                return new Response(JSON.stringify({ success: false, error: "Vincita non trovata." }), {
+                    status: 400, headers: { "Content-Type": "application/json" }
+                });
+            }
+
+            if (savedVincite[targetIndex].stato === 'RITIRATO') {
+                return new Response(JSON.stringify({ success: false, error: "Questo premio è già stato ritirato.", vincite: savedVincite }), {
+                    status: 400, headers: { "Content-Type": "application/json" }
+                });
+            }
+
+            savedVincite[targetIndex].stato = 'RITIRATO';
+            savedVincite[targetIndex].operatore = opName || "Operatore";
+
+            await store.setJSON("vincite", savedVincite);
+
+            return new Response(JSON.stringify({ success: true, message: "Premio contrassegnato come ritirato!", vincite: savedVincite }), {
                 status: 200, headers: { "Content-Type": "application/json" }
             });
         }
