@@ -300,7 +300,6 @@
                 document.getElementById('login-section').classList.remove('hidden');
             }
 
-            // Sincronizzazione in tempo reale fra schede (es. quando la ruota effettua una vincita)
             window.addEventListener('storage', (event) => {
                 if (event.key === 'ls_admin_vincite' || event.key === 'ls_admin_tickets') {
                     loadAllData();
@@ -327,7 +326,6 @@
         }
 
         function loadAllData() {
-            // Carica premi
             const savedPrizes = localStorage.getItem('ls_saved_prizes');
             if (savedPrizes) {
                 try { currentPrizes = JSON.parse(savedPrizes); } catch(e) {}
@@ -341,19 +339,16 @@
                 ];
             }
 
-            // Carica ticket
             const savedTickets = localStorage.getItem('ls_admin_tickets');
             if (savedTickets) {
                 try { ticketsList = JSON.parse(savedTickets); } catch(e) {}
             }
 
-            // Carica vincite
             const savedVincite = localStorage.getItem('ls_admin_vincite');
             if (savedVincite) {
                 try { vinciteList = JSON.parse(savedVincite); } catch(e) {}
             }
 
-            // Carica operatori
             const savedOps = localStorage.getItem('ls_admin_operatori');
             if (savedOps) {
                 try { operatoriList = JSON.parse(savedOps); } catch(e) {}
@@ -377,7 +372,6 @@
             document.getElementById('stat-ritirati').textContent = vinciteList.filter(v => v.stato === 'RITIRATO').length;
         }
 
-        // --- PREMI ---
         function renderPrizesUI() {
             const container = document.getElementById('prizes-list-container');
             container.innerHTML = '';
@@ -505,7 +499,6 @@
             }
         }
 
-        // --- TICKET ---
         async function generateNewTicket() {
             const giri = parseInt(document.getElementById('gen-giri').value) || 1;
             const giorni = document.getElementById('gen-giorni').value;
@@ -572,7 +565,6 @@
             updateStats();
         }
 
-        // --- VINCITE ---
         function setVinciteFilter(filter) {
             currentVinciteFilter = filter;
             ['TUTTI', 'ATTESA', 'RITIRATI', 'SCADUTI'].forEach(f => {
@@ -616,7 +608,6 @@
                 if (v.stato === 'ATTESA') badgeClass = "bg-amber-500/10 text-amber-400 border-amber-500/30";
                 if (v.stato === 'SCADUTO') badgeClass = "bg-red-500/10 text-red-400 border-red-500/30";
 
-                // Se per errore in passato è stato salvato l'ID nel campo player, estrae il nome o usa un fallback pulito
                 let nomeVisualizzato = v.player || 'Giocatore';
 
                 let azioneHtml = '';
@@ -682,7 +673,6 @@
             updateStats();
         }
 
-        // --- OPERATORI ---
         function createOperator() {
             const nome = document.getElementById('op-nome').value.trim();
             const pass = document.getElementById('op-pass').value.trim();

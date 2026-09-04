@@ -89,7 +89,7 @@
             <div>
                 <span class="text-[10px] tracking-widest text-amber-500 font-semibold uppercase">Server Roleplay • Estrazione Ufficiale</span>
                 <h2 class="text-3xl font-black text-white tracking-wide mt-1">RUOTA DELLA FORTUNA</h2>
-                <p class="text-xs text-gray-400 mt-1">Inserisci il tuo ID Discord e il codice ticket fornito dallo staff, gira la ruota e vinci premi esclusivi in gioco.</p>
+                <p class="text-xs text-gray-400 mt-1">Inserisci il tuo Nickname, ID Discord e il codice ticket, gira la ruota e vinci premi esclusivi in gioco.</p>
             </div>
             <div class="mt-4 md:mt-0">
                 <a href="admin_premi.html" class="border border-amber-500/30 hover:border-amber-500/60 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-4 py-2 rounded-xl text-xs font-semibold transition inline-flex items-center gap-2">
@@ -107,16 +107,20 @@
                     <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-ticket text-amber-400"></i> Il tuo ticket
                     </h3>
-                    <div class="space-y-4">
+                    <div class="space-y-3">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">ID Discord</label>
-                            <input type="text" id="discord-id" placeholder="123456789012345678" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500 placeholder-gray-600">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Nome / Nickname</label>
+                            <input type="text" id="player-name" placeholder="Es. Mario Rossi" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500 placeholder-gray-600">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Codice Ticket</label>
-                            <input type="text" id="ticket-code" placeholder="TICKET-XYZ" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs font-mono uppercase focus:outline-none focus:border-amber-500 placeholder-gray-600">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">ID Discord</label>
+                            <input type="text" id="discord-id" placeholder="123456789012345678" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500 placeholder-gray-600">
                         </div>
-                        <button onclick="verifyAndStart()" class="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Codice Ticket</label>
+                            <input type="text" id="ticket-code" placeholder="TICKET-XYZ" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3 py-2 text-white text-xs font-mono uppercase focus:outline-none focus:border-amber-500 placeholder-gray-600">
+                        </div>
+                        <button onclick="verifyAndStart()" class="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2 mt-2">
                             <i class="fa-solid fa-dice"></i> Verifica e Gira
                         </button>
                     </div>
@@ -162,10 +166,7 @@
             <div class="lg:col-span-3 bg-[#121218] border border-[#232333] p-5 rounded-3xl">
                 <h3 class="text-sm font-bold text-white mb-4">Ultimi vincitori</h3>
                 <div id="ultimi-vincitori-container" class="space-y-2.5">
-                    <div class="bg-[#0b0b0e] border border-[#232333] p-3 rounded-xl">
-                        <div class="font-bold text-xs text-white">TEST_Player</div>
-                        <div class="text-[11px] text-amber-400 font-medium">2.000$ Cash</div>
-                    </div>
+                    <div class="bg-[#0b0b0e] border border-[#232333] p-3 rounded-xl text-center text-xs text-gray-500">Nessuna vincita recente</div>
                 </div>
             </div>
 
@@ -183,6 +184,7 @@
         let currentRotation = 0;
         let isSpinning = false;
         let activeDiscordId = "";
+        let activePlayerName = "";
         let isVerified = false;
         let currentTicket = null;
         let ticketsList = [];
@@ -206,7 +208,8 @@
             const localSaved = localStorage.getItem('ls_saved_prizes');
             if (localSaved) {
                 try {
-                    prizesData = JSON.parse(localSaved);
+                    let parsed = JSON.parse(localSaved);
+                    prizesData = parsed.filter(p => p.attivo !== false);
                     drawWheel();
                     return;
                 } catch (e) {
@@ -223,7 +226,7 @@
                 const result = await response.json();
 
                 if (result.success && result.premi && result.premi.length > 0) {
-                    prizesData = result.premi;
+                    prizesData = result.premi.filter(p => p.attivo !== false);
                 } else {
                     prizesData = [];
                 }
@@ -237,7 +240,10 @@
             const canvas = document.getElementById("wheel");
             const ctx = canvas.getContext("2d");
             const numSegments = prizesData.length;
-            if (numSegments === 0) return;
+            if (numSegments === 0) {
+                ctx.clearRect(0, 0, 336, 336);
+                return;
+            }
             const arc = Math.PI * 2 / numSegments;
             const size = 336;
             const center = size / 2;
@@ -273,9 +279,17 @@
 
         async function verifyAndStart() {
             caricaDatiLocali();
+            const playerName = document.getElementById('player-name').value.trim();
             const discordId = document.getElementById('discord-id').value.trim();
             const codice = document.getElementById('ticket-code').value.trim().toUpperCase();
             const msgEl = document.getElementById('ticket-message');
+
+            if (!playerName) {
+                msgEl.textContent = "Inserisci il tuo Nome / Nickname.";
+                msgEl.className = "text-xs mt-3 text-red-400 font-medium text-center";
+                msgEl.classList.remove('hidden');
+                return;
+            }
 
             if (!discordId || discordId.length < 16) {
                 msgEl.textContent = "Inserisci un ID Discord valido.";
@@ -291,7 +305,6 @@
                 return;
             }
 
-            // Verifica locale del ticket sincronizzato con admin
             const ticketIndex = ticketsList.findIndex(t => t.codice.toUpperCase() === codice);
             if (ticketIndex !== -1) {
                 currentTicket = ticketsList[ticketIndex];
@@ -305,8 +318,9 @@
                 }
 
                 activeDiscordId = discordId;
+                activePlayerName = playerName;
                 isVerified = true;
-                document.getElementById('display-user').textContent = `<@${discordId}> (${currentTicket.codice})`;
+                document.getElementById('display-user').textContent = `${playerName} (${currentTicket.codice})`;
                 document.getElementById('info-giri').textContent = residui;
                 document.getElementById('ticket-section').classList.add('hidden');
                 document.getElementById('verified-box').classList.remove('hidden');
@@ -318,7 +332,6 @@
                 return;
             }
 
-            // Fallback su Netlify function se non trovato localmente
             try {
                 const response = await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
@@ -329,9 +342,10 @@
 
                 if (result.success) {
                     activeDiscordId = discordId;
+                    activePlayerName = playerName;
                     isVerified = true;
-                    currentTicket = { codice: codice, giriResidui: 1, nota: `<@${discordId}>` };
-                    document.getElementById('display-user').textContent = `<@${discordId}>`;
+                    currentTicket = { codice: codice, giriResidui: 1, nota: playerName };
+                    document.getElementById('display-user').textContent = `${playerName} (${codice})`;
                     document.getElementById('info-giri').textContent = 1;
                     document.getElementById('ticket-section').classList.add('hidden');
                     document.getElementById('verified-box').classList.remove('hidden');
@@ -355,11 +369,13 @@
         function resetVerification() {
             isVerified = false;
             activeDiscordId = "";
+            activePlayerName = "";
             currentTicket = null;
             document.getElementById('verified-box').classList.add('hidden');
             document.getElementById('ticket-section').classList.remove('hidden');
             document.getElementById('ticket-code').value = "";
             document.getElementById('discord-id').value = "";
+            document.getElementById('player-name').value = "";
             
             const spinBtn = document.getElementById('spin-btn');
             spinBtn.disabled = true;
@@ -412,7 +428,6 @@
                 const wonPrizeName = wonPrizeObj.nome;
                 const wonPrizeDesc = wonPrizeObj.desc || "";
 
-                // Aggiorna i dati del ticket locale
                 caricaDatiLocali();
                 if (currentTicket) {
                     const tIdx = ticketsList.findIndex(t => t.codice.toUpperCase() === currentTicket.codice.toUpperCase());
@@ -428,9 +443,8 @@
                     }
                 }
 
-                // Salva la vincita localmente per sincronizzarla con admin_premi.html
                 const nuovaVincita = {
-                    player: `<@${activeDiscordId}>`,
+                    player: activePlayerName,
                     premio: wonPrizeName,
                     codice: 'VINC-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
                     ticketUsato: currentTicket ? currentTicket.codice : 'N/D',
@@ -448,10 +462,8 @@
                 }
                 document.getElementById('win-result').innerHTML = winHtml;
 
-                // Mantiene l'invio dei log su Discord tramite la Netlify Function originale
                 await saveWinToServer(wonPrizeName, wonPrizeDesc);
 
-                // Controlla se abilitare o meno il pulsante in base ai giri residui
                 if (currentTicket) {
                     const tIdx = ticketsList.findIndex(t => t.codice.toUpperCase() === currentTicket.codice.toUpperCase());
                     const residuiAggiornati = tIdx !== -1 ? (ticketsList[tIdx].giriResidui ?? 0) : 0;
