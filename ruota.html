@@ -3,73 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FORTUNA RP • Ruota della Fortuna</title>
+    <title>LS Racing - Ruota della Fortuna</title>
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="icon" type="image/png" href="assets/img/favicon.png?v=2">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #0b0b0e; color: #fff; font-family: ui-sans-serif, system-ui, sans-serif; }
+        body {
+            background-color: #0b0b0e;
+            background-image: radial-gradient(circle at center, #1a1510 0%, #050507 100%);
+        }
+        .wheel-outer-ring {
+            position: relative;
+            width: 360px;
+            height: 360px;
+            margin: 0 auto;
+            border-radius: 50%;
+            padding: 12px;
+            background: linear-gradient(135deg, #d97706 0%, #78350f 50%, #f59e0b 100%);
+            box-shadow: 0 0 35px rgba(245, 158, 11, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.8);
+            border: 3px solid #fbbf24;
+        }
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        canvas {
+            transition: transform 4s cubic-bezier(0.15, 0.90, 0.15, 1);
+            border-radius: 50%;
+        }
+        .pointer {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top: 32px solid #fbbf24;
+            filter: drop-shadow(0 3px 4px rgba(0,0,0,0.8));
+            z-index: 20;
+        }
+        .center-hub {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 105px;
+            height: 105px;
+            background: radial-gradient(circle, #1a1207 0%, #050301 100%);
+            border: 3px solid #fbbf24;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(0,0,0,0.9), inset 0 0 12px rgba(245,158,11,0.5);
+            z-index: 10;
+            overflow: hidden;
+            padding: 2px;
+        }
+        .center-hub img {
+            width: 170%;
+            height: 170%;
+            max-width: none;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.9));
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
+<body class="text-white font-sans min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
 
-    <header class="border-b border-[#1f1f2e] bg-[#0b0b0e]/85 backdrop-blur px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl border border-amber-500/40 bg-amber-500/10 flex items-center justify-center text-amber-400">
-                <i class="fa-solid fa-dice"></i>
-            </div>
+    <div id="navbar"></div>
+
+    <main class="container mx-auto px-6 py-6 flex-grow flex flex-col justify-center">
+        
+        <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-                <h1 class="font-black tracking-wider text-amber-400 text-sm">FORTUNA RP</h1>
-                <p class="text-[11px] text-gray-400">Ruota della Fortuna</p>
+                <span class="text-[10px] tracking-widest text-amber-500 font-semibold uppercase">Server Roleplay • Estrazione Ufficiale</span>
+                <h2 class="text-3xl font-black text-white tracking-wide mt-1">RUOTA DELLA FORTUNA</h2>
+                <p class="text-xs text-gray-400 mt-1">Inserisci il tuo ID Discord e il codice ticket fornito dallo staff, gira la ruota e vinci premi esclusivi in gioco.</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <a href="admin_premi.html" class="border border-amber-500/30 hover:border-amber-500/60 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-4 py-2 rounded-xl text-xs font-semibold transition inline-flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield"></i> Area Operatori
+                </a>
             </div>
         </div>
-        <a href="admin_premi.html" class="border border-amber-500/30 hover:border-amber-500/60 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-2">
-            <i class="fa-solid fa-lock text-[10px]"></i> Pannello Operatori
-        </a>
-    </header>
 
-    <main class="container mx-auto px-4 py-8 flex-grow flex flex-col items-center justify-center">
-        <div class="w-full max-w-lg bg-[#121218] border border-[#232333] p-6 rounded-3xl shadow-2xl text-center">
-            <h2 class="text-xl font-black mb-2 text-white">Inserisci il tuo Ticket</h2>
-            <p class="text-xs text-gray-400 mb-6">Digita il codice del ticket rilasciato dagli operatori per girare la ruota.</p>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
-            <div class="flex gap-2 mb-4">
-                <input type="text" id="ticket-input" placeholder="Es. TICKET-ABC123" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-4 py-3 text-xs text-white uppercase tracking-widest focus:outline-none focus:border-amber-500 font-mono">
-                <button onclick="verificaTicket()" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-5 rounded-xl text-xs uppercase tracking-wider transition">Verifica</button>
+            <!-- Colonna Sinistra -->
+            <div class="lg:col-span-3 bg-[#121218] border border-[#232333] p-5 rounded-3xl shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+                
+                <div id="ticket-section">
+                    <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-ticket text-amber-400"></i> Il tuo ticket
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">ID Discord</label>
+                            <input type="text" id="discord-id" placeholder="123456789012345678" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500 placeholder-gray-600">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Codice Ticket</label>
+                            <input type="text" id="ticket-code" placeholder="TICKET-XYZ" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs font-mono uppercase focus:outline-none focus:border-amber-500 placeholder-gray-600">
+                        </div>
+                        <button onclick="verifyAndStart()" class="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-dice"></i> Verifica e Gira
+                        </button>
+                    </div>
+                    <p id="ticket-message" class="text-xs mt-3 hidden font-medium text-center"></p>
+                </div>
+
+                <div id="verified-box" class="hidden text-center py-4">
+                    <div class="w-10 h-10 mx-auto rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-2">
+                        <i class="fa-solid fa-check text-sm"></i>
+                    </div>
+                    <span class="text-[10px] uppercase tracking-wider text-gray-400 block">Utente Verificato</span>
+                    <span id="display-user" class="text-xs text-amber-400 font-bold block mt-1"></span>
+                    <div class="text-[11px] text-gray-300 mt-2">Giri Residui: <strong id="info-giri" class="text-green-400">0</strong></div>
+                    <button onclick="resetVerification()" class="mt-4 text-[10px] text-gray-500 hover:text-gray-300 underline">Cambia Ticket</button>
+                </div>
+
             </div>
 
-            <div id="ticket-info-box" class="hidden bg-[#0b0b0e] border border-[#232333] p-4 rounded-2xl mb-6 text-left">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="text-xs text-gray-400">Codice: <strong id="info-codice" class="text-amber-400 font-mono"></strong></span>
-                    <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" id="info-stato-badge"></span>
+            <!-- Colonna Centrale -->
+            <div class="lg:col-span-6 flex flex-col items-center justify-center relative">
+                
+                <div class="wheel-outer-ring mb-6">
+                    <div class="pointer"></div>
+                    <div class="wheel-container">
+                        <canvas id="wheel" width="336" height="336"></canvas>
+                    </div>
+                    <div class="center-hub">
+                        <img src="ruota.png" alt="LS Racing Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display:none;" class="flex-col items-center justify-center text-center">
+                            <span class="text-amber-400 font-black text-xs tracking-wider">LS</span>
+                            <span class="text-white font-bold text-[8px] tracking-widest uppercase">RACING</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-xs text-gray-300">Giri Residui: <strong id="info-giri" class="text-green-400 text-sm">0</strong></div>
-            </div>
 
-            <div id="ruota-container" class="hidden relative my-6 p-4">
-                <div class="w-48 h-48 mx-auto rounded-full border-4 border-amber-500 flex items-center justify-center bg-[#0b0b0e] relative shadow-[0_0_30px_rgba(245,158,11,0.2)]" id="wheel-element">
-                    <i class="fa-solid fa-gift text-4xl text-amber-400 animate-pulse"></i>
-                </div>
-                <button id="spin-btn" onclick="giraRuota()" class="mt-6 w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg">
-                    Gira la Ruota!
+                <button id="spin-btn" onclick="spinWheel()" disabled class="bg-gray-800 text-gray-500 cursor-not-allowed font-black text-sm py-3 px-8 rounded-full shadow transition duration-200 uppercase tracking-wider border border-gray-700">
+                    Inserisci Ticket per Girare
                 </button>
+                <div id="win-result" class="mt-4 text-xl font-black text-amber-400 text-center drop-shadow-[0_2px_8px_rgba(245,158,11,0.4)] min-h-[2rem]"></div>
             </div>
 
-            <div id="risultato-box" class="hidden mt-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-amber-300 text-sm font-bold"></div>
+            <!-- Colonna Destra -->
+            <div class="lg:col-span-3 bg-[#121218] border border-[#232333] p-5 rounded-3xl">
+                <h3 class="text-sm font-bold text-white mb-4">Ultimi vincitori</h3>
+                <div id="ultimi-vincitori-container" class="space-y-2.5">
+                    <div class="bg-[#0b0b0e] border border-[#232333] p-3 rounded-xl">
+                        <div class="font-bold text-xs text-white">TEST_Player</div>
+                        <div class="text-[11px] text-amber-400 font-medium">2.000$ Cash</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
     </main>
 
-    <footer class="border-t border-[#1f1f2e] bg-[#0b0b0e]/85 py-4 text-center text-xs text-gray-500">
-        &copy; 2026 FORTUNA RP • Tutti i diritti riservati
+    <footer class="bg-black/60 backdrop-blur border-t border-amber-500/20 p-4 text-center text-xs text-amber-500/50">
+        &copy; 2026 LS Racing • Luxury Edition
     </footer>
 
+    <script src="assets/js/navbar.js"></script>
     <script>
+        let prizesData = [];
+        let currentRotation = 0;
+        let isSpinning = false;
+        let activeDiscordId = "";
+        let isVerified = false;
         let currentTicket = null;
         let ticketsList = [];
         let vinciteList = [];
-        let premiList = [];
 
-        window.onload = function() {
+        window.onload = async function() {
             caricaDatiLocali();
+            await fetchPrizes();
+            aggiornaListaVincitoriUI();
         };
 
         function caricaDatiLocali() {
@@ -78,119 +200,306 @@
 
             const vData = localStorage.getItem('ls_admin_vincite');
             if (vData) { try { vinciteList = JSON.parse(vData); } catch(e) {} }
+        }
 
-            const pData = localStorage.getItem('ls_saved_prizes');
-            if (pData) { 
-                try { premiList = JSON.parse(pData); } catch(e) {} 
+        async function fetchPrizes() {
+            const localSaved = localStorage.getItem('ls_saved_prizes');
+            if (localSaved) {
+                try {
+                    prizesData = JSON.parse(localSaved);
+                    drawWheel();
+                    return;
+                } catch (e) {
+                    console.error("Errore parsing localStorage", e);
+                }
             }
-            if (!premiList.length) {
-                premiList = [
-                    { nome: "2.000$ Cash", desc: "Denaro contante", perc: 25, attivo: true },
-                    { nome: "Pacco Misterioso", desc: "Premio sorpresa", perc: 25, attivo: true },
-                    { nome: "Kit Riparazione", desc: "Oggetti officina", perc: 25, attivo: true },
-                    { nome: "VIP Pass", desc: "Accesso prioritario", perc: 25, attivo: true }
-                ];
+
+            try {
+                const response = await fetch('/.netlify/functions/ruota-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get-premi' })
+                });
+                const result = await response.json();
+
+                if (result.success && result.premi && result.premi.length > 0) {
+                    prizesData = result.premi;
+                } else {
+                    prizesData = [];
+                }
+            } catch (err) {
+                prizesData = [];
+            }
+            drawWheel();
+        }
+
+        function drawWheel() {
+            const canvas = document.getElementById("wheel");
+            const ctx = canvas.getContext("2d");
+            const numSegments = prizesData.length;
+            if (numSegments === 0) return;
+            const arc = Math.PI * 2 / numSegments;
+            const size = 336;
+            const center = size / 2;
+            const radius = center;
+
+            ctx.clearRect(0, 0, size, size);
+            
+            for (let i = 0; i < numSegments; i++) {
+                const premio = prizesData[i];
+                ctx.beginPath();
+                ctx.fillStyle = premio.colore || "#d97706";
+                ctx.moveTo(center, center);
+                ctx.arc(center, center, radius, i * arc, (i + 1) * arc);
+                ctx.lineTo(center, center);
+                ctx.fill();
+
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#fbbf24';
+                ctx.stroke();
+                
+                ctx.save();
+                ctx.translate(center, center);
+                ctx.rotate(i * arc + arc / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 12px sans-serif";
+                ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+                ctx.shadowBlur = 4;
+                ctx.fillText(premio.nome, radius - 24, 4);
+                ctx.restore();
             }
         }
 
-        function verificaTicket() {
+        async function verifyAndStart() {
             caricaDatiLocali();
-            const inputCode = document.getElementById('ticket-input').value.trim().toUpperCase();
-            if (!inputCode) {
-                alert("Inserisci un codice ticket valido.");
+            const discordId = document.getElementById('discord-id').value.trim();
+            const codice = document.getElementById('ticket-code').value.trim().toUpperCase();
+            const msgEl = document.getElementById('ticket-message');
+
+            if (!discordId || discordId.length < 16) {
+                msgEl.textContent = "Inserisci un ID Discord valido.";
+                msgEl.className = "text-xs mt-3 text-red-400 font-medium text-center";
+                msgEl.classList.remove('hidden');
                 return;
             }
 
-            const ticketIndex = ticketsList.findIndex(t => t.codice.toUpperCase() === inputCode);
-            if (ticketIndex === -1) {
-                alert("Ticket non trovato nel sistema.");
+            if (!codice) {
+                msgEl.textContent = "Inserisci il codice del ticket.";
+                msgEl.className = "text-xs mt-3 text-red-400 font-medium text-center";
+                msgEl.classList.remove('hidden');
                 return;
             }
 
-            currentTicket = ticketsList[ticketIndex];
-            const residui = currentTicket.giriResidui !== undefined ? currentTicket.giriResidui : currentTicket.giri;
+            // Verifica locale del ticket sincronizzato con admin
+            const ticketIndex = ticketsList.findIndex(t => t.codice.toUpperCase() === codice);
+            if (ticketIndex !== -1) {
+                currentTicket = ticketsList[ticketIndex];
+                const residui = currentTicket.giriResidui !== undefined ? currentTicket.giriResidui : currentTicket.giri;
 
-            document.getElementById('info-codice').textContent = currentTicket.codice;
-            document.getElementById('info-giri').textContent = residui;
-            document.getElementById('ticket-info-box').classList.remove('hidden');
+                if (residui <= 0) {
+                    msgEl.textContent = "Questo ticket ha esaurito i giri disponibili!";
+                    msgEl.className = "text-xs mt-3 text-red-400 font-medium text-center";
+                    msgEl.classList.remove('hidden');
+                    return;
+                }
 
-            const badge = document.getElementById('info-stato-badge');
-            const spinBtn = document.getElementById('spin-btn');
-
-            if (residui <= 0) {
-                badge.textContent = "ESAURITO";
-                badge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/30";
-                spinBtn.disabled = true;
-                spinBtn.className = "mt-6 w-full bg-gray-700 text-gray-400 font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider cursor-not-allowed";
-                document.getElementById('ruota-container').classList.remove('hidden');
-                alert("Questo ticket ha esaurito i giri disponibili!");
-            } else {
-                badge.textContent = "ATTIVO";
-                badge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/30";
+                activeDiscordId = discordId;
+                isVerified = true;
+                document.getElementById('display-user').textContent = `<@${discordId}> (${currentTicket.codice})`;
+                document.getElementById('info-giri').textContent = residui;
+                document.getElementById('ticket-section').classList.add('hidden');
+                document.getElementById('verified-box').classList.remove('hidden');
+                
+                const spinBtn = document.getElementById('spin-btn');
                 spinBtn.disabled = false;
-                spinBtn.className = "mt-6 w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg";
-                document.getElementById('ruota-container').classList.remove('hidden');
+                spinBtn.className = "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 text-black font-black text-sm py-3 px-8 rounded-full shadow-[0_0_25px_rgba(245,158,11,0.5)] transition duration-200 uppercase tracking-wider border border-yellow-300 cursor-pointer";
+                spinBtn.textContent = "Gira la Ruota!";
+                return;
+            }
+
+            // Fallback su Netlify function se non trovato localmente
+            try {
+                const response = await fetch('/.netlify/functions/ruota-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'verify', codice: codice })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    activeDiscordId = discordId;
+                    isVerified = true;
+                    currentTicket = { codice: codice, giriResidui: 1, nota: `<@${discordId}>` };
+                    document.getElementById('display-user').textContent = `<@${discordId}>`;
+                    document.getElementById('info-giri').textContent = 1;
+                    document.getElementById('ticket-section').classList.add('hidden');
+                    document.getElementById('verified-box').classList.remove('hidden');
+                    
+                    const spinBtn = document.getElementById('spin-btn');
+                    spinBtn.disabled = false;
+                    spinBtn.className = "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 text-black font-black text-sm py-3 px-8 rounded-full shadow-[0_0_25px_rgba(245,158,11,0.5)] transition duration-200 uppercase tracking-wider border border-yellow-300 cursor-pointer";
+                    spinBtn.textContent = "Gira la Ruota!";
+                } else {
+                    msgEl.textContent = result.message || "Ticket non trovato nel sistema.";
+                    msgEl.className = "text-xs mt-3 text-red-400 font-medium text-center";
+                    msgEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                msgEl.textContent = "Errore di connessione al server.";
+                msgEl.className = "text-xs mt-3 text-red-400 font-medium text-center";
+                msgEl.classList.remove('hidden');
             }
         }
 
-        function giraRuota() {
+        function resetVerification() {
+            isVerified = false;
+            activeDiscordId = "";
+            currentTicket = null;
+            document.getElementById('verified-box').classList.add('hidden');
+            document.getElementById('ticket-section').classList.remove('hidden');
+            document.getElementById('ticket-code').value = "";
+            document.getElementById('discord-id').value = "";
+            
+            const spinBtn = document.getElementById('spin-btn');
+            spinBtn.disabled = true;
+            spinBtn.className = "bg-gray-800 text-gray-500 cursor-not-allowed font-black text-sm py-3 px-8 rounded-full shadow transition duration-200 uppercase tracking-wider border border-gray-700";
+            spinBtn.textContent = "Inserisci Ticket per Girare";
+            document.getElementById('win-result').textContent = "";
+        }
+
+        function spinWheel() {
+            if (isSpinning || !isVerified || prizesData.length === 0) return;
+            isSpinning = true;
+            document.getElementById('spin-btn').disabled = true;
+            document.getElementById('win-result').textContent = "";
+
+            const canvas = document.getElementById("wheel");
+            const numSegments = prizesData.length;
+            const segmentDegree = 360 / numSegments;
+
+            let totalWeight = prizesData.reduce((sum, p) => sum + (p.perc || 0), 0);
+            if (totalWeight <= 0) totalWeight = numSegments;
+
+            let randomWeight = Math.random() * totalWeight;
+            let cumulativeWeight = 0;
+            let winningIndex = 0;
+
+            for (let i = 0; i < numSegments; i++) {
+                cumulativeWeight += (prizesData[i].perc || 1);
+                if (randomWeight <= cumulativeWeight) {
+                    winningIndex = i;
+                    break;
+                }
+            }
+
+            const extraSpins = 360 * 5;
+            const currentMod = currentRotation % 360;
+            let targetAngle = 270 - (winningIndex * segmentDegree) - (segmentDegree / 2);
+            
+            let degreesToRotate = extraSpins + targetAngle - currentMod;
+            while (degreesToRotate < extraSpins) {
+                degreesToRotate += 360;
+            }
+            
+            currentRotation += degreesToRotate;
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(async () => {
+                isSpinning = false;
+                
+                const wonPrizeObj = prizesData[winningIndex];
+                const wonPrizeName = wonPrizeObj.nome;
+                const wonPrizeDesc = wonPrizeObj.desc || "";
+
+                // Aggiorna i dati del ticket locale
+                caricaDatiLocali();
+                if (currentTicket) {
+                    const tIdx = ticketsList.findIndex(t => t.codice.toUpperCase() === currentTicket.codice.toUpperCase());
+                    if (tIdx !== -1) {
+                        let residui = ticketsList[tIdx].giriResidui !== undefined ? ticketsList[tIdx].giriResidui : ticketsList[tIdx].giri;
+                        residui = Math.max(0, residui - 1);
+                        ticketsList[tIdx].giriResidui = residui;
+                        if (residui <= 0) {
+                            ticketsList[tIdx].stato = 'ESAURITO';
+                        }
+                        localStorage.setItem('ls_admin_tickets', JSON.stringify(ticketsList));
+                        document.getElementById('info-giri').textContent = residui;
+                    }
+                }
+
+                // Salva la vincita localmente per sincronizzarla con admin_premi.html
+                const nuovaVincita = {
+                    player: `<@${activeDiscordId}>`,
+                    premio: wonPrizeName,
+                    codice: 'VINC-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+                    ticketUsato: currentTicket ? currentTicket.codice : 'N/D',
+                    data: new Date().toLocaleDateString(),
+                    scadenza: new Date(Date.now() + 7*24*60*60*1000).toLocaleDateString(),
+                    stato: 'ATTESA'
+                };
+                vinciteList.unshift(nuovaVincita);
+                localStorage.setItem('ls_admin_vincite', JSON.stringify(vinciteList));
+                aggiornaListaVincitoriUI();
+
+                let winHtml = `✨ Hai vinto: ${wonPrizeName} ✨`;
+                if (wonPrizeDesc) {
+                    winHtml += `<div class="text-xs text-amber-300/80 mt-1 font-normal">${wonPrizeDesc}</div>`;
+                }
+                document.getElementById('win-result').innerHTML = winHtml;
+
+                // Mantiene l'invio dei log su Discord tramite la Netlify Function originale
+                await saveWinToServer(wonPrizeName, wonPrizeDesc);
+
+                // Controlla se abilitare o meno il pulsante in base ai giri residui
+                if (currentTicket) {
+                    const tIdx = ticketsList.findIndex(t => t.codice.toUpperCase() === currentTicket.codice.toUpperCase());
+                    const residuiAggiornati = tIdx !== -1 ? (ticketsList[tIdx].giriResidui ?? 0) : 0;
+                    if (residuiAggiornati > 0) {
+                        document.getElementById('spin-btn').disabled = false;
+                    } else {
+                        document.getElementById('spin-btn').disabled = true;
+                        document.getElementById('spin-btn').className = "bg-gray-800 text-gray-500 cursor-not-allowed font-black text-sm py-3 px-8 rounded-full shadow transition duration-200 uppercase tracking-wider border border-gray-700";
+                        document.getElementById('spin-btn').textContent = "Giri Esauriti";
+                    }
+                }
+
+            }, 4000);
+        }
+
+        function aggiornaListaVincitoriUI() {
             caricaDatiLocali();
-            if (!currentTicket) return;
+            const container = document.getElementById('ultimi-vincitori-container');
+            if (!container) return;
 
-            const ticketIndex = ticketsList.findIndex(t => t.codice === currentTicket.codice);
-            if (ticketIndex === -1) return;
-
-            let residui = ticketsList[ticketIndex].giriResidui !== undefined ? ticketsList[ticketIndex].giriResidui : ticketsList[ticketIndex].giri;
-            if (residui <= 0) {
-                alert("Impossibile procedere: giri esauriti per questo ticket.");
-                verificaTicket();
+            if (!vinciteList.length) {
+                container.innerHTML = `<div class="text-xs text-gray-500 text-center py-4">Nessuna vincita recente</div>`;
                 return;
             }
 
-            // Filtra solo i premi attivi
-            const attivi = premiList.filter(p => p.attivo !== false);
-            if (!attivi.length) {
-                alert("Nessun premio attivo configurato nel pannello operatori.");
-                return;
+            container.innerHTML = vinciteList.slice(0, 5).map(v => `
+                <div class="bg-[#0b0b0e] border border-[#232333] p-3 rounded-xl">
+                    <div class="font-bold text-xs text-white">${v.player}</div>
+                    <div class="text-[11px] text-amber-400 font-medium">${v.premio}</div>
+                </div>
+            `).join('');
+        }
+
+        async function saveWinToServer(premio, descrizione) {
+            try {
+                await fetch('/.netlify/functions/ruota-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'win', 
+                        discordId: activeDiscordId, 
+                        premio: premio, 
+                        descrizione: descrizione 
+                    })
+                });
+            } catch (err) {
+                console.error("Errore invio vincita:", err);
             }
-
-            // Estrazione casuale basata sulla percentuale
-            const randomPremio = attivi[Math.floor(Math.random() * attivi.length)];
-
-            // Decrementa i giri residui
-            residui -= 1;
-            ticketsList[ticketIndex].giriResidui = residui;
-            if (residui <= 0) {
-                ticketsList[ticketIndex].stato = 'ESAURITO';
-            }
-
-            // Registra la vincita nel database locale condiviso con il pannello admin
-            const nuovaVincita = {
-                player: currentTicket.nota || "Giocatore (" + currentTicket.codice + ")",
-                premio: randomPremio.nome,
-                codice: 'VINC-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-                ticketUsato: currentTicket.codice,
-                data: new Date().toLocaleDateString(),
-                scadenza: new Date(Date.now() + 7*24*60*60*1000).toLocaleDateString(),
-                stato: 'ATTESA'
-            };
-
-            vinciteList.unshift(nuovaVincita);
-
-            // Salva tutto su localStorage in modo sincronizzato
-            localStorage.setItem('ls_admin_tickets', JSON.stringify(ticketsList));
-            localStorage.setItem('ls_admin_vincite', JSON.stringify(vinciteList));
-
-            // Aggiorna lo stato locale dell'interfaccia
-            currentTicket = ticketsList[ticketIndex];
-
-            // Mostra il risultato a schermo
-            const risBox = document.getElementById('risultato-box');
-            risBox.textContent = `Complimenti! Hai vinto: ${randomPremio.nome} (Giri residui: ${residui})`;
-            risBox.classList.remove('hidden');
-
-            // Aggiorna contatore visivo
-            verificaTicket();
         }
     </script>
 </body>
