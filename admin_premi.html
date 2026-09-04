@@ -531,9 +531,7 @@
         }
 
         function copyTicketCode(code) {
-            navigator.clipboard.writeText(code).then(() => {
-                // Copia effettuata silenziosamente senza alert
-            }).catch(err => {
+            navigator.clipboard.writeText(code).then(() => {}).catch(err => {
                 console.error("Errore durante la copia", err);
             });
         }
