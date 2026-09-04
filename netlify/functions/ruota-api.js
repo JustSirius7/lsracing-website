@@ -11,7 +11,7 @@ export default async (req) => {
     try {
         const store = getStore({ name: "fortuna-rp-store", consistency: "strong" });
         const body = await req.json();
-        const { action, discordId, codice, premio, descrizione, premi, tickets, vincite, operatori, ticket } = body;
+        const { action, discordId, discordName, codice, premio, descrizione, premi, tickets, vincite, operatori, ticket } = body;
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
@@ -121,12 +121,15 @@ export default async (req) => {
 
         if (action === 'win') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
-            const giocatore = discordId ? discordId.trim() : 'Ospite';
+            
+            // Gestione pulita del nome e dell'ID per il web e per il webhook Discord
+            const nomeVisualizzato = (discordName && discordName.trim() !== "") ? discordName.trim() : ((discordId && discordId.trim() !== "") ? discordId.trim() : "Ospite");
+            const tagDiscord = (discordId && discordId.trim() !== "") ? `<@${discordId.trim()}>` : `**${nomeVisualizzato}**`;
             
             let savedTickets = await store.get("tickets", { type: "json" }) || [];
             let savedVincite = await store.get("vincite", { type: "json" }) || [];
 
-            // Aggiorna i giri residui e segna come esaurito se arrivati a 0
+            // Aggiorna i giri residui e segna il ticket come esaurito se finiscono i giri
             const ticketObj = savedTickets.find(t => t.codice === ticketClean);
             if (ticketObj) {
                 if (ticketObj.giriResidui === undefined) ticketObj.giriResidui = ticketObj.giri;
@@ -140,9 +143,9 @@ export default async (req) => {
                 await store.setJSON("tickets", savedTickets);
             }
 
-            // Registra la vincita pulita con il ticket associato
+            // Registra la vincita salvando il nome leggibile per il web
             const nuovaVincita = {
-                player: giocatore,
+                player: nomeVisualizzato,
                 premio: premio || "Premio",
                 codice: 'WIN-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
                 ticketUsato: ticketClean || 'N/D',
@@ -161,7 +164,7 @@ export default async (req) => {
             const payload = {
                 embeds: [{
                     "title": "🎡 Ruota della Fortuna - Nuova Vincita!",
-                    "description": `L'utente **${giocatore}** ha girato la ruota e ha vinto:`,
+                    "description": `L'utente ${tagDiscord} ha girato la ruota e ha vinto:`,
                     "color": 16753920,
                     "fields": [
                         {"name": "🎁 Premio Ottenuto", "value": fieldValue, "inline": false},
