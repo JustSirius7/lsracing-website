@@ -99,7 +99,7 @@ export default async (req) => {
             }
 
             let savedTickets = await store.get("tickets", { type: "json" }) || [];
-            const foundTicket = savedTickets.find(t => t.codice === ticketClean);
+            const foundTicket = savedTickets.find(t => t.codice.trim().toUpperCase() === ticketClean);
 
             if (!foundTicket) {
                 return new Response(JSON.stringify({ success: false, message: "Codice ticket inesistente." }), {
@@ -122,28 +122,30 @@ export default async (req) => {
         if (action === 'win') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
             
-            // Gestione pulita del nome e dell'ID per il web e per il webhook Discord
             const nomeVisualizzato = (discordName && discordName.trim() !== "") ? discordName.trim() : ((discordId && discordId.trim() !== "") ? discordId.trim() : "Ospite");
             const tagDiscord = (discordId && discordId.trim() !== "") ? `<@${discordId.trim()}>` : `**${nomeVisualizzato}**`;
             
             let savedTickets = await store.get("tickets", { type: "json" }) || [];
             let savedVincite = await store.get("vincite", { type: "json" }) || [];
 
-            // Aggiorna i giri residui e segna il ticket come esaurito se finiscono i giri
-            const ticketObj = savedTickets.find(t => t.codice === ticketClean);
-            if (ticketObj) {
-                if (ticketObj.giriResidui === undefined) ticketObj.giriResidui = ticketObj.giri;
-                if (ticketObj.giriResidui > 0) {
-                    ticketObj.giriResidui -= 1;
+            const ticketIndex = savedTickets.findIndex(t => t.codice.trim().toUpperCase() === ticketClean);
+            if (ticketIndex !== -1) {
+                let t = savedTickets[ticketIndex];
+                let residui = t.giriResidui !== undefined ? parseInt(t.giriResidui) : parseInt(t.giri);
+                
+                if (residui > 0) {
+                    residui -= 1;
                 }
-                if (ticketObj.giriResidui <= 0) {
-                    ticketObj.giriResidui = 0;
-                    ticketObj.stato = 'ESAURITO';
+                
+                t.giriResidui = residui;
+                if (residui <= 0) {
+                    t.giriResidui = 0;
+                    t.stato = 'ESAURITO';
                 }
+                savedTickets[ticketIndex] = t;
                 await store.setJSON("tickets", savedTickets);
             }
 
-            // Registra la vincita salvando il nome leggibile per il web
             const nuovaVincita = {
                 player: nomeVisualizzato,
                 premio: premio || "Premio",
@@ -163,12 +165,12 @@ export default async (req) => {
 
             const payload = {
                 embeds: [{
-                    "title": "🎡 Ruota della Fortuna - Nuova Vincita!",
+                    "title": "🎰 Ruota della Fortuna - Nuova Vincita!",
                     "description": `L'utente ${tagDiscord} ha girato la ruota e ha vinto:`,
                     "color": 16753920,
                     "fields": [
                         {"name": "🎁 Premio Ottenuto", "value": fieldValue, "inline": false},
-                        {"name": "🎫 Ticket Utilizzato", "value": ticketClean || "N/D", "inline": true}
+                        {"name": "🎟️ Ticket Utilizzato", "value": ticketClean || "N/D", "inline": true}
                     ],
                     "footer": {"text": "LS Racing • Sistema Automatico Officina"}
                 }]
@@ -180,7 +182,7 @@ export default async (req) => {
                 body: JSON.stringify(payload)
             });
 
-            return new Response(JSON.stringify({ success: true, vincite: savedVincite }), {
+            return new Response(JSON.stringify({ success: true, vincite: savedVincite, tickets: savedTickets }), {
                 status: 200, headers: { "Content-Type": "application/json" }
             });
         }

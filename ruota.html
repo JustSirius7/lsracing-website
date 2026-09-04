@@ -418,8 +418,8 @@
                         body: JSON.stringify({ 
                             action: 'win', 
                             discordId: activeDiscordId, 
-                            playerName: activePlayerName,
-                            ticketCode: currentTicketCode,
+                            discordName: activePlayerName, // CORRETTO: invia il nome con la chiave attesa dal backend
+                            codice: currentTicketCode,       // CORRETTO: invia il codice con la chiave attesa dal backend
                             premio: wonPrizeName, 
                             descrizione: wonPrizeDesc 
                         })
