@@ -265,10 +265,13 @@
             const urlParams = new URLSearchParams(window.location.search);
             const autenticato = urlParams.get('autenticato');
             const errore = urlParams.get('errore');
+            const discordIdParam = urlParams.get('discordId');
 
             if (autenticato === 'true') {
                 localStorage.setItem('ls_discord_logged', 'true');
-                // Se la funzione di login restituisce anche l'username o l'ID via query o localStorage, li salviamo
+                if (discordIdParam) {
+                    localStorage.setItem('ls_logged_discord_id', discordIdParam);
+                }
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
@@ -282,10 +285,21 @@
             } else if (isDiscordLogged) {
                 document.getElementById('admin-section').classList.remove('hidden');
                 document.getElementById('top-user-bar').classList.remove('hidden');
-                await loadAllDataFromServer();
                 
-                // Imposta il nome dell'operatore loggato nell'header
-                currentOperatorName = localStorage.getItem('ls_logged_operator_name') || "Operatore Discord";
+                await loadAllDataFromServer();
+
+                let savedId = localStorage.getItem('ls_logged_discord_id');
+                let matchedOp = operatoriList.find(op => op.discordId === savedId);
+
+                if (matchedOp) {
+                    currentOperatorName = matchedOp.nome;
+                } else if (operatoriList.length > 0) {
+                    currentOperatorName = operatoriList[0].nome;
+                } else {
+                    currentOperatorName = "Amministratore";
+                }
+                
+                localStorage.setItem('ls_logged_operator_name', currentOperatorName);
                 document.getElementById('current-operator-badge').innerHTML = `<i class="fa-solid fa-user-shield mr-1.5"></i> ${currentOperatorName}`;
             } else {
                 document.getElementById('login-section').classList.remove('hidden');
@@ -327,7 +341,6 @@
                     vinciteList = data.vincite || [];
                     operatoriList = data.operatori || [];
 
-                    // Tentativo di associare l'utente loggato con un operatore registrato se presente
                     let savedId = localStorage.getItem('ls_logged_discord_id');
                     if (savedId) {
                         let match = operatoriList.find(op => op.discordId === savedId);
@@ -630,7 +643,7 @@
                 container.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Nessun operatore registrato.</p>';
                 return;
             }
-            operatoriList.forEach((op, idx) => {
+            operatoriList.exports = operatoriList.forEach((op, idx) => {
                 container.innerHTML += `
                     <div class="bg-[#0b0b0e] border border-[#232333] p-4 rounded-2xl flex items-center justify-between">
                         <div>
