@@ -110,15 +110,15 @@
                     <div class="space-y-3">
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Nome / Nickname</label>
-                            <input type="text" id="player-name" placeholder="Es. Mario Rossi" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500 placeholder-gray-600">
+                            <input type="text" id="player-name" autocomplete="off" placeholder="Es. Mario Rossi" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500 placeholder-gray-600">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">ID Discord</label>
-                            <input type="text" id="discord-id" placeholder="123456789012345678" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500 placeholder-gray-600">
+                            <input type="text" id="discord-id" autocomplete="off" placeholder="123456789012345678" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500 placeholder-gray-600">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Codice Ticket</label>
-                            <input type="text" id="ticket-code" placeholder="TICKET-XYZ" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3 py-2 text-white text-xs font-mono uppercase focus:outline-none focus:border-amber-500 placeholder-gray-600">
+                            <input type="text" id="ticket-code" autocomplete="off" placeholder="TICKET-XYZ" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3 py-2 text-white text-xs font-mono uppercase focus:outline-none focus:border-amber-500 placeholder-gray-600">
                         </div>
                         <button onclick="verifyAndStart()" class="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2 mt-2">
                             <i class="fa-solid fa-dice"></i> Verifica e Gira
@@ -189,6 +189,11 @@
         let currentTicketCode = "";
 
         window.onload = async function() {
+            // Svuota forzatamente i campi input all'avvio/ricarica pagina per evitare autocompilazioni indesiderate
+            document.getElementById('player-name').value = "";
+            document.getElementById('discord-id').value = "";
+            document.getElementById('ticket-code').value = "";
+
             await fetchPrizes();
             await fetchUltimiVincitori();
         };
@@ -352,6 +357,7 @@
             document.getElementById('ticket-code').value = "";
             document.getElementById('discord-id').value = "";
             document.getElementById('player-name').value = "";
+            document.getElementById('ticket-message').classList.add('hidden');
             
             const spinBtn = document.getElementById('spin-btn');
             spinBtn.disabled = true;
@@ -410,7 +416,6 @@
                 }
                 document.getElementById('win-result').innerHTML = winHtml;
 
-                // Registra la vincita e scala i giri immediatamente online tramite API
                 try {
                     const response = await fetch('/.netlify/functions/ruota-api', {
                         method: 'POST',
@@ -427,7 +432,6 @@
                     const result = await response.json();
                     
                     if (result.success) {
-                        // Trova il ticket corrente aggiornato nell'array dei ticket ritornati dal server
                         if (result.tickets && result.tickets.length > 0) {
                             const updatedTicket = result.tickets.find(t => t.codice.trim().toUpperCase() === currentTicketCode.trim().toUpperCase());
                             if (updatedTicket) {
@@ -439,10 +443,13 @@
                                     document.getElementById('spin-btn').className = "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 text-black font-black text-sm py-3 px-8 rounded-full shadow-[0_0_25px_rgba(245,158,11,0.5)] transition duration-200 uppercase tracking-wider border border-yellow-300 cursor-pointer";
                                     document.getElementById('spin-btn').textContent = "Gira di nuovo!";
                                 } else {
+                                    // Giri esauriti: resettiamo completamente il form a sinistra ripulendo tutto
                                     document.getElementById('spin-btn').disabled = true;
                                     document.getElementById('spin-btn').className = "bg-gray-800 text-gray-500 cursor-not-allowed font-black text-sm py-3 px-8 rounded-full shadow transition duration-200 uppercase tracking-wider border border-gray-700";
                                     document.getElementById('spin-btn').textContent = "Giri Esauriti";
-                                    isVerified = false;
+                                    setTimeout(() => {
+                                        resetVerification();
+                                    }, 2500); // Riporta l'utente alla schermata iniziale dei ticket dopo 2.5 secondi
                                 }
                             }
                         } else if (result.giriResidui !== undefined) {
@@ -455,11 +462,12 @@
                                 document.getElementById('spin-btn').disabled = true;
                                 document.getElementById('spin-btn').className = "bg-gray-800 text-gray-500 cursor-not-allowed font-black text-sm py-3 px-8 rounded-full shadow transition duration-200 uppercase tracking-wider border border-gray-700";
                                 document.getElementById('spin-btn').textContent = "Giri Esauriti";
-                                isVerified = false;
+                                setTimeout(() => {
+                                    resetVerification();
+                                }, 2500);
                             }
                         }
 
-                        // Aggiorna la lista degli ultimi vincitori con i dati corretti dal server
                         if (result.vincite) {
                             aggiornaListaVincitoriUI(result.vincite);
                         } else {
