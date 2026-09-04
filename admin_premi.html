@@ -275,14 +275,14 @@
             } else if (isDiscordLogged) {
                 document.getElementById('admin-section').classList.remove('hidden');
                 document.getElementById('top-user-bar').classList.remove('hidden');
-                loadAllData();
+                await loadAllData();
             } else {
                 document.getElementById('login-section').classList.remove('hidden');
             }
 
-            window.addEventListener('storage', (event) => {
+            window.addEventListener('storage', async (event) => {
                 if (event.key === 'ls_saved_prizes' || event.key === 'fortuna_rp_premi' || event.key === 'ls_admin_vincite' || event.key === 'ls_admin_tickets') {
-                    loadAllData();
+                    await loadAllData();
                 }
             });
         };
@@ -305,12 +305,31 @@
             document.getElementById(`tab-btn-${tabName}`).className = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-black";
         }
 
-        function loadAllData() {
-            // Controlla entrambe le chiavi per garantire la compatibilità con la ruota
-            const savedPrizes = localStorage.getItem('ls_saved_prizes') || localStorage.getItem('fortuna_rp_premi');
-            if (savedPrizes) {
-                try { currentPrizes = JSON.parse(savedPrizes); } catch(e) {}
+        async function loadAllData() {
+            // 1. Prova prima a scaricare i dati aggiornati dal server/Netlify API
+            try {
+                const response = await fetch('/.netlify/functions/ruota-api');
+                if (response.ok) {
+                    const serverData = await response.json();
+                    if (serverData && serverData.premi && serverData.premi.length > 0) {
+                        currentPrizes = serverData.premi;
+                        localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
+                        localStorage.setItem('fortuna_rp_premi', JSON.stringify(currentPrizes));
+                    }
+                }
+            } catch (err) {
+                console.log("Server non raggiungibile, fallback su localStorage.");
             }
+
+            // 2. Se il server non ha risposto o è vuoto, usa il localStorage
+            if (!currentPrizes.length) {
+                const savedPrizes = localStorage.getItem('ls_saved_prizes') || localStorage.getItem('fortuna_rp_premi');
+                if (savedPrizes) {
+                    try { currentPrizes = JSON.parse(savedPrizes); } catch(e) {}
+                }
+            }
+
+            // 3. Ultimo fallback se tutto è vuoto
             if (!currentPrizes.length) {
                 currentPrizes = [
                     { nome: "2.000$ Cash", desc: "Denaro contante", perc: 25, colore: "#d97706", attivo: true },
@@ -320,6 +339,7 @@
                 ];
             }
 
+            // Caricamento dati di ticket, vincite e operatori (ora correttamente dentro la funzione)
             const savedTickets = localStorage.getItem('ls_admin_tickets');
             if (savedTickets) {
                 try { ticketsList = JSON.parse(savedTickets); } catch(e) {}
@@ -444,7 +464,6 @@
 
         function syncAndSavePrizes() {
             const serialized = JSON.stringify(currentPrizes);
-            // Salva su entrambe le chiavi per sincronizzare admin e ruota
             localStorage.setItem('ls_saved_prizes', serialized);
             localStorage.setItem('fortuna_rp_premi', serialized);
 
