@@ -19,8 +19,8 @@
         }
         .wheel-outer-ring {
             position: relative;
-            width: 380px;
-            height: 380px;
+            width: 360px;
+            height: 360px;
             margin: 0 auto;
             border-radius: 50%;
             padding: 12px;
@@ -57,8 +57,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 115px;
-            height: 115px;
+            width: 105px;
+            height: 105px;
             background: radial-gradient(circle, #1a1207 0%, #050301 100%);
             border: 3px solid #fbbf24;
             border-radius: 50%;
@@ -79,48 +79,113 @@
         }
     </style>
 </head>
-<body class="text-white font-sans min-h-screen flex flex-col justify-between">
+<body class="text-white font-sans min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
 
+    <!-- Navbar originale del sito (gestita da assets/js/navbar.js) con aggiunta del collegamento Area Operatori -->
     <div id="navbar"></div>
 
-    <main class="container mx-auto px-4 py-6 flex flex-col items-center justify-center flex-grow">
+    <main class="container mx-auto px-6 py-6 flex-grow flex flex-col justify-center">
         
-        <!-- Sezione Inserimento ID Discord e Ticket -->
-        <div id="ticket-section" class="bg-black/40 border border-amber-500/30 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] text-center max-w-md w-full mb-6 backdrop-blur">
-            <h2 class="text-xl font-bold mb-3 text-amber-400">Ruota della Fortuna</h2>
-            <p class="text-gray-300 text-sm mb-6">Inserisci il tuo ID Discord e il codice ticket fornito dallo staff per procedere.</p>
-            
-            <div class="flex flex-col gap-3">
-                <input type="text" id="discord-id" placeholder="ID Discord (es. 123456789012345678)" class="bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 w-full text-white focus:outline-none focus:border-amber-400 placeholder-gray-600">
-                <input type="text" id="ticket-code" placeholder="Codice Ticket (es. TICKET-XYZ)" class="bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 w-full uppercase text-white focus:outline-none focus:border-amber-400 placeholder-gray-600">
-                <button onclick="verifyAndStart()" class="bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold px-6 py-3 rounded-xl transition duration-200 uppercase tracking-wider text-sm shadow mt-2">Verifica e Gira</button>
+        <!-- Intestazione Sezione in stile immagine -->
+        <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <span class="text-[10px] tracking-widest text-amber-500 font-semibold uppercase">Server Roleplay • Estrazione Ufficiale</span>
+                <h2 class="text-3xl font-black text-white tracking-wide mt-1">RUOTA DELLA FORTUNA</h2>
+                <p class="text-xs text-gray-400 mt-1">Inserisci il tuo ID Discord e il codice ticket fornito dallo staff, gira la ruota e vinci premi esclusivi in gioco.</p>
             </div>
-            <p id="ticket-message" class="text-sm mt-4 hidden font-medium"></p>
+            <!-- Collegamento Area Operatori -->
+            <div class="mt-4 md:mt-0">
+                <a href="admin_premi.html" class="border border-amber-500/30 hover:border-amber-500/60 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-4 py-2 rounded-xl text-xs font-semibold transition inline-flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield"></i> Area Operatori
+                </a>
+            </div>
         </div>
 
-        <!-- Sezione Gioco / Ruota -->
-        <div id="wheel-section" class="flex flex-col items-center hidden">
-            <div class="text-center mb-4">
-                <p class="text-sm text-gray-400">Utente verificato: <span id="display-user" class="text-amber-400 font-bold"></span></p>
-            </div>
-            <div class="wheel-outer-ring mb-8">
-                <div class="pointer"></div>
-                <div class="wheel-container">
-                    <canvas id="wheel" width="356" height="356"></canvas>
+        <!-- Layout a 3 Colonne (Ticket / Ruota / Ultimi Vincitori) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            <!-- Colonna Sinistra: Inserimento Ticket e Discord (Mantiene tutte le logiche originali) -->
+            <div class="lg:col-span-3 bg-[#121218] border border-[#232333] p-5 rounded-3xl shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+                
+                <!-- Sezione inserimento ticket/Discord (iniziale) -->
+                <div id="ticket-section">
+                    <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-ticket text-amber-400"></i> Il tuo ticket
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">ID Discord</label>
+                            <input type="text" id="discord-id" placeholder="123456789012345678" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500 placeholder-gray-600">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Codice Ticket</label>
+                            <input type="text" id="ticket-code" placeholder="TICKET-XYZ" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs font-mono uppercase focus:outline-none focus:border-amber-500 placeholder-gray-600">
+                        </div>
+                        <button onclick="verifyAndStart()" class="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-dice"></i> Verifica e Gira
+                        </button>
+                    </div>
+                    <p id="ticket-message" class="text-xs mt-3 hidden font-medium text-center"></p>
                 </div>
-                <div class="center-hub">
-                    <img src="ruota.png" alt="LS Racing Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div style="display:none;" class="flex-col items-center justify-center text-center">
-                        <span class="text-amber-400 font-black text-xs tracking-wider">LS</span>
-                        <span class="text-white font-bold text-[8px] tracking-widest uppercase">RACING</span>
+
+                <!-- Box utente verificato (mostrato dopo la verifica) -->
+                <div id="verified-box" class="hidden text-center py-4">
+                    <div class="w-10 h-10 mx-auto rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-2">
+                        <i class="fa-solid fa-check text-sm"></i>
+                    </div>
+                    <span class="text-[10px] uppercase tracking-wider text-gray-400 block">Utente Verificato</span>
+                    <span id="display-user" class="text-xs text-amber-400 font-bold block mt-1"></span>
+                    <button onclick="resetVerification()" class="mt-4 text-[10px] text-gray-500 hover:text-gray-300 underline">Cambia Ticket</button>
+                </div>
+
+            </div>
+
+            <!-- Colonna Centrale: La Ruota -->
+            <div class="lg:col-span-6 flex flex-col items-center justify-center relative">
+                
+                <div class="wheel-outer-ring mb-6">
+                    <div class="pointer"></div>
+                    <div class="wheel-container">
+                        <canvas id="wheel" width="336" height="336"></canvas>
+                    </div>
+                    <div class="center-hub">
+                        <img src="ruota.png" alt="LS Racing Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display:none;" class="flex-col items-center justify-center text-center">
+                            <span class="text-amber-400 font-black text-xs tracking-wider">LS</span>
+                            <span class="text-white font-bold text-[8px] tracking-widest uppercase">RACING</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="spin-btn" onclick="spinWheel()" disabled class="bg-gray-800 text-gray-500 cursor-not-allowed font-black text-sm py-3 px-8 rounded-full shadow transition duration-200 uppercase tracking-wider border border-gray-700">
+                    Inserisci Ticket per Girare
+                </button>
+                <div id="win-result" class="mt-4 text-xl font-black text-amber-400 text-center drop-shadow-[0_2px_8px_rgba(245,158,11,0.4)] min-h-[2rem]"></div>
+            </div>
+
+            <!-- Colonna Destra: Ultimi Vincitori -->
+            <div class="lg:col-span-3 bg-[#121218] border border-[#232333] p-5 rounded-3xl">
+                <h3 class="text-sm font-bold text-white mb-4">Ultimi vincitori</h3>
+                <div class="space-y-2.5">
+                    <div class="bg-[#0b0b0e] border border-[#232333] p-3 rounded-xl">
+                        <div class="font-bold text-xs text-white">TEST_Player</div>
+                        <div class="text-[11px] text-amber-400 font-medium">2.000$ Cash</div>
+                    </div>
+                    <div class="bg-[#0b0b0e] border border-[#232333] p-3 rounded-xl">
+                        <div class="font-bold text-xs text-white">TEST_Player</div>
+                        <div class="text-[11px] text-amber-400 font-medium">2.000$ Cash</div>
+                    </div>
+                    <div class="bg-[#0b0b0e] border border-[#232333] p-3 rounded-xl">
+                        <div class="font-bold text-xs text-white">Mario Testini</div>
+                        <div class="text-[11px] text-amber-400 font-medium">Pacco Misterioso</div>
+                    </div>
+                    <div class="bg-[#0b0b0e] border border-[#232333] p-3 rounded-xl">
+                        <div class="font-bold text-xs text-white">TEST_UI_Player_X</div>
+                        <div class="text-[11px] text-amber-400 font-medium">Pacco Misterioso</div>
                     </div>
                 </div>
             </div>
 
-            <button id="spin-btn" onclick="spinWheel()" class="bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 text-black font-black text-lg py-3.5 px-10 rounded-full shadow-[0_0_25px_rgba(245,158,11,0.5)] transition duration-200 uppercase tracking-wider border border-yellow-300">
-                Gira la Ruota!
-            </button>
-            <div id="win-result" class="mt-6 text-2xl font-black text-amber-400 text-center drop-shadow-[0_2px_8px_rgba(245,158,11,0.4)] min-h-[2rem]"></div>
         </div>
 
     </main>
@@ -135,13 +200,13 @@
         let currentRotation = 0;
         let isSpinning = false;
         let activeDiscordId = "";
+        let isVerified = false;
 
         window.onload = async function() {
             await fetchPrizes();
         };
 
         async function fetchPrizes() {
-            // Legge prima i premi salvati nel browser
             const localSaved = localStorage.getItem('ls_saved_prizes');
             if (localSaved) {
                 try {
@@ -153,7 +218,6 @@
                 }
             }
 
-            // Altrimenti li richiede al server
             try {
                 const response = await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
@@ -179,7 +243,7 @@
             const numSegments = prizesData.length;
             if (numSegments === 0) return;
             const arc = Math.PI * 2 / numSegments;
-            const size = 356;
+            const size = 336;
             const center = size / 2;
             const radius = center;
 
@@ -203,10 +267,10 @@
                 ctx.rotate(i * arc + arc / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = "#ffffff";
-                ctx.font = "bold 13px sans-serif";
+                ctx.font = "bold 12px sans-serif";
                 ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
                 ctx.shadowBlur = 4;
-                ctx.fillText(premio.nome, radius - 28, 5);
+                ctx.fillText(premio.nome, radius - 24, 4);
                 ctx.restore();
             }
         }
@@ -218,14 +282,14 @@
 
             if (!discordId || discordId.length < 16) {
                 msgEl.textContent = "Inserisci un ID Discord valido.";
-                msgEl.className = "text-sm mt-4 text-red-400 font-medium";
+                msgEl.className = "text-xs mt-3 text-red-400 font-medium text-center";
                 msgEl.classList.remove('hidden');
                 return;
             }
 
             if (!codice) {
                 msgEl.textContent = "Inserisci il codice del ticket.";
-                msgEl.className = "text-sm mt-4 text-red-400 font-medium";
+                msgEl.className = "text-xs mt-3 text-red-400 font-medium text-center";
                 msgEl.classList.remove('hidden');
                 return;
             }
@@ -240,23 +304,44 @@
 
                 if (result.success) {
                     activeDiscordId = discordId;
+                    isVerified = true;
                     document.getElementById('display-user').textContent = `<@${discordId}>`;
                     document.getElementById('ticket-section').classList.add('hidden');
-                    document.getElementById('wheel-section').classList.remove('hidden');
+                    document.getElementById('verified-box').classList.remove('hidden');
+                    
+                    // Abilita il pulsante di giro
+                    const spinBtn = document.getElementById('spin-btn');
+                    spinBtn.disabled = false;
+                    spinBtn.className = "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 text-black font-black text-sm py-3 px-8 rounded-full shadow-[0_0_25px_rgba(245,158,11,0.5)] transition duration-200 uppercase tracking-wider border border-yellow-300 cursor-pointer";
+                    spinBtn.textContent = "Gira la Ruota!";
                 } else {
                     msgEl.textContent = result.message;
-                    msgEl.className = "text-sm mt-4 text-red-400 font-medium";
+                    msgEl.className = "text-xs mt-3 text-red-400 font-medium text-center";
                     msgEl.classList.remove('hidden');
                 }
             } catch (err) {
                 msgEl.textContent = "Errore di connessione al server.";
-                msgEl.className = "text-sm mt-4 text-red-400 font-medium";
+                msgEl.className = "text-xs mt-3 text-red-400 font-medium text-center";
                 msgEl.classList.remove('hidden');
             }
         }
 
+        function resetVerification() {
+            isVerified = false;
+            activeDiscordId = "";
+            document.getElementById('verified-box').classList.add('hidden');
+            document.getElementById('ticket-section').classList.remove('hidden');
+            document.getElementById('ticket-code').value = "";
+            
+            const spinBtn = document.getElementById('spin-btn');
+            spinBtn.disabled = true;
+            spinBtn.className = "bg-gray-800 text-gray-500 cursor-not-allowed font-black text-sm py-3 px-8 rounded-full shadow transition duration-200 uppercase tracking-wider border border-gray-700";
+            spinBtn.textContent = "Inserisci Ticket per Girare";
+            document.getElementById('win-result').textContent = "";
+        }
+
         function spinWheel() {
-            if (isSpinning || prizesData.length === 0) return;
+            if (isSpinning || !isVerified || prizesData.length === 0) return;
             isSpinning = true;
             document.getElementById('spin-btn').disabled = true;
             document.getElementById('win-result').textContent = "";
@@ -265,7 +350,6 @@
             const numSegments = prizesData.length;
             const segmentDegree = 360 / numSegments;
 
-            // 1. Estrazione in base alle percentuali
             let totalWeight = prizesData.reduce((sum, p) => sum + (p.perc || 0), 0);
             if (totalWeight <= 0) totalWeight = numSegments;
 
@@ -281,11 +365,8 @@
                 }
             }
 
-            // 2. Sincronizzazione geometrica esatta
             const extraSpins = 360 * 5;
             const currentMod = currentRotation % 360;
-            
-            // Sottraendo l'indice moltiplicato per i gradi del segmento, agganciamo millimetricamente il centro dello spicchio sotto la freccia in alto
             let targetAngle = 270 - (winningIndex * segmentDegree) - (segmentDegree / 2);
             
             let degreesToRotate = extraSpins + targetAngle - currentMod;
@@ -306,7 +387,7 @@
 
                 let winHtml = `✨ Hai vinto: ${wonPrizeName} ✨`;
                 if (wonPrizeDesc) {
-                    winHtml += `<div class="text-sm text-amber-300/80 mt-1 font-normal">${wonPrizeDesc}</div>`;
+                    winHtml += `<div class="text-xs text-amber-300/80 mt-1 font-normal">${wonPrizeDesc}</div>`;
                 }
                 document.getElementById('win-result').innerHTML = winHtml;
 

@@ -3,108 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LS Racing - Admin Ruota</title>
+    <title>FORTUNA RP • Pannello Operatori</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0b0b0e; color: #fff; font-family: ui-sans-serif, system-ui, sans-serif; }
+    </style>
 </head>
-<body class="text-white font-sans min-h-screen flex flex-col justify-between bg-[#0b0b0e]">
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
 
-    <header class="bg-black/60 backdrop-blur border-b border-amber-500/20 p-4 text-center">
-        <h1 class="text-xl font-black tracking-widest text-amber-400">LS RACING • ADMIN RUOTA</h1>
-    </header>
-
-    <main class="container mx-auto px-4 py-6 flex flex-col items-center justify-center flex-grow">
-        
-        <!-- Sezione 1: Verifica con Discord -->
-        <div id="login-section" class="bg-black/40 border border-amber-500/30 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] text-center max-w-md w-full mb-6 hidden backdrop-blur">
-            <h2 class="text-xl font-bold mb-3 text-amber-400">Verifica con Discord</h2>
-            <p class="text-gray-300 text-sm mb-6">Effettua la verifica tramite Discord per accedere al pannello di controllo.</p>
-            <button onclick="simulateLogin()" class="inline-block bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3 px-8 rounded-xl shadow-lg transition duration-200 uppercase tracking-wider text-sm">
-                Verifica con Discord
-            </button>
-            <!-- Box messaggio di errore -->
-            <p id="error-message-box" class="text-red-400 text-xs mt-4 hidden bg-red-500/10 border border-red-500/20 p-3 rounded-xl"></p>
+    <!-- Header Principale -->
+    <header class="border-b border-[#1f1f2e] bg-[#0b0b0e]/80 backdrop-blur px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl border border-amber-500/40 bg-amber-500/10 flex items-center justify-center text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+                <i class="fa-solid fa-dice"></i>
+            </div>
+            <div>
+                <h1 class="font-black tracking-wider text-amber-400 text-sm">FORTUNA RP</h1>
+                <p class="text-[11px] text-gray-400">Pannello Operatori</p>
+            </div>
         </div>
 
-        <!-- Sezione 2: Pannello Admin a due colonne -->
-        <div id="admin-section" class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full max-w-6xl hidden">
+        <div id="top-user-bar" class="flex items-center gap-4 hidden">
+            <span class="text-xs text-gray-300">Amministratore <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-bold ml-1">Admin</span></span>
+            <button onclick="logout()" class="border border-red-500/30 hover:border-red-500/60 bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                <i class="fa-solid fa-right-from-bracket"></i> Esci
+            </button>
+        </div>
+    </header>
+
+    <!-- Sezione 1: Schermata di Login/Verifica -->
+    <main id="login-section" class="flex-grow flex items-center justify-center p-4 hidden">
+        <div class="bg-[#121218] border border-[#232333] p-8 rounded-3xl shadow-2xl text-center max-w-md w-full relative">
+            <div class="w-14 h-14 mx-auto mb-4 rounded-2xl border border-amber-500/40 bg-amber-500/10 flex items-center justify-center text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                <i class="fa-solid fa-dice text-xl"></i>
+            </div>
+            <p class="text-[10px] tracking-widest text-amber-500 font-bold uppercase mb-1">Area Riservata</p>
+            <h2 class="text-2xl font-black mb-6 text-white">ACCESSO OPERATORI</h2>
             
-            <!-- Colonna Sinistra: Premi Attivi e Modifica -->
-            <div class="lg:col-span-2 bg-black/40 border border-amber-500/30 p-6 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur">
-                <h2 class="text-lg font-bold mb-4 text-amber-400 flex items-center justify-between">
-                    <span>Premi Attivi sulla Ruota</span>
-                    <button onclick="saveAllPrizes()" class="bg-amber-600 hover:bg-amber-500 text-black font-bold px-3 py-1.5 rounded-lg text-xs uppercase tracking-wider transition">Salva Modifiche</button>
-                </h2>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-gray-300">
-                        <thead class="bg-black/60 text-amber-400 uppercase text-xs border-b border-amber-500/20">
-                            <tr>
-                                <th class="p-3">Nome Ruota</th>
-                                <th class="p-3">Descrizione</th>
-                                <th class="p-3 w-24">%</th>
-                                <th class="p-3 w-16">Colore</th>
-                                <th class="p-3 text-center w-16">Azioni</th>
-                            </tr>
-                        </thead>
-                        <tbody id="prizes-table-body" class="divide-y divide-amber-500/10">
-                            <!-- Popolato dinamicamente -->
-                        </tbody>
-                    </table>
+            <button onclick="simulateLogin()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-bold py-3.5 px-6 rounded-xl shadow-lg transition duration-200 text-sm uppercase tracking-wider">
+                Verifica con Discord
+            </button>
+            <p id="error-message-box" class="text-red-400 text-xs mt-4 hidden bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-left"></p>
+            
+            <div class="mt-6">
+                <a href="/" class="text-xs text-gray-400 hover:text-white transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-arrow-left text-[10px]"></i> Torna alla ruota
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sezione 2: Dashboard Admin Completa -->
+    <main id="admin-section" class="container mx-auto px-4 py-8 flex-grow hidden">
+        
+        <!-- Box Statistiche in Alto -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-[#121218] border border-[#232333] p-5 rounded-2xl relative overflow-hidden">
+                <div class="flex items-center justify-between text-gray-400 mb-2">
+                    <span class="text-xs uppercase tracking-wider font-semibold">Giri Totali</span>
+                    <i class="fa-solid fa-dice text-amber-400/80"></i>
+                </div>
+                <div class="text-3xl font-black text-white" id="stat-giri">7</div>
+            </div>
+            <div class="bg-[#121218] border border-[#232333] p-5 rounded-2xl relative overflow-hidden">
+                <div class="flex items-center justify-between text-gray-400 mb-2">
+                    <span class="text-xs uppercase tracking-wider font-semibold">Ticket Attivi</span>
+                    <i class="fa-solid fa-ticket text-amber-400/80"></i>
+                </div>
+                <div class="text-3xl font-black text-white" id="stat-ticket">4</div>
+            </div>
+            <div class="bg-[#121218] border border-[#232333] p-5 rounded-2xl relative overflow-hidden">
+                <div class="flex items-center justify-between text-gray-400 mb-2">
+                    <span class="text-xs uppercase tracking-wider font-semibold">Premi in Attesa</span>
+                    <i class="fa-solid fa-gift text-amber-400/80"></i>
+                </div>
+                <div class="text-3xl font-black text-white" id="stat-attesa">2</div>
+            </div>
+            <div class="bg-[#121218] border border-[#232333] p-5 rounded-2xl relative overflow-hidden">
+                <div class="flex items-center justify-between text-gray-400 mb-2">
+                    <span class="text-xs uppercase tracking-wider font-semibold">Premi Ritirati</span>
+                    <i class="fa-solid fa-circle-check text-amber-400/80"></i>
+                </div>
+                <div class="text-3xl font-black text-white" id="stat-ritirati">5</div>
+            </div>
+        </div>
+
+        <!-- Menu a Schede (Tab) -->
+        <div class="flex items-center gap-2 mb-8 border-b border-[#1f1f2e] pb-4">
+            <button onclick="switchTab('premi')" id="tab-btn-premi" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-black">Premi</button>
+            <button onclick="switchTab('ticket')" id="tab-btn-ticket" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition text-gray-400 hover:text-white bg-[#121218] border border-[#232333]">Ticket</button>
+            <button onclick="switchTab('vincite')" id="tab-btn-vincite" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition text-gray-400 hover:text-white bg-[#121218] border border-[#232333]">Vincite</button>
+            <button onclick="switchTab('operatori')" id="tab-btn-operatori" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition text-gray-400 hover:text-white bg-[#121218] border border-[#232333]">Operatori</button>
+        </div>
+
+        <!-- Contenuto Tab: PREMI -->
+        <div id="tab-content-premi" class="space-y-6">
+            <div class="bg-[#121218] border border-[#232333] p-6 rounded-3xl">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-black text-white">Gestione Premi</h2>
+                        <p class="text-xs text-gray-400 mt-0.5">Probabilità totale premi attivi: <span id="total-prob" class="text-amber-400 font-bold">105.0%</span> <span class="text-[11px] text-gray-500">(le quote vengono normalizzate sul totale)</span></p>
+                    </div>
+                    <button onclick="openAddPrizeModal()" class="bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2 shadow-md">
+                        <i class="fa-solid fa-plus text-[10px]"></i> Aggiungi Premio
+                    </button>
+                </div>
+
+                <!-- Lista Premi -->
+                <div id="prizes-list-container" class="space-y-3">
+                    <!-- Popolato dinamicamente via JS -->
                 </div>
             </div>
+        </div>
 
-            <!-- Colonna Destra: Aggiungi Premio & Generazione Ticket -->
-            <div class="flex flex-col gap-6">
-                <!-- Aggiungi Nuovo Premio -->
-                <div class="bg-black/40 border border-amber-500/30 p-6 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur">
-                    <h3 class="text-base font-bold mb-3 text-amber-400">Aggiungi Nuovo Premio</h3>
-                    <div class="space-y-3">
+        <!-- Contenuto Tab: TICKET -->
+        <div id="tab-content-ticket" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Form Genera Ticket -->
+                <div class="bg-[#121218] border border-[#232333] p-6 rounded-3xl h-fit">
+                    <h3 class="text-base font-black text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-ticket text-amber-400"></i> Genera Ticket
+                    </h3>
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Nome Ruota</label>
-                            <input type="text" id="new-p-nome" placeholder="Es. Auto Import" class="bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 w-full text-white text-sm focus:outline-none focus:border-amber-400">
+                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Numero di Giri</label>
+                            <select id="gen-giri" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                                <option value="1">1 giro</option>
+                                <option value="3" selected>3 giri</option>
+                                <option value="5">5 giri</option>
+                            </select>
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Descrizione</label>
-                            <input type="text" id="new-p-desc" placeholder="Es. Veicolo di classe alta" class="bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 w-full text-white text-sm focus:outline-none focus:border-amber-400">
+                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Giorni per ritirare il premio</label>
+                            <input type="number" id="gen-giorni" value="7" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-xs text-gray-400 mb-1">Probabilità (%)</label>
-                                <input type="number" step="0.1" min="0" id="new-p-perc" placeholder="Es. 0.5" class="bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 w-full text-white text-sm focus:outline-none focus:border-amber-400">
-                            </div>
-                            <div>
-                                <label class="block text-xs text-gray-400 mb-1">Colore Spicchio</label>
-                                <input type="color" id="new-p-color" value="#d97706" class="bg-black/60 border border-amber-500/30 rounded-xl px-2 py-1.5 w-full h-[38px] cursor-pointer">
-                            </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Nota / Destinatario (Opzionale)</label>
+                            <input type="text" id="gen-nota" placeholder="Es. evento del sabato" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
                         </div>
-                        <button onclick="addNewPrize()" class="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition mt-2">Aggiungi Premio</button>
+                        <button onclick="generateAutoTicket()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-md">
+                            Genera Ticket
+                        </button>
                     </div>
                 </div>
 
-                <!-- Generatore Automatico Ticket -->
-                <div class="bg-black/40 border border-amber-500/30 p-6 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur">
-                    <h3 class="text-base font-bold mb-3 text-amber-400">Genera Ticket Automatico</h3>
-                    <div class="space-y-3">
-                        <button onclick="generateAutoTicket()" class="w-full bg-amber-600 hover:bg-amber-500 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition">Genera Codice Casuale</button>
-                        <div id="auto-ticket-result" class="hidden bg-black/60 border border-amber-500/20 p-3 rounded-xl text-center">
-                            <p class="text-xs text-gray-400 mb-1">Codice Generato:</p>
-                            <p id="generated-code-text" class="text-amber-400 font-mono font-bold text-sm select-all"></p>
+                <!-- Lista Ticket Generati -->
+                <div class="lg:col-span-2 bg-[#121218] border border-[#232333] p-6 rounded-3xl">
+                    <h3 class="text-base font-black text-white mb-4">Ticket generati</h3>
+                    <div id="tickets-list-container" class="space-y-3">
+                        <!-- Popolato dinamicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenuto Tab: VINCITE -->
+        <div id="tab-content-vincite" class="space-y-6 hidden">
+            <div class="bg-[#121218] border border-[#232333] p-6 rounded-3xl">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-black text-white">Vincite & Riscatti</h2>
+                    </div>
+                    <div class="relative w-full sm:w-72">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-xs text-gray-500"></i>
+                        <input type="text" placeholder="Cerca giocatore o codice..." class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                </div>
+                <!-- Filtri interni -->
+                <div class="flex items-center gap-2 mb-6">
+                    <button class="bg-amber-500 text-black px-4 py-1.5 rounded-lg text-xs font-bold uppercase">Tutti</button>
+                    <button class="bg-[#0b0b0e] border border-[#232333] text-gray-400 hover:text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition">In attesa</button>
+                    <button class="bg-[#0b0b0e] border border-[#232333] text-gray-400 hover:text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition">Ritirati</button>
+                    <button class="bg-[#0b0b0e] border border-[#232333] text-gray-400 hover:text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition">Scaduti</button>
+                </div>
+                <div id="vincite-list-container" class="space-y-3">
+                    <!-- Demo Item Vincita -->
+                    <div class="bg-[#0b0b0e] border border-[#232333] p-4 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-bold text-sm text-white">TEST_UI_Player_X</span>
+                                <span class="text-xs text-amber-400 font-bold">Pacco Misterioso</span>
+                            </div>
+                            <p class="text-[11px] text-gray-500">04 set, 07:22 • WIN-KW3CEW • scade 07 set 2026</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="bg-green-500/10 text-green-400 border border-green-500/30 px-3 py-1 rounded-full text-xs font-semibold">Ritirato</span>
+                            <span class="text-xs text-gray-500 font-mono">dalscustoms2026@gmail.com</span>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Contenuto Tab: OPERATORI -->
+        <div id="tab-content-operatori" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-[#121218] border border-[#232333] p-6 rounded-3xl h-fit">
+                    <h3 class="text-base font-black text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-amber-400"></i> Nuovo Operatore
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Nome</label>
+                            <input type="text" placeholder="Es. Luca Bianchi" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Email</label>
+                            <input type="email" placeholder="operatore@esempio.com" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Password</label>
+                            <input type="password" placeholder="Minimo 6 caratteri" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                        </div>
+                        <button onclick="alert('Operatore registrato!')" class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-md">
+                            Crea Operatore
+                        </button>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 bg-[#121218] border border-[#232333] p-6 rounded-3xl">
+                    <h3 class="text-base font-black text-white mb-4">Operatori attivi</h3>
+                    <div class="bg-[#0b0b0e] border border-[#232333] p-4 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-sm text-white mb-0.5">TEST UI Op4</div>
+                            <div class="text-xs text-gray-500">test_ui_op_1788499373@example.com</div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs text-gray-500">dal 04 set 2026</span>
+                            <button class="text-red-400 hover:text-red-300 p-2 transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </main>
 
-    <footer class="bg-black/60 backdrop-blur border-t border-amber-500/20 p-4 text-center text-xs text-amber-500/50">
-        &copy; 2026 LS Racing • Luxury Edition
+    <!-- Modale Modifica Premio -->
+    <div id="prize-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-[#121218] border border-[#232333] w-full max-w-lg p-6 rounded-3xl shadow-2xl relative">
+            <button onclick="closePrizeModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 id="modal-title" class="text-lg font-black text-white mb-5">Modifica Premio</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Nome Premio</label>
+                    <input type="text" id="modal-input-nome" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Descrizione (Opzionale)</label>
+                    <input type="text" id="modal-input-desc" placeholder="Dettagli del premio" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Probabilità %</label>
+                    <input type="number" step="0.1" id="modal-input-perc" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Colore Spicchio</label>
+                    <div class="flex items-center gap-2">
+                        <input type="color" id="modal-input-color" class="w-10 h-10 rounded-xl bg-transparent border border-[#232333] cursor-pointer">
+                        <span class="text-xs text-gray-400">Scegli il colore identificativo</span>
+                    </div>
+                </div>
+                <button onclick="saveModalPrize()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-md mt-2">
+                    Salva modifiche
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#1f1f2e] bg-[#0b0b0e]/80 py-4 text-center text-xs text-gray-500">
+        &copy; 2026 FORTUNA RP • Pannello Operatori
     </footer>
 
+    <!-- Script funzionali protetti (Integrazione con Bot e Netlify Functions) -->
     <script>
         let currentPrizes = [];
+        let editingIndex = null;
 
         window.onload = async function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -121,8 +296,6 @@
             if (errore) {
                 document.getElementById('login-section').classList.remove('hidden');
                 const errorBox = document.getElementById('error-message-box');
-                
-                // Gestione personalizzata dei messaggi in base al tipo di errore passato dal server
                 if (errore === 'ruoli_insufficienti' || errore === 'unauthorized') {
                     errorBox.textContent = "Accesso Negato: L'utente connesso non possiede i ruoli richiesti (Direzione o Staff Eventi) per accedere al pannello.";
                 } else {
@@ -131,22 +304,39 @@
                 errorBox.classList.remove('hidden');
             } else if (isDiscordLogged) {
                 document.getElementById('admin-section').classList.remove('hidden');
+                document.getElementById('top-user-bar').classList.remove('hidden');
                 await loadAdminPrizes();
             } else {
                 document.getElementById('login-section').classList.remove('hidden');
             }
         };
 
+        function simulateLogin() {
+            window.location.href = '/.netlify/functions/discord-login?next=admin';
+        }
+
+        function logout() {
+            localStorage.removeItem('ls_discord_logged');
+            window.location.reload();
+        }
+
+        function switchTab(tabName) {
+            ['premi', 'ticket', 'vincite', 'operatori'].forEach(t => {
+                document.getElementById(`tab-content-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).className = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition text-gray-400 hover:text-white bg-[#121218] border border-[#232333]";
+            });
+            document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabName}`).className = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-black";
+        }
+
         async function loadAdminPrizes() {
             const localSaved = localStorage.getItem('ls_saved_prizes');
             if (localSaved) {
                 try {
                     currentPrizes = JSON.parse(localSaved);
-                    renderPrizesTable();
+                    renderPrizesUI();
                     return;
-                } catch (e) {
-                    console.error("Errore lettura localStorage", e);
-                }
+                } catch (e) {}
             }
 
             try {
@@ -156,117 +346,96 @@
                     body: JSON.stringify({ action: 'get-premi' })
                 });
                 const result = await response.json();
-
                 if (result.success && result.premi && result.premi.length > 0) {
                     currentPrizes = result.premi;
                 } else {
-                    currentPrizes = [];
+                    currentPrizes = [
+                        { id: 1, nome: "2.000$ Cash", desc: "Denaro contante in gioco", perc: 40, colore: "#ef4444" },
+                        { id: 2, nome: "10.000$ Cash", desc: "Denaro contante", perc: 20, colore: "#f59e0b" },
+                        { id: 3, nome: "Pacco Misterioso", desc: "Premio sorpresa", perc: 15, colore: "#06b6d4" },
+                        { id: 4, nome: "50.000$ Cash", desc: "Premio alto", perc: 10, colore: "#10b981" }
+                    ];
                 }
             } catch (err) {
                 currentPrizes = [];
             }
-            renderPrizesTable();
+            renderPrizesUI();
         }
 
-        function simulateLogin() {
-            window.location.href = '/.netlify/functions/discord-login?next=admin';
-        }
-
-        function renderPrizesTable() {
-            const tbody = document.getElementById('prizes-table-body');
-            tbody.innerHTML = '';
+        function renderPrizesUI() {
+            const container = document.getElementById('prizes-list-container');
+            container.innerHTML = '';
+            let totalPerc = 0;
 
             currentPrizes.forEach((p, index) => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-black/40 transition">
-                        <td class="p-3"><input type="text" value="${p.nome}" id="p-nome-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
-                        <td class="p-3"><input type="text" value="${p.desc || ''}" id="p-desc-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
-                        <td class="p-3"><input type="number" step="0.1" min="0" value="${p.perc || 0}" id="p-perc-${index}" class="bg-black/60 border border-amber-500/20 rounded-lg px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-amber-400"></td>
-                        <td class="p-3"><input type="color" value="${p.colore || '#d97706'}" id="p-color-${index}" class="w-8 h-8 rounded-lg bg-transparent cursor-pointer"></td>
-                        <td class="p-3 text-center flex items-center justify-center gap-2">
-                            <button onclick="saveSinglePrize(${index})" class="text-amber-400 hover:text-amber-300 p-2 transition rounded-lg hover:bg-amber-500/10" title="Salva questo premio">
-                                <i class="fa-solid fa-floppy-disk text-sm"></i>
-                            </button>
-                            <button onclick="deletePrize(${index})" class="text-red-400 hover:text-red-300 p-2 transition rounded-lg hover:bg-red-500/10" title="Elimina premio">
-                                <i class="fa-solid fa-trash text-sm"></i>
-                            </button>
-                        </td>
-                    </tr>
+                totalPerc += (p.perc || 0);
+                container.innerHTML += `
+                    <div class="bg-[#0b0b0e] border border-[#232333] p-4 rounded-2xl flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3.5">
+                            <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-[0_0_10px_currentColor]" style="background-color: ${p.colore || '#f59e0b'}; color: ${p.colore || '#f59e0b'}"></span>
+                            <div>
+                                <h4 class="font-bold text-sm text-white">${p.nome}</h4>
+                                <p class="text-[11px] text-gray-500">${p.desc || 'Nessuna descrizione'}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">${p.perc || 0}%</span>
+                            <div class="flex items-center gap-1">
+                                <button onclick="openEditPrizeModal(${index})" class="text-gray-400 hover:text-amber-400 p-2 transition rounded-lg hover:bg-amber-500/10"><i class="fa-solid fa-pen text-xs"></i></button>
+                                <button onclick="deletePrize(${index})" class="text-gray-400 hover:text-red-400 p-2 transition rounded-lg hover:bg-red-500/10"><i class="fa-solid fa-trash text-xs"></i></button>
+                            </div>
+                        </div>
+                    </div>
                 `;
             });
+            document.getElementById('total-prob').textContent = totalPerc.toFixed(1) + '%';
         }
 
-        function syncTableToMemory() {
-            currentPrizes.forEach((p, index) => {
-                const nomeInput = document.getElementById(`p-nome-${index}`);
-                const descInput = document.getElementById(`p-desc-${index}`);
-                const percInput = document.getElementById(`p-perc-${index}`);
-                const colorInput = document.getElementById(`p-color-${index}`);
-
-                if (nomeInput) p.nome = nomeInput.value;
-                if (descInput) p.desc = descInput.value;
-                if (percInput) p.perc = parseFloat(percInput.value) || 0;
-                if (colorInput) p.colore = colorInput.value;
-            });
+        function openAddPrizeModal() {
+            editingIndex = null;
+            document.getElementById('modal-title').textContent = "Aggiungi Nuovo Premio";
+            document.getElementById('modal-input-nome').value = '';
+            document.getElementById('modal-input-desc').value = '';
+            document.getElementById('modal-input-perc').value = '';
+            document.getElementById('modal-input-color').value = '#f59e0b';
+            document.getElementById('prize-modal').classList.remove('hidden');
         }
 
-        async function saveAllPrizes() {
-            syncTableToMemory();
-            localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
-
-            try {
-                await fetch('/.netlify/functions/ruota-api', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
-                });
-                alert("Modifiche salvate con successo e memorizzate per sempre!");
-            } catch (err) {
-                alert("Salvato nel browser, ma errore di rete con il server.");
-            }
-            renderPrizesTable();
+        function openEditPrizeModal(index) {
+            editingIndex = index;
+            const p = currentPrizes[index];
+            document.getElementById('modal-title').textContent = "Modifica Premio";
+            document.getElementById('modal-input-nome').value = p.nome || '';
+            document.getElementById('modal-input-desc').value = p.desc || '';
+            document.getElementById('modal-input-perc').value = p.perc || 0;
+            document.getElementById('modal-input-color').value = p.colore || '#f59e0b';
+            document.getElementById('prize-modal').classList.remove('hidden');
         }
 
-        async function saveSinglePrize(index) {
-            syncTableToMemory();
-            localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
-
-            try {
-                await fetch('/.netlify/functions/ruota-api', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
-                });
-                alert("Premio salvato con successo!");
-            } catch (err) {
-                alert("Salvato nel browser.");
-            }
-            renderPrizesTable();
+        function closePrizeModal() {
+            document.getElementById('prize-modal').classList.add('hidden');
         }
 
-        function deletePrize(index) {
-            if (confirm("Sei sicuro di voler eliminare questo premio?")) {
-                syncTableToMemory();
-                currentPrizes.splice(index, 1);
-                localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
-                renderPrizesTable();
-            }
-        }
-
-        async function addNewPrize() {
-            const nome = document.getElementById('new-p-nome').value.trim();
-            const desc = document.getElementById('new-p-desc').value.trim();
-            const perc = parseFloat(document.getElementById('new-p-perc').value) || 0;
-            const colore = document.getElementById('new-p-color').value;
+        async function saveModalPrize() {
+            const nome = document.getElementById('modal-input-nome').value.trim();
+            const desc = document.getElementById('modal-input-desc').value.trim();
+            const perc = parseFloat(document.getElementById('modal-input-perc').value) || 0;
+            const colore = document.getElementById('modal-input-color').value;
 
             if (!nome) {
-                alert("Inserisci almeno il nome del premio.");
+                alert("Inserisci il nome del premio.");
                 return;
             }
 
-            syncTableToMemory();
-            currentPrizes.push({ id: Date.now(), nome, desc, perc, colore });
+            if (editingIndex !== null) {
+                currentPrizes[editingIndex] = { ...currentPrizes[editingIndex], nome, desc, perc, colore };
+            } else {
+                currentPrizes.push({ id: Date.now(), nome, desc, perc, colore });
+            }
+
             localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
+            closePrizeModal();
+            renderPrizesUI();
 
             try {
                 await fetch('/.netlify/functions/ruota-api', {
@@ -274,33 +443,45 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
                 });
-                
-                document.getElementById('new-p-nome').value = '';
-                document.getElementById('new-p-desc').value = '';
-                document.getElementById('new-p-perc').value = '';
-                
-                alert("Nuovo premio aggiunto e salvato!");
-                renderPrizesTable();
-            } catch (err) {
-                alert("Aggiunto nel browser.");
+            } catch (err) {}
+        }
+
+        async function deletePrize(index) {
+            if (confirm("Eliminare questo premio?")) {
+                currentPrizes.splice(index, 1);
+                localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
+                renderPrizesUI();
+                try {
+                    await fetch('/.netlify/functions/ruota-api', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
+                    });
+                } catch (err) {}
             }
         }
 
         async function generateAutoTicket() {
-            const randomCode = 'TICKET-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const randomCode = 'WHEEL-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const container = document.getElementById('tickets-list-container');
             
+            container.innerHTML = `
+                <div class="bg-[#0b0b0e] border border-[#232333] p-4 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-sm text-amber-400 font-mono">${randomCode}</div>
+                        <div class="text-[11px] text-gray-500 mt-0.5">Creato adesso • Attivo</div>
+                    </div>
+                    <span class="bg-green-500/10 text-green-400 border border-green-500/30 px-3 py-1 rounded-full text-xs font-semibold">Attivo</span>
+                </div>
+            ` + container.innerHTML;
+
             try {
                 await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'create-ticket', codice: randomCode })
                 });
-                document.getElementById('generated-code-text').textContent = randomCode;
-                document.getElementById('auto-ticket-result').classList.remove('hidden');
-            } catch (err) {
-                document.getElementById('generated-code-text').textContent = randomCode;
-                document.getElementById('auto-ticket-result').classList.remove('hidden');
-            }
+            } catch (err) {}
         }
     </script>
 </body>

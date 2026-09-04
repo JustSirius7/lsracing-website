@@ -1,5 +1,10 @@
-// Versione autonoma senza premi di default
-let memoryStorage = [];
+// Versione autonoma con premi di default precaricati e sincronizzati
+let memoryStorage = [
+    { nome: "2.000$ Cash", desc: "Contanti in gioco", perc: 25, colore: "#d97706" },
+    { nome: "Pacco Misterioso", desc: "Premio a sorpresa", perc: 25, colore: "#78350f" },
+    { nome: "Kit Riparazione", desc: "Oggetti per officina", perc: 25, colore: "#b45309" },
+    { nome: "VIP Pass", desc: "Accesso prioritario", perc: 25, colore: "#f59e0b" }
+];
 
 const usedTicketsStore = new Set();
 const validTicketsStore = new Set(["TICKET-TEST", "TICKET-123"]);
@@ -15,7 +20,7 @@ exports.handler = async function(event, context) {
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
-        // Azione: Restituisce l'elenco dei premi attivi
+        // Azione: Restituisce l'elenco dei premi attivi[cite: 5]
         if (action === 'get-premi') {
             return { 
                 statusCode: 200, 
@@ -23,7 +28,7 @@ exports.handler = async function(event, context) {
             };
         }
 
-        // Azione Admin: Salvataggio dei premi (consentito anche se vuoto)
+        // Azione Admin: Salvataggio dei premi[cite: 5]
         if (action === 'update-premi') {
             if (!Array.isArray(premi)) {
                 return { statusCode: 200, body: JSON.stringify({ success: false, message: "Lista premi non valida." }) };
@@ -32,7 +37,7 @@ exports.handler = async function(event, context) {
             return { statusCode: 200, body: JSON.stringify({ success: true, message: "Premi salvati con successo!" }) };
         }
 
-        // Azione Admin: Creazione nuovo ticket
+        // Azione Admin: Creazione nuovo ticket[cite: 5]
         if (action === 'create-ticket') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
             if (!ticketClean) {
@@ -43,7 +48,7 @@ exports.handler = async function(event, context) {
             return { statusCode: 200, body: JSON.stringify({ success: true, message: `Ticket ${ticketClean} creato con successo!` }) };
         }
 
-        // Azione 1: Verifica del Ticket (Monouso)
+        // Azione 1: Verifica del Ticket (Monouso)[cite: 5]
         if (action === 'verify') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
             
@@ -65,7 +70,7 @@ exports.handler = async function(event, context) {
             return { statusCode: 200, body: JSON.stringify({ success: true, message: "Ticket valido!" }) };
         }
 
-        // Azione 2: Salvataggio Vincita e Invio Webhook
+        // Azione 2: Salvataggio Vincita e Invio Webhook[cite: 5]
         if (action === 'win') {
             let fieldValue = `**${premio}**`;
             if (descrizione && descrizione.trim() !== "") {
