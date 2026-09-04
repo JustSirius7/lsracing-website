@@ -67,7 +67,11 @@ exports.handler = async (event, context) => {
         }
       }
 
-      return { statusCode: 302, headers: { Location: `https://lsracing.top/${targetPage}?autenticato=true` }, body: "" };
+      return { 
+        statusCode: 302, 
+        headers: { Location: `https://lsracing.top/${targetPage}?autenticato=true&discordId=${userData.id}` }, 
+        body: "" 
+      };
     } else {
       return { statusCode: 302, headers: { Location: `https://lsracing.top/${targetPage}?errore=non_nel_server` }, body: "" };
     }
