@@ -15,7 +15,6 @@ export default async (req) => {
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
-        // 1. Recupero di tutti i dati per il pannello Admin
         if (action === 'get-all-data') {
             let savedPremi = await store.get("premi", { type: "json" });
             if (!savedPremi) {
@@ -43,7 +42,6 @@ export default async (req) => {
             });
         }
 
-        // 2. Solo premi (per la ruota o compatibilità)
         if (action === 'get-premi') {
             let savedPremi = await store.get("premi", { type: "json" });
             if (!savedPremi) {
@@ -72,7 +70,6 @@ export default async (req) => {
             });
         }
 
-        // 3. Gestione Ticket (Creazione, Aggiornamento, Eliminazione)
         if (action === 'create-ticket') {
             let savedTickets = await store.get("tickets", { type: "json" }) || [];
             if (ticket) {
@@ -93,7 +90,6 @@ export default async (req) => {
             });
         }
 
-        // 4. Verifica del Ticket da parte dell'utente sulla Ruota
         if (action === 'verify') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
             if (!ticketClean) {
@@ -112,7 +108,7 @@ export default async (req) => {
             }
 
             const residui = foundTicket.giriResidui !== undefined ? foundTicket.giriResidui : foundTicket.giri;
-            if (residui <= 0) {
+            if (residui <= 0 || foundTicket.stato === 'ESAURITO') {
                 return new Response(JSON.stringify({ success: false, message: "Questo ticket ha esaurito i giri disponibili!" }), {
                     status: 200, headers: { "Content-Type": "application/json" }
                 });
@@ -123,26 +119,30 @@ export default async (req) => {
             });
         }
 
-        // 5. Registrazione Vincita, Scalo Giri e Notifica Discord
         if (action === 'win') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
+            const giocatore = discordId ? discordId.trim() : 'Ospite';
+            
             let savedTickets = await store.get("tickets", { type: "json" }) || [];
             let savedVincite = await store.get("vincite", { type: "json" }) || [];
 
-            // Aggiorna i giri residui del ticket usato
+            // Aggiorna i giri residui e segna come esaurito se arrivati a 0
             const ticketObj = savedTickets.find(t => t.codice === ticketClean);
             if (ticketObj) {
                 if (ticketObj.giriResidui === undefined) ticketObj.giriResidui = ticketObj.giri;
                 if (ticketObj.giriResidui > 0) {
                     ticketObj.giriResidui -= 1;
-                    if (ticketObj.giriResidui <= 0) ticketObj.stato = 'ESAURITO';
+                }
+                if (ticketObj.giriResidui <= 0) {
+                    ticketObj.giriResidui = 0;
+                    ticketObj.stato = 'ESAURITO';
                 }
                 await store.setJSON("tickets", savedTickets);
             }
 
-            // Aggiunge la vincita allo storico globale del pannello
+            // Registra la vincita pulita con il ticket associato
             const nuovaVincita = {
-                player: discordId || "Giocatore",
+                player: giocatore,
                 premio: premio || "Premio",
                 codice: 'WIN-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
                 ticketUsato: ticketClean || 'N/D',
@@ -153,7 +153,6 @@ export default async (req) => {
             savedVincite.unshift(nuovaVincita);
             await store.setJSON("vincite", savedVincite);
 
-            // Invio Webhook Discord
             let fieldValue = `**${premio}**`;
             if (descrizione && descrizione.trim() !== "") {
                 fieldValue += `\n*${descrizione}*`;
@@ -162,7 +161,7 @@ export default async (req) => {
             const payload = {
                 embeds: [{
                     "title": "🎡 Ruota della Fortuna - Nuova Vincita!",
-                    "description": `L'utente <@${discordId}> ha girato la ruota e ha vinto:`,
+                    "description": `L'utente **${giocatore}** ha girato la ruota e ha vinto:`,
                     "color": 16753920,
                     "fields": [
                         {"name": "🎁 Premio Ottenuto", "value": fieldValue, "inline": false},
@@ -178,12 +177,11 @@ export default async (req) => {
                 body: JSON.stringify(payload)
             });
 
-            return new Response(JSON.stringify({ success: true }), {
+            return new Response(JSON.stringify({ success: true, vincite: savedVincite }), {
                 status: 200, headers: { "Content-Type": "application/json" }
             });
         }
 
-        // 6. Aggiornamento Storico Vincite (es. segnato come ritirato)
         if (action === 'update-vincite') {
             if (Array.isArray(vincite)) {
                 await store.setJSON("vincite", vincite);
@@ -193,7 +191,6 @@ export default async (req) => {
             });
         }
 
-        // 7. Gestione Operatori
         if (action === 'update-operatori') {
             if (Array.isArray(operatori)) {
                 await store.setJSON("operatori", operatori);
