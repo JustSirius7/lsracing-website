@@ -111,7 +111,7 @@ export const handler = async function(event, context) {
 
         return { statusCode: 400, body: JSON.stringify({ success: false, message: "Azione non valida" }) };
 
-    } src (err) {
+    } catch (err) {
         return { statusCode: 500, body: JSON.stringify({ success: false, message: "Errore interno: " + err.message }) };
     }
 };
