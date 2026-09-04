@@ -242,7 +242,7 @@
         </div>
     </div>
 
-    <!-- Modale Consegna Premio da parte di un Operatore -->
+    <!-- Modale Consegna Premio -->
     <div id="consegna-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-[#121218] border border-[#232333] w-full max-w-md p-6 rounded-3xl shadow-2xl relative">
             <button onclick="closeConsegnaModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -300,7 +300,7 @@
                 document.getElementById('login-section').classList.remove('hidden');
             }
 
-            // Ascolta aggiornamenti in tempo reale se la ruota assegna un premio in un'altra scheda
+            // Sincronizzazione in tempo reale fra schede (es. quando la ruota effettua una vincita)
             window.addEventListener('storage', (event) => {
                 if (event.key === 'ls_admin_vincite' || event.key === 'ls_admin_tickets') {
                     loadAllData();
@@ -351,10 +351,6 @@
             const savedVincite = localStorage.getItem('ls_admin_vincite');
             if (savedVincite) {
                 try { vinciteList = JSON.parse(savedVincite); } catch(e) {}
-            } else {
-                vinciteList = [
-                    { player: "TEST_UI_Player_X", premio: "Pacco Misterioso", codice: "WIN-KW3CEW", ticketUsato: "TICKET-DEMO1", data: "04 set, 07:22", stato: "ATTESA", scadenza: "07 set 2026", operatore: "" }
-                ];
             }
 
             // Carica operatori
@@ -375,7 +371,7 @@
         }
 
         function updateStats() {
-            document.getElementById('stat-giri').textContent = vinciteList.length + ticketsList.reduce((acc, t) => acc + parseInt(t.giri || 0), 0);
+            document.getElementById('stat-giri').textContent = vinciteList.length + ticketsList.reduce((acc, t) => acc + parseInt(t.giriResidui !== undefined ? t.giriResidui : t.giri || 0), 0);
             document.getElementById('stat-ticket').textContent = ticketsList.filter(t => t.stato === 'ATTIVO').length;
             document.getElementById('stat-attesa').textContent = vinciteList.filter(v => v.stato === 'ATTESA').length;
             document.getElementById('stat-ritirati').textContent = vinciteList.filter(v => v.stato === 'RITIRATO').length;
@@ -539,18 +535,33 @@
                 return;
             }
             ticketsList.forEach((t, idx) => {
+                const residui = t.giriResidui !== undefined ? t.giriResidui : t.giri;
+                const isUsato = residui <= 0;
                 container.innerHTML += `
                     <div class="bg-[#0b0b0e] border border-[#232333] p-4 rounded-2xl flex items-center justify-between">
                         <div>
-                            <div class="font-bold text-sm text-amber-400 font-mono">${t.codice}</div>
-                            <div class="text-[11px] text-gray-400 mt-0.5">Giri Totali: ${t.giri} • Residui: ${t.giriResidui !== undefined ? t.giriResidui : t.giri} • Scadenza: ${t.giorni} giorni ${t.nota ? '• ' + t.nota : ''}</div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-bold text-sm text-amber-400 font-mono">${t.codice}</span>
+                                <button onclick="copyTicketCode('${t.codice}')" title="Copia codice" class="text-gray-400 hover:text-white transition p-1 bg-[#1a1a24] rounded-lg text-xs">
+                                    <i class="fa-solid fa-copy"></i>
+                                </button>
+                            </div>
+                            <div class="text-[11px] text-gray-400">Giri Totali: ${t.giri} • Residui: <strong class="${residui > 0 ? 'text-green-400' : 'text-red-400'}">${residui}</strong> • Scadenza: ${t.giorni} giorni ${t.nota ? '• ' + t.nota : ''}</div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span class="bg-green-500/10 text-green-400 border border-green-500/30 px-3 py-1 rounded-full text-xs font-semibold">${t.stato}</span>
+                            <span class="${isUsato ? 'bg-red-500/10 text-red-400 border-red-500/30' : 'bg-green-500/10 text-green-400 border-green-500/30'} border px-3 py-1 rounded-full text-xs font-semibold">${isUsato ? 'ESAURITO' : t.stato}</span>
                             <button onclick="deleteTicket(${idx})" class="text-gray-400 hover:text-red-400 p-2"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
                     </div>
                 `;
+            });
+        }
+
+        function copyTicketCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                alert("Codice ticket copiato negli appunti: " + code);
+            }).catch(err => {
+                console.error("Errore durante la copia", err);
             });
         }
 
@@ -598,7 +609,7 @@
                 return;
             }
 
-            filtered.forEach((v, originalIdx) => {
+            filtered.forEach((v) => {
                 const realIdx = vinciteList.indexOf(v);
                 let badgeClass = "bg-green-500/10 text-green-400 border-green-500/30";
                 if (v.stato === 'ATTESA') badgeClass = "bg-amber-500/10 text-amber-400 border-amber-500/30";
