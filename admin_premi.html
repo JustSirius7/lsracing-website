@@ -546,7 +546,7 @@
                 if (v.stato === 'ATTESA') badgeClass = "bg-amber-500/10 text-amber-400 border-amber-500/30";
                 if (v.stato === 'SCADUTO') badgeClass = "bg-red-500/10 text-red-400 border-red-500/30";
 
-                let nomeVisualizzato = v.player || 'Giocatore';
+                let nomeVisualizzato = v.player || v.playerName || 'Giocatore';
                 let azioneHtml = '';
                 if (v.stato === 'ATTESA') {
                     azioneHtml = `<button onclick="markAsRitirato(${realIdx})" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-xl text-xs font-semibold transition">Segna Ritirato</button>`;
@@ -561,7 +561,7 @@
                                 <span class="font-bold text-sm text-white">${nomeVisualizzato}</span>
                                 <span class="text-xs text-amber-400 font-bold">${v.premio}</span>
                             </div>
-                            <p class="text-[11px] text-gray-500">${v.data} • Codice Vincita: ${v.codice} • Ticket: <span class="text-amber-400 font-mono">${v.ticketUsato || 'N/D'}</span> • Scade ${v.scadenza}</p>
+                            <p class="text-[11px] text-gray-500">${v.data || 'Data recente'} • Codice Vincita: ${v.codice || 'N/D'} • Ticket: <span class="text-amber-400 font-mono">${v.ticketUsato || v.ticketCode || 'N/D'}</span></p>
                         </div>
                         <div class="flex items-center gap-4">
                             ${azioneHtml}
