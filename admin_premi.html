@@ -291,6 +291,7 @@
 
         function logout() {
             localStorage.removeItem('ls_discord_logged');
+            localStorage.removeItem('ls_logged_discord_id');
             window.location.reload();
         }
 
@@ -576,8 +577,22 @@
         }
 
         async function markAsRitirato(vincitaIndex) {
+            let currentOperatorName = "Operatore";
+            let loggedDiscordId = localStorage.getItem('ls_logged_discord_id') || prompt("Inserisci il tuo ID Discord o il nome registrato per confermare l'azione:");
+            
+            if (!loggedDiscordId) return;
+
+            let trovato = operatoriList.find(op => op.discordId === loggedDiscordId || op.nome.toLowerCase() === loggedDiscordId.toLowerCase());
+            
+            if (trovato) {
+                currentOperatorName = trovato.nome;
+                localStorage.setItem('ls_logged_discord_id', trovato.discordId);
+            } else {
+                currentOperatorName = loggedDiscordId; 
+            }
+
             vinciteList[vincitaIndex].stato = 'RITIRATO';
-            vinciteList[vincitaIndex].operatore = "Operatore";
+            vinciteList[vincitaIndex].operatore = currentOperatorName;
 
             await sendUpdateToServer('update-vincite', { vincite: vinciteList });
             renderVinciteUI();
