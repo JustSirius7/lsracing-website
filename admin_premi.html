@@ -281,7 +281,7 @@
             }
 
             window.addEventListener('storage', (event) => {
-                if (event.key === 'ls_admin_vincite' || event.key === 'ls_admin_tickets') {
+                if (event.key === 'ls_saved_prizes' || event.key === 'fortuna_rp_premi' || event.key === 'ls_admin_vincite' || event.key === 'ls_admin_tickets') {
                     loadAllData();
                 }
             });
@@ -306,7 +306,8 @@
         }
 
         function loadAllData() {
-            const savedPrizes = localStorage.getItem('ls_saved_prizes');
+            // Controlla entrambe le chiavi per garantire la compatibilità con la ruota
+            const savedPrizes = localStorage.getItem('ls_saved_prizes') || localStorage.getItem('fortuna_rp_premi');
             if (savedPrizes) {
                 try { currentPrizes = JSON.parse(savedPrizes); } catch(e) {}
             }
@@ -430,52 +431,45 @@
                 currentPrizes.push({ nome, desc, perc, colore, attivo: true });
             }
 
-            localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
+            syncAndSavePrizes();
             closePrizeModal();
             renderPrizesUI();
             alert("Premio salvato correttamente!");
         }
 
         async function saveAllPrizesChanges() {
-            localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
+            syncAndSavePrizes();
+            alert("Tutte le modifiche ai premi sono state salvate con successo!");
+        }
+
+        function syncAndSavePrizes() {
+            const serialized = JSON.stringify(currentPrizes);
+            // Salva su entrambe le chiavi per sincronizzare admin e ruota
+            localStorage.setItem('ls_saved_prizes', serialized);
+            localStorage.setItem('fortuna_rp_premi', serialized);
+
             try {
-                await fetch('/.netlify/functions/ruota-api', {
+                fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
                 });
             } catch (err) {}
-            alert("Tutte le modifiche ai premi sono state salvate con successo!");
         }
 
         async function togglePrizeStatus(index) {
             const currentStatus = currentPrizes[index].attivo !== false;
             currentPrizes[index].attivo = !currentStatus;
 
-            localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
+            syncAndSavePrizes();
             renderPrizesUI();
-
-            try {
-                await fetch('/.netlify/functions/ruota-api', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
-                });
-            } catch (err) {}
         }
 
         async function deletePrize(index) {
             if (confirm("Eliminare questo premio?")) {
                 currentPrizes.splice(index, 1);
-                localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
+                syncAndSavePrizes();
                 renderPrizesUI();
-                try {
-                    await fetch('/.netlify/functions/ruota-api', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
-                    });
-                } catch (err) {}
             }
         }
 
