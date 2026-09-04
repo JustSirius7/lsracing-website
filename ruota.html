@@ -418,8 +418,8 @@
                         body: JSON.stringify({ 
                             action: 'win', 
                             discordId: activeDiscordId, 
-                            discordName: activePlayerName, // CORRETTO: invia il nome con la chiave attesa dal backend
-                            codice: currentTicketCode,       // CORRETTO: invia il codice con la chiave attesa dal backend
+                            discordName: activePlayerName, 
+                            codice: currentTicketCode,       
                             premio: wonPrizeName, 
                             descrizione: wonPrizeDesc 
                         })
@@ -427,7 +427,25 @@
                     const result = await response.json();
                     
                     if (result.success) {
-                        if (result.giriResidui !== undefined) {
+                        // Trova il ticket corrente aggiornato nell'array dei ticket ritornati dal server
+                        if (result.tickets && result.tickets.length > 0) {
+                            const updatedTicket = result.tickets.find(t => t.codice.trim().toUpperCase() === currentTicketCode.trim().toUpperCase());
+                            if (updatedTicket) {
+                                const residui = updatedTicket.giriResidui !== undefined ? updatedTicket.giriResidui : updatedTicket.giri;
+                                document.getElementById('info-giri').textContent = residui;
+                                
+                                if (residui > 0) {
+                                    document.getElementById('spin-btn').disabled = false;
+                                    document.getElementById('spin-btn').className = "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 text-black font-black text-sm py-3 px-8 rounded-full shadow-[0_0_25px_rgba(245,158,11,0.5)] transition duration-200 uppercase tracking-wider border border-yellow-300 cursor-pointer";
+                                    document.getElementById('spin-btn').textContent = "Gira di nuovo!";
+                                } else {
+                                    document.getElementById('spin-btn').disabled = true;
+                                    document.getElementById('spin-btn').className = "bg-gray-800 text-gray-500 cursor-not-allowed font-black text-sm py-3 px-8 rounded-full shadow transition duration-200 uppercase tracking-wider border border-gray-700";
+                                    document.getElementById('spin-btn').textContent = "Giri Esauriti";
+                                    isVerified = false;
+                                }
+                            }
+                        } else if (result.giriResidui !== undefined) {
                             document.getElementById('info-giri').textContent = result.giriResidui;
                             if (result.giriResidui > 0) {
                                 document.getElementById('spin-btn').disabled = false;
@@ -437,9 +455,11 @@
                                 document.getElementById('spin-btn').disabled = true;
                                 document.getElementById('spin-btn').className = "bg-gray-800 text-gray-500 cursor-not-allowed font-black text-sm py-3 px-8 rounded-full shadow transition duration-200 uppercase tracking-wider border border-gray-700";
                                 document.getElementById('spin-btn').textContent = "Giri Esauriti";
-                                isVerified = false; // Blocca ulteriori tentativi con lo stesso ticket
+                                isVerified = false;
                             }
                         }
+
+                        // Aggiorna la lista degli ultimi vincitori con i dati corretti dal server
                         if (result.vincite) {
                             aggiornaListaVincitoriUI(result.vincite);
                         } else {
