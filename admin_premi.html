@@ -275,16 +275,10 @@
             } else if (isDiscordLogged) {
                 document.getElementById('admin-section').classList.remove('hidden');
                 document.getElementById('top-user-bar').classList.remove('hidden');
-                await loadAllData();
+                await loadAllDataFromServer();
             } else {
                 document.getElementById('login-section').classList.remove('hidden');
             }
-
-            window.addEventListener('storage', async (event) => {
-                if (event.key === 'ls_saved_prizes' || event.key === 'fortuna_rp_premi' || event.key === 'ls_admin_vincite' || event.key === 'ls_admin_tickets') {
-                    await loadAllData();
-                }
-            });
         };
 
         function simulateLogin() {
@@ -305,57 +299,33 @@
             document.getElementById(`tab-btn-${tabName}`).className = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-black";
         }
 
-        async function loadAllData() {
-            // 1. Prova prima a scaricare i dati aggiornati dal server/Netlify API
+        // CARICAMENTO TOTALE DAL SERVER (Senza localStorage per i dati condivisi)
+        async function loadAllDataFromServer() {
             try {
-                const response = await fetch('/.netlify/functions/ruota-api');
+                const response = await fetch('/.netlify/functions/ruota-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get-all-data' })
+                });
+
                 if (response.ok) {
-                    const serverData = await response.json();
-                    if (serverData && serverData.premi && serverData.premi.length > 0) {
-                        currentPrizes = serverData.premi;
-                        localStorage.setItem('ls_saved_prizes', JSON.stringify(currentPrizes));
-                        localStorage.setItem('fortuna_rp_premi', JSON.stringify(currentPrizes));
-                    }
+                    const data = await response.json();
+                    currentPrizes = data.premi || [];
+                    ticketsList = data.tickets || [];
+                    vinciteList = data.vincite || [];
+                    operatoriList = data.operatori || [];
                 }
             } catch (err) {
-                console.log("Server non raggiungibile, fallback su localStorage.");
+                console.error("Errore di connessione al server:", err);
             }
 
-            // 2. Se il server non ha risposto o è vuoto, usa il localStorage
-            if (!currentPrizes.length) {
-                const savedPrizes = localStorage.getItem('ls_saved_prizes') || localStorage.getItem('fortuna_rp_premi');
-                if (savedPrizes) {
-                    try { currentPrizes = JSON.parse(savedPrizes); } catch(e) {}
-                }
-            }
-
-            // 3. Ultimo fallback se tutto è vuoto
+            // Fallback di sicurezza se il server è vuoto o irrangiungibile
             if (!currentPrizes.length) {
                 currentPrizes = [
                     { nome: "2.000$ Cash", desc: "Denaro contante", perc: 25, colore: "#d97706", attivo: true },
                     { nome: "Pacco Misterioso", desc: "Premio sorpresa", perc: 25, colore: "#78350f", attivo: true },
                     { nome: "Kit Riparazione", desc: "Oggetti officina", perc: 25, colore: "#b45309", attivo: true },
                     { nome: "VIP Pass", desc: "Accesso prioritario", perc: 25, colore: "#f59e0b", attivo: true }
-                ];
-            }
-
-            // Caricamento dati di ticket, vincite e operatori (ora correttamente dentro la funzione)
-            const savedTickets = localStorage.getItem('ls_admin_tickets');
-            if (savedTickets) {
-                try { ticketsList = JSON.parse(savedTickets); } catch(e) {}
-            }
-
-            const savedVincite = localStorage.getItem('ls_admin_vincite');
-            if (savedVincite) {
-                try { vinciteList = JSON.parse(savedVincite); } catch(e) {}
-            }
-
-            const savedOps = localStorage.getItem('ls_admin_operatori');
-            if (savedOps) {
-                try { operatoriList = JSON.parse(savedOps); } catch(e) {}
-            } else {
-                operatoriList = [
-                    { nome: "Admin Principale", data: "04 set 2026" }
                 ];
             }
 
@@ -451,43 +421,26 @@
                 currentPrizes.push({ nome, desc, perc, colore, attivo: true });
             }
 
-            syncAndSavePrizes();
+            await sendUpdateToServer('update-premi', { premi: currentPrizes });
             closePrizeModal();
             renderPrizesUI();
-            alert("Premio salvato correttamente!");
         }
 
         async function saveAllPrizesChanges() {
-            syncAndSavePrizes();
-            alert("Tutte le modifiche ai premi sono state salvate con successo!");
-        }
-
-        function syncAndSavePrizes() {
-            const serialized = JSON.stringify(currentPrizes);
-            localStorage.setItem('ls_saved_prizes', serialized);
-            localStorage.setItem('fortuna_rp_premi', serialized);
-
-            try {
-                fetch('/.netlify/functions/ruota-api', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'update-premi', premi: currentPrizes })
-                });
-            } catch (err) {}
+            await sendUpdateToServer('update-premi', { premi: currentPrizes });
+            alert("Tutte le modifiche ai premi sono state salvate sul server!");
         }
 
         async function togglePrizeStatus(index) {
-            const currentStatus = currentPrizes[index].attivo !== false;
-            currentPrizes[index].attivo = !currentStatus;
-
-            syncAndSavePrizes();
+            currentPrizes[index].attivo = currentPrizes[index].attivo === false ? true : false;
+            await sendUpdateToServer('update-premi', { premi: currentPrizes });
             renderPrizesUI();
         }
 
         async function deletePrize(index) {
             if (confirm("Eliminare questo premio?")) {
                 currentPrizes.splice(index, 1);
-                syncAndSavePrizes();
+                await sendUpdateToServer('update-premi', { premi: currentPrizes });
                 renderPrizesUI();
             }
         }
@@ -500,17 +453,11 @@
 
             const newTicket = { codice, giri: giri, giriResidui: giri, giorni, nota, stato: 'ATTIVO', data: new Date().toLocaleDateString() };
             ticketsList.unshift(newTicket);
-            localStorage.setItem('ls_admin_tickets', JSON.stringify(ticketsList));
+
+            await sendUpdateToServer('create-ticket', { ticket: newTicket, tickets: ticketsList });
             renderTicketsUI();
             updateStats();
-
-            try {
-                await fetch('/.netlify/functions/ruota-api', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'create-ticket', codice, giri })
-                });
-            } catch (err) {}
+            alert("Ticket generato e salvato sul server!");
         }
 
         function renderTicketsUI() {
@@ -544,16 +491,16 @@
         }
 
         function copyTicketCode(code) {
-            navigator.clipboard.writeText(code).then(() => {}).catch(err => {
-                console.error("Errore durante la copia", err);
-            });
+            navigator.clipboard.writeText(code);
         }
 
-        function deleteTicket(idx) {
-            ticketsList.splice(idx, 1);
-            localStorage.setItem('ls_admin_tickets', JSON.stringify(ticketsList));
-            renderTicketsUI();
-            updateStats();
+        async function deleteTicket(idx) {
+            if (confirm("Vuoi eliminare questo ticket?")) {
+                ticketsList.splice(idx, 1);
+                await sendUpdateToServer('update-tickets', { tickets: ticketsList });
+                renderTicketsUI();
+                updateStats();
+            }
         }
 
         function setVinciteFilter(filter) {
@@ -600,7 +547,6 @@
                 if (v.stato === 'SCADUTO') badgeClass = "bg-red-500/10 text-red-400 border-red-500/30";
 
                 let nomeVisualizzato = v.player || 'Giocatore';
-
                 let azioneHtml = '';
                 if (v.stato === 'ATTESA') {
                     azioneHtml = `<button onclick="markAsRitirato(${realIdx})" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-xl text-xs font-semibold transition">Segna Ritirato</button>`;
@@ -626,18 +572,16 @@
             });
         }
 
-        function markAsRitirato(vincitaIndex) {
-            const operatoreCorrente = localStorage.getItem('ls_logged_operator') || "Operatore";
-            
+        async function markAsRitirato(vincitaIndex) {
             vinciteList[vincitaIndex].stato = 'RITIRATO';
-            vinciteList[vincitaIndex].operatore = operatoreCorrente;
+            vinciteList[vincitaIndex].operatore = "Operatore";
 
-            localStorage.setItem('ls_admin_vincite', JSON.stringify(vinciteList));
+            await sendUpdateToServer('update-vincite', { vincite: vinciteList });
             renderVinciteUI();
             updateStats();
         }
 
-        function createOperator() {
+        async function createOperator() {
             const nome = document.getElementById('op-nome').value.trim();
             const pass = document.getElementById('op-pass').value.trim();
 
@@ -647,11 +591,11 @@
             }
 
             operatoriList.push({ nome, data: new Date().toLocaleDateString() });
-            localStorage.setItem('ls_admin_operatori', JSON.stringify(operatoriList));
+            await sendUpdateToServer('update-operatori', { operatori: operatoriList });
             document.getElementById('op-nome').value = '';
             document.getElementById('op-pass').value = '';
             renderOperatoriUI();
-            alert("Operatore creato con successo!");
+            alert("Operatore creato e salvato sul server!");
         }
 
         function renderOperatoriUI() {
@@ -676,11 +620,24 @@
             });
         }
 
-        function deleteOperator(idx) {
+        async function deleteOperator(idx) {
             if (confirm("Vuoi rimuovere questo operatore?")) {
                 operatoriList.splice(idx, 1);
-                localStorage.setItem('ls_admin_operatori', JSON.stringify(operatoriList));
+                await sendUpdateToServer('update-operatori', { operatori: operatoriList });
                 renderOperatoriUI();
+            }
+        }
+
+        // Funzione di utilità generale per inviare i dati alle Netlify Functions
+        async function sendUpdateToServer(action, payload) {
+            try {
+                await fetch('/.netlify/functions/ruota-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, ...payload })
+                });
+            } catch (err) {
+                console.error("Errore salvataggio server:", err);
             }
         }
     </script>
