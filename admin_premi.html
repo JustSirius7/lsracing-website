@@ -193,6 +193,10 @@
                             <input type="text" id="op-nome" placeholder="Es. Luca Bianchi" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
                         </div>
                         <div>
+                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">ID Discord Operatore</label>
+                            <input type="text" id="op-discordId" placeholder="Es. 123456789012345678" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
                             <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Password</label>
                             <input type="password" id="op-pass" placeholder="Minimo 6 caratteri" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
                         </div>
@@ -582,6 +586,7 @@
 
         async function createOperator() {
             const nome = document.getElementById('op-nome').value.trim();
+            const discordId = document.getElementById('op-discordId').value.trim();
             const pass = document.getElementById('op-pass').value.trim();
 
             if (!nome || pass.length < 6) {
@@ -589,9 +594,13 @@
                 return;
             }
 
-            operatoriList.push({ nome, data: new Date().toLocaleDateString() });
-            await sendUpdateToServer('update-operatori', { operatori: operatoriList });
+            const nuovoOp = { nome, discordId, data: new Date().toLocaleDateString() };
+            operatoriList.push(nuovoOp);
+            
+            await sendUpdateToServer('create-operatore', { operatore: nuovoOp, operatori: operatoriList });
+            
             document.getElementById('op-nome').value = '';
+            document.getElementById('op-discordId').value = '';
             document.getElementById('op-pass').value = '';
             renderOperatoriUI();
             alert("Operatore creato e salvato sul server!");
@@ -609,6 +618,7 @@
                     <div class="bg-[#0b0b0e] border border-[#232333] p-4 rounded-2xl flex items-center justify-between">
                         <div>
                             <div class="font-bold text-sm text-white mb-0.5">${op.nome}</div>
+                            ${op.discordId ? `<div class="text-xs text-amber-400 mb-0.5">Discord ID: &lt;@${op.discordId}&gt;</div>` : ''}
                             <div class="text-xs text-gray-500">Creato il ${op.data}</div>
                         </div>
                         <div class="flex items-center gap-4">
