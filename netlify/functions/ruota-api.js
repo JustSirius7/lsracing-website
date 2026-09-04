@@ -1,18 +1,20 @@
 import { getStore } from "@netlify/blobs";
 
-export const handler = async function(event, context) {
-    if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: JSON.stringify({ success: false, message: "Metodo non consentito" }) };
+export default async (req) => {
+    if (req.method !== 'POST') {
+        return new Response(JSON.stringify({ success: false, message: "Metodo non consentito" }), {
+            status: 405,
+            headers: { "Content-Type": "application/json" }
+        });
     }
 
     try {
-        const store = getStore("fortuna-rp-store");
-        const body = JSON.parse(event.body);
+        const store = getStore({ name: "fortuna-rp-store", consistency: "strong" });
+        const body = await req.json();
         const { action, discordId, codice, premio, descrizione, premi } = body;
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
-        // 1. Gestione Premi
         if (action === 'get-premi') {
             let savedPremi = await store.get("premi", { type: "json" });
             if (!savedPremi) {
@@ -24,25 +26,29 @@ export const handler = async function(event, context) {
                 ];
                 await store.setJSON("premi", savedPremi);
             }
-            return { 
-                statusCode: 200, 
-                body: JSON.stringify({ success: true, premi: savedPremi }) 
-            };
+            return new Response(JSON.stringify({ success: true, premi: savedPremi }), {
+                status: 200, headers: { "Content-Type": "application/json" }
+            });
         }
 
         if (action === 'update-premi') {
             if (!Array.isArray(premi)) {
-                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Lista premi non valida." }) };
+                return new Response(JSON.stringify({ success: false, message: "Lista premi non valida." }), {
+                    status: 200, headers: { "Content-Type": "application/json" }
+                });
             }
             await store.setJSON("premi", premi);
-            return { statusCode: 200, body: JSON.stringify({ success: true, message: "Premi salvati con successo!" }) };
+            return new Response(JSON.stringify({ success: true, message: "Premi salvati con successo!" }), {
+                status: 200, headers: { "Content-Type": "application/json" }
+            });
         }
 
-        // 2. Gestione Ticket
         if (action === 'create-ticket') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
             if (!ticketClean) {
-                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Codice non valido." }) };
+                return new Response(JSON.stringify({ success: false, message: "Codice non valido." }), {
+                    status: 200, headers: { "Content-Type": "application/json" }
+                });
             }
             
             let validTickets = await store.get("valid_tickets", { type: "json" }) || ["TICKET-TEST", "TICKET-123"];
@@ -51,15 +57,18 @@ export const handler = async function(event, context) {
                 await store.setJSON("valid_tickets", validTickets);
             }
 
-            return { statusCode: 200, body: JSON.stringify({ success: true, message: `Ticket ${ticketClean} creato con successo!` }) };
+            return new Response(JSON.stringify({ success: true, message: `Ticket ${ticketClean} creato con successo!` }), {
+                status: 200, headers: { "Content-Type": "application/json" }
+            });
         }
 
-        // 3. Verifica del Ticket
         if (action === 'verify') {
             const ticketClean = codice ? codice.trim().toUpperCase() : '';
             
             if (!ticketClean) {
-                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Inserisci un codice valido." }) };
+                return new Response(JSON.stringify({ success: false, message: "Inserisci un codice valido." }), {
+                    status: 200, headers: { "Content-Type": "application/json" }
+                });
             }
 
             let validTickets = await store.get("valid_tickets", { type: "json" }) || ["TICKET-TEST", "TICKET-123"];
@@ -68,20 +77,25 @@ export const handler = async function(event, context) {
             const isValido = ticketClean.startsWith("TICKET-") || validTickets.includes(ticketClean);
 
             if (!isValido) {
-                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Codice ticket inesistente." }) };
+                return new Response(JSON.stringify({ success: false, message: "Codice ticket inesistente." }), {
+                    status: 200, headers: { "Content-Type": "application/json" }
+                });
             }
 
             if (usedTickets.includes(ticketClean)) {
-                return { statusCode: 200, body: JSON.stringify({ success: false, message: "Questo ticket è già stato utilizzato!" }) };
+                return new Response(JSON.stringify({ success: false, message: "Questo ticket è già stato utilizzato!" }), {
+                    status: 200, headers: { "Content-Type": "application/json" }
+                });
             }
 
             usedTickets.push(ticketClean);
             await store.setJSON("used_tickets", usedTickets);
 
-            return { statusCode: 200, body: JSON.stringify({ success: true, message: "Ticket valido!" }) };
+            return new Response(JSON.stringify({ success: true, message: "Ticket valido!" }), {
+                status: 200, headers: { "Content-Type": "application/json" }
+            });
         }
 
-        // 4. Salvataggio Vincita e Webhook Discord
         if (action === 'win') {
             let fieldValue = `**${premio}**`;
             if (descrizione && descrizione.trim() !== "") {
@@ -106,12 +120,18 @@ export const handler = async function(event, context) {
                 body: JSON.stringify(payload)
             });
 
-            return { statusCode: 200, body: JSON.stringify({ success: true }) };
+            return new Response(JSON.stringify({ success: true }), {
+                status: 200, headers: { "Content-Type": "application/json" }
+            });
         }
 
-        return { statusCode: 400, body: JSON.stringify({ success: false, message: "Azione non valida" }) };
+        return new Response(JSON.stringify({ success: false, message: "Azione non valida" }), {
+            status: 400, headers: { "Content-Type": "application/json" }
+        });
 
     } catch (err) {
-        return { statusCode: 500, body: JSON.stringify({ success: false, message: "Errore interno: " + err.message }) };
+        return new Response(JSON.stringify({ success: false, message: "Errore interno: " + err.message }), {
+            status: 500, headers: { "Content-Type": "application/json" }
+        });
     }
 };
