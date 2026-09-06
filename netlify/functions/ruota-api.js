@@ -15,6 +15,14 @@ export default async (req) => {
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
+        if (action === 'reset-storage') {
+            await store.setJSON("tickets", []);
+            await store.setJSON("vincite", []);
+            return new Response(JSON.stringify({ success: true, message: "Storage ripulito con successo!" }), {
+                status: 200, headers: { "Content-Type": "application/json" }
+            });
+        }
+
         if (action === 'get-all-data') {
             let savedPremi = await store.get("premi", { type: "json" });
             if (!savedPremi) {
@@ -78,7 +86,7 @@ export default async (req) => {
             const optionsTime = { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', hour12: false };
             const dataCreazioneStr = `${now.toLocaleDateString('it-IT', optionsDate)}, ${now.toLocaleTimeString('it-IT', optionsTime)}`;
             
-            const nomeOperatoreCreatore = (operatore && operatore.trim() !== "") ? operatore.trim() : ((opName && opName.trim() !== "") ? opName.trim() : "Operatore");
+            const nomeOperatoreCreatore = (operatore && operatore.trim() !== "") ? operatore.trim() : ((opName && opName.trim() !== "") ? opName.trim() : "");
 
             if (ticket) {
                 savedTickets.unshift(ticket);
@@ -158,7 +166,7 @@ export default async (req) => {
             let savedVincite = await store.get("vincite", { type: "json" }) || [];
 
             let giorniScadenzaPremio = 7; 
-            let infoCreatore = "Operatore";
+            let infoCreatore = "";
             let dataCreazioneTicketStr = "";
 
             const ticketIndex = savedTickets.findIndex(t => t.codice.trim().toUpperCase() === ticketClean);
@@ -209,7 +217,7 @@ export default async (req) => {
                 dataCreazione: dataCreazioneTicketStr || dataVincitaStr,
                 data: dataVincitaStr,
                 scadenzaData: dataScadenzaStr,
-                stato: 'ATTESA' // ATTESA, RITIRATO, SCADUTO
+                stato: 'ATTESA' 
             };
 
             savedVincite.unshift(nuovaVincita);
@@ -283,7 +291,7 @@ export default async (req) => {
             }
 
             savedVincite[targetIndex].stato = 'RITIRATO';
-            savedVincite[targetIndex].operatore = opName || "Operatore";
+            savedVincite[targetIndex].operatore = opName || "";
             
             if (dataRiscatto) {
                 savedVincite[targetIndex].dataRiscatto = dataRiscatto;
