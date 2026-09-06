@@ -439,7 +439,6 @@
             document.getElementById('total-prob').textContent = totalPerc.toFixed(1) + '%';
         }
 
-        // Funzioni per il Drag and Drop manuale dei premi
         function dragStart(e, index) {
             draggedIndex = index;
             e.target.classList.add('dragging');
@@ -538,15 +537,23 @@
             const now = new Date();
             const giorno = String(now.getDate()).padStart(2, '0');
             const mese = String(now.getMonth() + 1).padStart(2, '0');
-            const anno = now.getFullYear();
+            const anno = String(now.getFullYear()).slice(-2);
             const ora = String(now.getHours()).padStart(2, '0');
             const minuti = String(now.getMinutes()).padStart(2, '0');
-            const secondi = String(now.getSeconds()).padStart(2, '0');
-            const dataCreazione = `${giorno}/${mese}/${anno} ${ora}:${minuti}:${secondi}`;
+            const dataCreazione = `${giorno}/${mese}/${anno}, ${ora}:${minuti}`;
 
             for (let i = 0; i < quantita; i++) {
                 const codice = 'TICKET-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-                const newTicket = { codice, giri: giri, giriResidui: giri, giorni, riscattoGiorni: riscatto, stato: 'ATTIVO', data: dataCreazione };
+                const newTicket = { 
+                    codice, 
+                    giri: giri, 
+                    giriResidui: giri, 
+                    giorni, 
+                    riscattoGiorni: riscatto, 
+                    creatore: currentOperatorName, 
+                    stato: 'ATTIVO', 
+                    dataCreazione: dataCreazione 
+                };
                 ticketsList.unshift(newTicket);
             }
 
@@ -574,7 +581,7 @@
                                     <i class="fa-solid fa-copy"></i>
                                 </button>
                             </div>
-                            <div class="text-[11px] text-gray-400">Giri Totali: ${t.giri} • Residui: <strong class="${residui > 0 ? 'text-green-400' : 'text-red-400'}">${residui}</strong> • Scadenza: ${t.giorni} giorni • Riscatto: ${t.riscattoGiorni || 7} giorni</div>
+                            <div class="text-[11px] text-gray-400">Creatore: ${t.creatore || currentOperatorName} • Giri Totali: ${t.giri} • Residui: <strong class="${residui > 0 ? 'text-green-400' : 'text-red-400'}">${residui}</strong> • Scadenza: ${t.giorni} giorni • Riscatto: ${t.riscattoGiorni || 7} giorni</div>
                         </div>
                         <div class="flex items-center gap-3">
                             <span class="${isUsato ? 'bg-red-500/10 text-red-400 border-red-500/30' : 'bg-green-500/10 text-green-400 border-green-500/30'} border px-3 py-1 rounded-full text-xs font-semibold">${isUsato ? 'ESAURITO' : t.stato}</span>
@@ -650,26 +657,27 @@
                 }
 
                 let nomeVisualizzato = v.player || v.playerName || 'Giocatore';
-                let subDetails = `${nomeVisualizzato} · Concessionario 816 · codice ${v.ticketUsato || v.ticketCode || 'N/D'}`;
+                let creatoreTicket = v.creatore || currentOperatorName;
+                let subDetails = `${nomeVisualizzato} · re · ${creatoreTicket} · codice ${v.ticketUsato || 'N/D'}`;
                 
                 let infoExtraHtml = '';
                 if (v.stato === 'ATTESA') {
                     infoExtraHtml = `
-                        <div class="text-[11px] text-gray-400 mt-1">Codice creato: ${v.dataCreazione || '06/09/26, 12:55'} da Concessionario 816 (@nettunos)</div>
-                        <div class="text-[11px] text-gray-400">Premio vinto: ${v.data || '06/09/26, 12:56'}</div>
-                        <div class="text-[11px] text-gray-400">Da riscattare entro: ${v.scadenzaData || '13/09/26, 12:56'}</div>
+                        <div class="text-[11px] text-gray-400 mt-1">Codice creato: ${v.dataCreazione || 'N/D'} da ${creatoreTicket}</div>
+                        <div class="text-[11px] text-gray-400">Premio vinto: ${v.data || 'N/D'}</div>
+                        <div class="text-[11px] text-gray-400">Da riscattare entro: ${v.scadenzaData || 'N/D'}</div>
                     `;
                 } else if (v.stato === 'RITIRATO') {
                     infoExtraHtml = `
-                        <div class="text-[11px] text-gray-400 mt-1">Codice creato: ${v.dataCreazione || '22/08/26, 13:50'} da Concessionario 816 (@nettunos)</div>
-                        <div class="text-[11px] text-gray-400">Premio vinto: ${v.data || '22/08/26, 13:50'}</div>
-                        <div class="text-[11px] text-gray-400">Riscattato: ${v.dataRiscatto || '22/08/26, 13:51'} da Concessionario 816</div>
+                        <div class="text-[11px] text-gray-400 mt-1">Codice creato: ${v.dataCreazione || 'N/D'} da ${creatoreTicket}</div>
+                        <div class="text-[11px] text-gray-400">Premio vinto: ${v.data || 'N/D'}</div>
+                        <div class="text-[11px] text-gray-400">Riscattato: ${v.dataRiscatto || 'N/D'} da ${v.operatore || currentOperatorName}</div>
                     `;
                 } else if (v.stato === 'SCADUTO') {
                     infoExtraHtml = `
-                        <div class="text-[11px] text-gray-400 mt-1">Codice creato: ${v.dataCreazione || '22/08/26, 20:20'} da Concessionario 816 (@nettunos)</div>
-                        <div class="text-[11px] text-gray-400">Premio vinto: ${v.data || '22/08/26, 20:20'}</div>
-                        <div class="text-[11px] text-gray-400">Scaduto: ${v.scadenzaData || '29/08/26, 20:20'}</div>
+                        <div class="text-[11px] text-gray-400 mt-1">Codice creato: ${v.dataCreazione || 'N/D'} da ${creatoreTicket}</div>
+                        <div class="text-[11px] text-gray-400">Premio vinto: ${v.data || 'N/D'}</div>
+                        <div class="text-[11px] text-gray-400">Scaduto: ${v.scadenzaData || 'N/D'}</div>
                     `;
                 }
 
@@ -707,12 +715,10 @@
             const now = new Date();
             const giorno = String(now.getDate()).padStart(2, '0');
             const mese = String(now.getMonth() + 1).padStart(2, '0');
-            const anno = now.getFullYear();
+            const anno = String(now.getFullYear()).slice(-2);
             const ora = String(now.getHours()).padStart(2, '0');
             const minuti = String(now.getMinutes()).padStart(2, '0');
-            const secondi = String(now.getSeconds()).padStart(2, '0');
-
-            const dataRiscatto = `${giorno}/${mese}/${anno} ${ora}:${minuti}:${secondi}`;
+            const dataRiscatto = `${giorno}/${mese}/${anno}, ${ora}:${minuti}`;
 
             try {
                 const response = await fetch('/.netlify/functions/ruota-api', {
@@ -759,11 +765,10 @@
             const now = new Date();
             const giorno = String(now.getDate()).padStart(2, '0');
             const mese = String(now.getMonth() + 1).padStart(2, '0');
-            const anno = now.getFullYear();
+            const anno = String(now.getFullYear()).slice(-2);
             const ora = String(now.getHours()).padStart(2, '0');
             const minuti = String(now.getMinutes()).padStart(2, '0');
-            const secondi = String(now.getSeconds()).padStart(2, '0');
-            const dataCreazione = `${giorno}/${mese}/${anno} ${ora}:${minuti}:${secondi}`;
+            const dataCreazione = `${giorno}/${mese}/${anno}, ${ora}:${minuti}`;
 
             const nuovoOp = { nome, discordId, data: dataCreazione };
             operatoriList.push(nuovoOp);

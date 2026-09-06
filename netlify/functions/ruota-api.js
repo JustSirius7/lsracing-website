@@ -78,7 +78,7 @@ export default async (req) => {
             const optionsTime = { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', hour12: false };
             const dataCreazioneStr = `${now.toLocaleDateString('it-IT', optionsDate)}, ${now.toLocaleTimeString('it-IT', optionsTime)}`;
             
-            const nomeOperatoreCreatore = (operatore && operatore.trim() !== "") ? operatore.trim() : "Concessionario 816 (@nettunos)";
+            const nomeOperatoreCreatore = (operatore && operatore.trim() !== "") ? operatore.trim() : "alex (@alex)";
 
             if (ticket) {
                 savedTickets.unshift(ticket);
@@ -158,7 +158,7 @@ export default async (req) => {
             let savedVincite = await store.get("vincite", { type: "json" }) || [];
 
             let giorniScadenzaPremio = 7; 
-            let infoCreatore = "Concessionario 816 (@nettunos)";
+            let infoCreatore = "alex (@alex)";
             let dataCreazioneTicketStr = "";
 
             const ticketIndex = savedTickets.findIndex(t => t.codice.trim().toUpperCase() === ticketClean);
@@ -283,7 +283,7 @@ export default async (req) => {
             }
 
             savedVincite[targetIndex].stato = 'RITIRATO';
-            savedVincite[targetIndex].operatore = opName || "Concessionario 816";
+            savedVincite[targetIndex].operatore = opName || "alex";
             
             if (dataRiscatto) {
                 savedVincite[targetIndex].dataRiscatto = dataRiscatto;
@@ -326,7 +326,7 @@ export default async (req) => {
         });
 
     } catch (err) {
-        return new Response(JSON.stringify({ success: false, message: "Errore interno: " + err.message }), {
+        return new Response(JSON.stringify({ success: false, message: "Errore인트: " + err.message }), {
             status: 500, headers: { "Content-Type": "application/json" }
         });
     }
