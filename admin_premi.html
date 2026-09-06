@@ -143,12 +143,7 @@
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Giri con ogni codice</label>
-                            <select id="gen-giri" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
-                                <option value="1">1 giro</option>
-                                <option value="3">3 giri</option>
-                                <option value="5">5 giri</option>
-                                <option value="10">10 giri</option>
-                            </select>
+                            <input type="number" id="gen-giri" value="1" min="1" oninput="if(this.value < 1) this.value = 1;" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Scadenza codice (giorni)</label>
