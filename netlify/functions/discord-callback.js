@@ -20,8 +20,7 @@ exports.handler = async (event, context) => {
   // Ruoli autorizzati per l'accesso admin
   const STAFF_ROLE_IDS = [
     "1524541647168208966",
-    "1542864747173511230",
-    "1524524329629520014"
+    "1542864747173511230"
   ];
 
   if (!code) {

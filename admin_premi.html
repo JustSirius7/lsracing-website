@@ -14,7 +14,7 @@
 <body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
 
     <!-- Header Principale -->
-    <header class="border-b border-[#1f1f2e] bg-[#0b0b0e]/80 backdrop-blur px-6 py-4 flex items-center justify-between">
+    <header class="border-b border-[#1f1f2e] bg-[#0b0b0e]/85 backdrop-blur px-6 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl border border-amber-500/40 bg-amber-500/10 flex items-center justify-center text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.15)]">
                 <i class="fa-solid fa-dice"></i>
@@ -259,7 +259,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="border-t border-[#1f1f2e] bg-[#0b0b0e]/80 py-4 text-center text-xs text-gray-500">
+    <footer class="border-t border-[#1f1f2e] bg-[#0b0b0e]/85 py-4 text-center text-xs text-gray-500">
         &copy; 2026 Ruota della Fortuna • Area Operatori
     </footer>
 
@@ -272,6 +272,8 @@
         let currentVinciteFilter = 'TUTTI';
         let currentOperatorName = "Operatore";
         let draggedIndex = null;
+        // Variabile globale per memorizzare il ruolo dell'utente corrente
+        let currentUserRole = ''; 
 
         window.onload = async function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -329,13 +331,39 @@
             window.location.reload();
         }
 
+        // Funzione per applicare i permessi in base al ruolo dell'utente
+        function applyRolePermissions() {
+            const btnPremi = document.getElementById('tab-btn-premi');
+            const btnOperatori = document.getElementById('tab-btn-operatori');
+
+            // Se l'utente possiede il ruolo "Ruota" ma NON Direzione o Resp. Eventi
+            if (currentUserRole === 'ruota' || (window.userRoles && userRoles.includes('Ruota') && !userRoles.includes('Direzione'))) {
+                if (btnPremi) btnPremi.style.display = 'none';
+                if (btnOperatori) btnOperatori.style.display = 'none';
+
+                // Forza l'utente a visualizzare solo Ticket o Vincite come default
+                switchTab('ticket');
+            }
+        }
+
         function switchTab(tabName) {
+            // Controllo di sicurezza bloccante se un utente "Ruota" prova ad accedere a Premi o Operatori
+            if ((tabName === 'premi' || tabName === 'operatori') && currentUserRole === 'ruota') {
+                alert("Accesso non autorizzato a questa sezione.");
+                return;
+            }
+
             ['premi', 'ticket', 'vincite', 'operatori'].forEach(t => {
-                document.getElementById(`tab-content-${t}`).classList.add('hidden');
-                document.getElementById(`tab-btn-${t}`).className = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition text-gray-400 hover:text-white bg-[#121218] border border-[#232333]";
+                const content = document.getElementById(`tab-content-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (content) content.classList.add('hidden');
+                if (btn) btn.className = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition text-gray-400 hover:text-white bg-[#121218] border border-[#232333]";
             });
-            document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
-            document.getElementById(`tab-btn-${tabName}`).className = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-black";
+            
+            const targetContent = document.getElementById(`tab-content-${tabName}`);
+            const targetBtn = document.getElementById(`tab-btn-${tabName}`);
+            if (targetContent) targetContent.classList.remove('hidden');
+            if (targetBtn) targetBtn.className = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-black";
         }
 
         async function loadAllDataFromServer() {
@@ -352,6 +380,10 @@
                     ticketsList = data.tickets || [];
                     vinciteList = data.vincite || [];
                     operatoriList = data.operatori || [];
+                    
+                    // Assegna il ruolo ricevuto dal server e applica i filtri visivi
+                    currentUserRole = data.ruoloUtente || 'ruota'; 
+                    applyRolePermissions();
 
                     let savedId = localStorage.getItem('ls_logged_discord_id');
                     if (savedId) {
