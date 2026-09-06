@@ -78,7 +78,7 @@ export default async (req) => {
             const optionsTime = { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', hour12: false };
             const dataCreazioneStr = `${now.toLocaleDateString('it-IT', optionsDate)}, ${now.toLocaleTimeString('it-IT', optionsTime)}`;
             
-            const nomeOperatoreCreatore = (operatore && operatore.trim() !== "") ? operatore.trim() : ((opName && opName.trim() !== "") ? opName.trim() : "Just");
+            const nomeOperatoreCreatore = (operatore && operatore.trim() !== "") ? operatore.trim() : ((opName && opName.trim() !== "") ? opName.trim() : "Operatore");
 
             if (ticket) {
                 savedTickets.unshift(ticket);
@@ -158,7 +158,7 @@ export default async (req) => {
             let savedVincite = await store.get("vincite", { type: "json" }) || [];
 
             let giorniScadenzaPremio = 7; 
-            let infoCreatore = "Just";
+            let infoCreatore = "Operatore";
             let dataCreazioneTicketStr = "";
 
             const ticketIndex = savedTickets.findIndex(t => t.codice.trim().toUpperCase() === ticketClean);
@@ -283,7 +283,7 @@ export default async (req) => {
             }
 
             savedVincite[targetIndex].stato = 'RITIRATO';
-            savedVincite[targetIndex].operatore = opName || "Just";
+            savedVincite[targetIndex].operatore = opName || "Operatore";
             
             if (dataRiscatto) {
                 savedVincite[targetIndex].dataRiscatto = dataRiscatto;
@@ -316,7 +316,7 @@ export default async (req) => {
             if (Array.isArray(operatori)) {
                 await store.setJSON("operatori", operatori);
             }
-            return new Response(JSON.stringify({ success: true, message: "Operatoratori aggiornati!" }), {
+            return new Response(JSON.stringify({ success: true, message: "Operatori aggiornati!" }), {
                 status: 200, headers: { "Content-Type": "application/json" }
             });
         }
