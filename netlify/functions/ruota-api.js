@@ -78,8 +78,7 @@ export default async (req) => {
             const optionsTime = { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', hour12: false };
             const dataCreazioneStr = `${now.toLocaleDateString('it-IT', optionsDate)}, ${now.toLocaleTimeString('it-IT', optionsTime)}`;
             
-            // Nome creatore pulito senza "Concessionario 816"
-            const nomeOperatoreCreatore = (operatore && operatore.trim() !== "") ? operatore.trim() : "alex (@alex)";
+            const nomeOperatoreCreatore = (operatore && operatore.trim() !== "") ? operatore.trim() : "Concessionario 816 (@nettunos)";
 
             if (ticket) {
                 savedTickets.unshift(ticket);
@@ -90,13 +89,13 @@ export default async (req) => {
                 const giorniRiscatto = parseInt(tempoRiscatto) || 7;
 
                 for (let i = 0; i < count; i++) {
-                    const randomCode = 'TICK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                    const randomCode = 'TICKET-' + Math.random().toString(36).substring(2, 8).toUpperCase();
                     const nuovoTicket = {
                         codice: randomCode,
                         giri: numGiri,
                         giriResidui: numGiri,
-                        scadenzaGiorni: giorniScadenza,
-                        tempoRiscatto: giorniRiscatto,
+                        giorni: giorniScadenza,
+                        riscattoGiorni: giorniRiscatto,
                         creatore: nomeOperatoreCreatore,
                         dataCreazione: dataCreazioneStr,
                         stato: 'ATTIVO'
@@ -159,13 +158,15 @@ export default async (req) => {
             let savedVincite = await store.get("vincite", { type: "json" }) || [];
 
             let giorniScadenzaPremio = 7; 
-            let infoCreatore = "alex (@alex)";
+            let infoCreatore = "Concessionario 816 (@nettunos)";
             let dataCreazioneTicketStr = "";
 
             const ticketIndex = savedTickets.findIndex(t => t.codice.trim().toUpperCase() === ticketClean);
             if (ticketIndex !== -1) {
                 let t = savedTickets[ticketIndex];
-                if (t.tempoRiscatto) {
+                if (t.riscattoGiorni) {
+                    giorniScadenzaPremio = parseInt(t.riscattoGiorni);
+                } else if (t.tempoRiscatto) {
                     giorniScadenzaPremio = parseInt(t.tempoRiscatto);
                 }
                 if (t.creatore) {
@@ -206,8 +207,8 @@ export default async (req) => {
                 ticketUsato: ticketClean || 'N/D',
                 creatore: infoCreatore,
                 dataCreazione: dataCreazioneTicketStr || dataVincitaStr,
-                dataVincita: dataVincitaStr,
-                scadenza: dataScadenzaStr,
+                data: dataVincitaStr,
+                scadenzaData: dataScadenzaStr,
                 stato: 'ATTESA' // ATTESA, RITIRATO, SCADUTO
             };
 
@@ -282,7 +283,7 @@ export default async (req) => {
             }
 
             savedVincite[targetIndex].stato = 'RITIRATO';
-            savedVincite[targetIndex].operatoreRiscatto = opName || "Operatore";
+            savedVincite[targetIndex].operatore = opName || "Concessionario 816";
             
             if (dataRiscatto) {
                 savedVincite[targetIndex].dataRiscatto = dataRiscatto;
