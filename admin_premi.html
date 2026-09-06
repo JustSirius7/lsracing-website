@@ -630,7 +630,7 @@
                     azioneHtml = `
                         <div class="text-right">
                             <span class="text-[11px] text-gray-400 block">Consegnato da: <strong class="text-white">${v.operatore}</strong></span>
-                            <span class="text-[10px] text-gray-500 block">${v.dataRiscatto || 'Data non disponibile'}</span>
+                            <span class="text-[10px] text-gray-500 block">${v.dataRiscatto || v.data || '-'}</span>
                         </div>
                     `;
                 }
