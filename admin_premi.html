@@ -167,23 +167,23 @@
 
         <!-- Contenuto Tab: VINCITE -->
         <div id="tab-content-vincite" class="space-y-6 hidden">
-            <div class="bg-[#121218] border border-[#232333] p-6 rounded-3xl">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div class="bg-[#121218] border border-[#232333] p-6 rounded-3xl flex flex-col h-[75vh]">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 flex-shrink-0">
                     <div>
                         <h2 class="text-xl font-black text-white">Vincite & Riscatti</h2>
                     </div>
                     <div class="relative w-full sm:w-72">
                         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-xs text-gray-500"></i>
-                        <input type="text" id="vincite-search" oninput="filterVincite()" placeholder="Cerca giocatore o codice..." class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                        <input type="text" id="vincite-search" oninput="filterVincite()" placeholder="Cerca giocatore o codice..." class="w-full bg-[#0b0b0e] border border-[#232333] ...">
                     </div>
                 </div>
-                <div class="flex items-center gap-2 mb-6 overflow-x-auto">
+                <div class="flex items-center gap-2 mb-6 overflow-x-auto flex-shrink-0">
                     <button onclick="setVinciteFilter('TUTTI')" id="filter-btn-TUTTI" class="bg-amber-500 text-black px-4 py-1.5 rounded-lg text-xs font-bold uppercase">Tutti</button>
-                    <button onclick="setVinciteFilter('ATTESA')" id="filter-btn-ATTESA" class="bg-[#0b0b0e] border border-[#232333] text-gray-400 hover:text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition">In attesa</button>
-                    <button onclick="setVinciteFilter('RITIRATI')" id="filter-btn-RITIRATI" class="bg-[#0b0b0e] border border-[#232333] text-gray-400 hover:text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition">Ritirati</button>
-                    <button onclick="setVinciteFilter('SCADUTI')" id="filter-btn-SCADUTI" class="bg-[#0b0b0e] border border-[#232333] text-gray-400 hover:text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition">Scaduti</button>
+                    <button onclick="setVinciteFilter('ATTESA')" id="filter-btn-ATTESA" class="bg-[#0b0b0e] border border-[#232333] text-gray-400 hover:text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase">In attesa</button>
+                    <button onclick="setVinciteFilter('RITIRATI')" id="filter-btn-RITIRATI" class="bg-[#0b0b0e] border border-[#232333] text-gray-400 hover:text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase">Ritirati</button>
+                    <button onclick="setVinciteFilter('SCADUTI')" id="filter-btn-SCADUTI" class="bg-[#0b0b0e] border border-[#232333] text-gray-400 hover:text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase">Scaduti</button>
                 </div>
-                <div id="vincite-list-container" class="space-y-3"></div>
+                <div id="vincite-list-container" class="space-y-3 overflow-y-auto pr-2 flex-1"></div>
             </div>
         </div>
 
