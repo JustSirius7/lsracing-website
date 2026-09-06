@@ -16,7 +16,8 @@ BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 # Lista degli ID dei ruoli Discord autorizzati ad accedere al pannello admin
 STAFF_ROLE_IDS = [
     "1524541647168208966",
-    "1542864747173511230"
+    "1542864747173511230",
+    "1546201205611700355"
 ]
 
 API_ENDPOINT = "https://discord.com/api/v10"

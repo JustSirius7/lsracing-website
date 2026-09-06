@@ -6,7 +6,8 @@ exports.handler = async (event, context) => {
     'candidati': 'candidati.html',
     'ruota': 'ruota.html',
     'prenota': 'prenota.html',
-    'admin': 'admin_premi.html'
+    'admin': 'admin_premi.html',
+    'operatori': 'operatori.html'
   };
   const targetPage = allowedPages[state] || 'prenota.html';
 
@@ -17,11 +18,19 @@ exports.handler = async (event, context) => {
   const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
   const API_ENDPOINT = "https://discord.com/api/v10";
 
-  // Ruoli autorizzati per l'accesso admin
-  const STAFF_ROLE_IDS = [
+  // Ruoli Direzione / Responsabile Eventi (Accesso completo a tutto)
+  const ADMIN_ROLE_IDS = [
     "1524541647168208966",
     "1542864747173511230"
   ];
+
+  // Ruolo Ruota (Accesso limitato a Ticket e Vincite)
+  const RUOTA_ROLE_IDS = [
+    "1546201205611700355"
+  ];
+
+  // Tutti i ruoli autorizzati ad accedere
+  const STAFF_ROLE_IDS = [...ADMIN_ROLE_IDS, ...RUOTA_ROLE_IDS];
 
   if (!code) {
     return { statusCode: 302, headers: { Location: `https://lsracing.top/${targetPage}?errore=no_code` }, body: "" };
@@ -58,17 +67,21 @@ exports.handler = async (event, context) => {
       const memberData = await memberRes.json();
       const userRoles = memberData.roles || [];
 
-      // Se la pagina richiesta è l'admin, verifica che l'utente abbia almeno un ruolo autorizzato
-      if (state === 'admin') {
+      // Verifica il controllo ruoli per le pagine protette (admin o operatori)
+      if (state === 'admin' || state === 'operatori') {
         const hasStaffRole = userRoles.some(roleId => STAFF_ROLE_IDS.includes(roleId));
         if (!hasStaffRole) {
-          return { statusCode: 302, headers: { Location: `https://lsracing.top/admin_premi.html?errore=unauthorized` }, body: "" };
+          return { statusCode: 302, headers: { Location: `https://lsracing.top/${targetPage}?errore=unauthorized` }, body: "" };
         }
       }
 
+      // Determina se l'utente ha solo il ruolo Ruota (senza ruoli amministrativi di Direzione/Resp. Eventi)
+      const hasAdminRole = userRoles.some(roleId => ADMIN_ROLE_IDS.includes(roleId));
+      const isRuotaOnly = !hasAdminRole && userRoles.some(roleId => RUOTA_ROLE_IDS.includes(roleId));
+
       return { 
         statusCode: 302, 
-        headers: { Location: `https://lsracing.top/${targetPage}?autenticato=true&discordId=${userData.id}` }, 
+        headers: { Location: `https://lsracing.top/${targetPage}?autenticato=true&discordId=${userData.id}&ruotaOnly=${isRuotaOnly}` }, 
         body: "" 
       };
     } else {
