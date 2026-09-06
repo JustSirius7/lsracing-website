@@ -131,24 +131,35 @@
         <div id="tab-content-ticket" class="space-y-6 hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-[#121218] border border-[#232333] p-6 rounded-3xl h-fit">
-                    <h3 class="text-base font-black text-white mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-ticket text-amber-400"></i> Genera Ticket
+                    <h3 class="text-base font-black text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-plus text-emerald-400 bg-emerald-500/10 p-2 rounded-xl"></i> Genera codici ruota
                     </h3>
+                    <p class="text-[11px] text-gray-400 mb-6">Imposta giri e tempo di riscatto per generare i codici.</p>
+                    
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Numero di Giri</label>
-                            <input type="number" id="gen-giri" value="3" min="1" oninput="if(this.value < 1) this.value = 1;" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Quantità codici</label>
+                            <input type="number" id="gen-quantita" value="1" min="1" oninput="if(this.value < 1) this.value = 1;" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Giorni di validità</label>
-                            <input type="number" id="gen-giorni" value="7" min="1" oninput="if(this.value < 1) this.value = 1;" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Giri con ogni codice</label>
+                            <select id="gen-giri" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                                <option value="1">1 giro</option>
+                                <option value="3">3 giri</option>
+                                <option value="5">5 giri</option>
+                                <option value="10">10 giri</option>
+                            </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Nota (Opzionale)</label>
-                            <input type="text" id="gen-nota" placeholder="Es. evento del sabato" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Scadenza codice (giorni)</label>
+                            <input type="number" id="gen-giorni" value="30" min="1" oninput="if(this.value < 1) this.value = 1;" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
                         </div>
-                        <button onclick="generateNewTicket()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-md">
-                            Genera Ticket
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Tempo riscatto premio dalla vincita (giorni)</label>
+                            <input type="number" id="gen-riscatto" value="7" min="1" oninput="if(this.value < 1) this.value = 1;" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
+                        </div>
+                        <button onclick="generateNewTicket()" class="w-full bg-[#a3e635] hover:bg-[#84cc16] text-black font-extrabold py-3.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg flex items-center justify-center gap-2">
+                            Genera <i class="fa-solid fa-sparkles text-[10px]"></i>
                         </button>
                     </div>
                 </div>
@@ -442,7 +453,6 @@
             e.preventDefault();
             if (draggedIndex === null || draggedIndex === targetIndex) return;
 
-            // Sposta l'elemento nell'array
             const movedItem = currentPrizes.splice(draggedIndex, 1)[0];
             currentPrizes.splice(targetIndex, 0, movedItem);
 
@@ -520,13 +530,10 @@
         }
 
         async function generateNewTicket() {
+            let quantita = parseInt(document.getElementById('gen-quantita').value) || 1;
             let giri = parseInt(document.getElementById('gen-giri').value) || 1;
-            if (giri < 1) giri = 1;
-            let giorni = parseInt(document.getElementById('gen-giorni').value) || 1;
-            if (giorni < 1) giorni = 1;
-
-            const nota = document.getElementById('gen-nota').value.trim();
-            const codice = 'TICKET-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            let giorni = parseInt(document.getElementById('gen-giorni').value) || 30;
+            let riscatto = parseInt(document.getElementById('gen-riscatto').value) || 7;
 
             const now = new Date();
             const giorno = String(now.getDate()).padStart(2, '0');
@@ -537,10 +544,13 @@
             const secondi = String(now.getSeconds()).padStart(2, '0');
             const dataCreazione = `${giorno}/${mese}/${anno} ${ora}:${minuti}:${secondi}`;
 
-            const newTicket = { codice, giri: giri, giriResidui: giri, giorni, nota, stato: 'ATTIVO', data: dataCreazione };
-            ticketsList.unshift(newTicket);
+            for (let i = 0; i < quantita; i++) {
+                const codice = 'TICKET-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                const newTicket = { codice, giri: giri, giriResidui: giri, giorni, riscattoGiorni: riscatto, stato: 'ATTIVO', data: dataCreazione };
+                ticketsList.unshift(newTicket);
+            }
 
-            await sendUpdateToServer('create-ticket', { ticket: newTicket, tickets: ticketsList });
+            await sendUpdateToServer('update-tickets', { tickets: ticketsList });
             renderTicketsUI();
             updateStats();
         }
@@ -564,11 +574,11 @@
                                     <i class="fa-solid fa-copy"></i>
                                 </button>
                             </div>
-                            <div class="text-[11px] text-gray-400">Giri Totali: ${t.giri} • Residui: <strong class="${residui > 0 ? 'text-green-400' : 'text-red-400'}">${residui}</strong> • Scadenza: ${t.giorni} giorni ${t.nota ? '• ' + t.nota : ''}</div>
+                            <div class="text-[11px] text-gray-400">Giri Totali: ${t.giri} • Residui: <strong class="${residui > 0 ? 'text-green-400' : 'text-red-400'}">${residui}</strong> • Scadenza: ${t.giorni} giorni • Riscatto: ${t.riscattoGiorni || 7} giorni</div>
                         </div>
                         <div class="flex items-center gap-3">
                             <span class="${isUsato ? 'bg-red-500/10 text-red-400 border-red-500/30' : 'bg-green-500/10 text-green-400 border-green-500/30'} border px-3 py-1 rounded-full text-xs font-semibold">${isUsato ? 'ESAURITO' : t.stato}</span>
-                            <button onclick="deleteTicket(${idx})" class="text-gray-400 hover:text-red-400 p-2"><i class="fa-solid fa-trash text-xs"></i></button>
+                            <button onclick="deleteTicket(idx)" class="text-gray-400 hover:text-red-400 p-2"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
                     </div>
                 `;
@@ -680,7 +690,6 @@
             const minuti = String(now.getMinutes()).padStart(2, '0');
             const secondi = String(now.getSeconds()).padStart(2, '0');
 
-            // Formato forzato giorno/mese/anno ora:minuti:secondi
             const dataRiscatto = `${giorno}/${mese}/${anno} ${ora}:${minuti}:${secondi}`;
 
             try {
