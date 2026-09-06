@@ -147,19 +147,15 @@ export default async (req) => {
             }
 
             const nowWin = new Date();
-            const gW = String(nowWin.getDate()).padStart(2, '0');
-            const mW = String(nowWin.getMonth() + 1).padStart(2, '0');
-            const yW = nowWin.getFullYear();
-            const hW = String(nowWin.getHours()).padStart(2, '0');
-            const minW = String(nowWin.getMinutes()).padStart(2, '0');
-            const sW = String(nowWin.getSeconds()).padStart(2, '0');
-            const dataCreazioneWin = `${gW}/${mW}/${yW} ${hW}:${minW}:${sW}`;
+            const optionsDate = { timeZone: 'Europe/Rome', day: '2-digit', month: '2-digit', year: 'numeric' };
+            const optionsTime = { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            
+            const dataStr = nowWin.toLocaleDateString('it-IT', optionsDate);
+            const timeStr = nowWin.toLocaleTimeString('it-IT', optionsTime);
+            const dataCreazioneWin = `${dataStr} ${timeStr}`;
 
             const scadenzaDate = new Date(nowWin.getTime() + 7*24*60*60*1000);
-            const gS = String(scadenzaDate.getDate()).padStart(2, '0');
-            const mS = String(scadenzaDate.getMonth() + 1).padStart(2, '0');
-            const yS = scadenzaDate.getFullYear();
-            const dataScadenzaStr = `${gS}/${mS}/${yS}`;
+            const dataScadenzaStr = scadenzaDate.toLocaleDateString('it-IT', optionsDate);
 
             const nuovaVincita = {
                 player: nomeVisualizzato,
@@ -247,13 +243,11 @@ export default async (req) => {
                 savedVincite[targetIndex].dataRiscatto = dataRiscatto;
             } else {
                 const now = new Date();
-                const g = String(now.getDate()).padStart(2, '0');
-                const m = String(now.getMonth() + 1).padStart(2, '0');
-                const y = now.getFullYear();
-                const h = String(now.getHours()).padStart(2, '0');
-                const min = String(now.getMinutes()).padStart(2, '0');
-                const s = String(now.getSeconds()).padStart(2, '0');
-                savedVincite[targetIndex].dataRiscatto = `${g}/${m}/${y} ${h}:${min}:${s}`;
+                const optionsDate = { timeZone: 'Europe/Rome', day: '2-digit', month: '2-digit', year: 'numeric' };
+                const optionsTime = { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                const dStr = now.toLocaleDateString('it-IT', optionsDate);
+                const tStr = now.toLocaleTimeString('it-IT', optionsTime);
+                savedVincite[targetIndex].dataRiscatto = `${dStr} ${tStr}`;
             }
 
             await store.setJSON("vincite", savedVincite);
@@ -278,7 +272,7 @@ export default async (req) => {
             if (Array.isArray(operatori)) {
                 await store.setJSON("operatori", operatori);
             }
-            return new Response(JSON.stringify({ success: true, message: "Operatori aggiornati!" }), {
+            return new Response(JSON.stringify({ success: true, message: "Tickets aggiornati!" }), {
                 status: 200, headers: { "Content-Type": "application/json" }
             });
         }
