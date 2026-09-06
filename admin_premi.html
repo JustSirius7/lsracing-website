@@ -528,7 +528,13 @@
             const nota = document.getElementById('gen-nota').value.trim();
             const codice = 'TICKET-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-            const newTicket = { codice, giri: giri, giriResidui: giri, giorni, nota, stato: 'ATTIVO', data: new Date().toLocaleDateString() };
+            const now = new Date();
+            const giorno = String(now.getDate()).padStart(2, '0');
+            const mese = String(now.getMonth() + 1).padStart(2, '0');
+            const anno = now.getFullYear();
+            const dataCreazione = `${giorno}/${mese}/${anno}`;
+
+            const newTicket = { codice, giri: giri, giriResidui: giri, giorni, nota, stato: 'ATTIVO', data: dataCreazione };
             ticketsList.unshift(newTicket);
 
             await sendUpdateToServer('create-ticket', { ticket: newTicket, tickets: ticketsList });
@@ -664,7 +670,14 @@
             if (!confirm(`Confermi la consegna del premio a ${vincita.player || 'questo giocatore'}?`)) return;
 
             const now = new Date();
-            const dataRiscatto = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+            const giorno = String(now.getDate()).padStart(2, '0');
+            const mese = String(now.getMonth() + 1).padStart(2, '0');
+            const anno = now.getFullYear();
+            const ora = String(now.getHours()).padStart(2, '0');
+            const minuti = String(now.getMinutes()).padStart(2, '0');
+            const secondi = String(now.getSeconds()).padStart(2, '0');
+
+            const dataRiscatto = `${giorno}/${mese}/${anno} ${ora}:${minuti}:${secondi}`;
 
             try {
                 const response = await fetch('/.netlify/functions/ruota-api', {
@@ -708,7 +721,13 @@
                 return;
             }
 
-            const nuovoOp = { nome, discordId, data: new Date().toLocaleDateString() };
+            const now = new Date();
+            const giorno = String(now.getDate()).padStart(2, '0');
+            const mese = String(now.getMonth() + 1).padStart(2, '0');
+            const anno = now.getFullYear();
+            const dataCreazione = `${giorno}/${mese}/${anno}`;
+
+            const nuovoOp = { nome, discordId, data: dataCreazione };
             operatoriList.push(nuovoOp);
             
             await sendUpdateToServer('create-operatore', { operatore: nuovoOp, operatori: operatoriList });
