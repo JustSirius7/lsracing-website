@@ -97,10 +97,10 @@
 
         <!-- Menu a Schede (Tab) -->
         <div class="flex items-center gap-2 mb-8 border-b border-[#1f1f2e] pb-4 overflow-x-auto">
-            <button onclick="switchTab('premi')" id="tab-btn-premi" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-black">Premi</button>
+            <button onclick="switchTab('premi')" id="tab-btn-premi" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-black hidden">Premi</button>
             <button onclick="switchTab('ticket')" id="tab-btn-ticket" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition text-gray-400 hover:text-white bg-[#121218] border border-[#232333]">Ticket</button>
             <button onclick="switchTab('vincite')" id="tab-btn-vincite" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition text-gray-400 hover:text-white bg-[#121218] border border-[#232333]">Vincite</button>
-            <button onclick="switchTab('operatori')" id="tab-btn-operatori" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition text-gray-400 hover:text-white bg-[#121218] border border-[#232333]">Operatori</button>
+            <button onclick="switchTab('operatori')" id="tab-btn-operatori" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition text-gray-400 hover:text-white bg-[#121218] border border-[#232333] hidden">Operatori</button>
         </div>
 
         <!-- Contenuto Tab: PREMI -->
@@ -270,6 +270,12 @@
         let currentUserRole = ''; 
 
         window.onload = async function() {
+            // Controllo istantaneo del ruolo salvato per nascondere subito le tab non autorizzate
+            if (localStorage.getItem('ls_ruota_only') === 'true') {
+                currentUserRole = 'ruota';
+                applyRolePermissions();
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const autenticato = urlParams.get('autenticato');
             const errore = urlParams.get('errore');
@@ -283,6 +289,10 @@
                 }
                 if (ruotaOnlyParam) {
                     localStorage.setItem('ls_ruota_only', ruotaOnlyParam);
+                    if (ruotaOnlyParam === 'true') {
+                        currentUserRole = 'ruota';
+                        applyRolePermissions();
+                    }
                 }
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
@@ -297,12 +307,13 @@
             } else if (isDiscordLogged) {
                 document.getElementById('admin-section').classList.remove('hidden');
                 document.getElementById('top-user-bar').classList.remove('hidden');
-                
+        
                 if (localStorage.getItem('ls_ruota_only') === 'true') {
                     currentUserRole = 'ruota';
                 } else if (localStorage.getItem('ls_ruota_only') === 'false') {
                     currentUserRole = 'admin';
                 }
+                applyRolePermissions();
 
                 await loadAllDataFromServer();
                 applyRolePermissions();
@@ -317,7 +328,7 @@
                 } else {
                     currentOperatorName = "Amministratore";
                 }
-                
+        
                 localStorage.setItem('ls_logged_operator_name', currentOperatorName);
                 document.getElementById('current-operator-badge').innerHTML = `<i class="fa-solid fa-user-shield mr-1.5"></i> ${currentOperatorName}`;
             } else {
