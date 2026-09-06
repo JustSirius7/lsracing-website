@@ -349,7 +349,13 @@
                 if (btnTicket) btnTicket.style.display = 'inline-block';
                 if (btnVincite) btnVincite.style.display = 'inline-block';
 
-                switchTab('ticket');
+                const currentActivePremi = document.getElementById('tab-content-premi');
+                const currentActiveOps = document.getElementById('tab-content-operatori');
+                
+                if ((currentActivePremi && !currentActivePremi.classList.contains('hidden')) || 
+                    (currentActiveOps && !currentActiveOps.classList.contains('hidden'))) {
+                    switchTab('ticket');
+                }
             } else {
                 if (btnPremi) btnPremi.style.display = 'inline-block';
                 if (btnTicket) btnTicket.style.display = 'inline-block';
@@ -360,7 +366,6 @@
 
         function switchTab(tabName) {
             if ((tabName === 'premi' || tabName === 'operatori') && currentUserRole === 'ruota') {
-                alert("Accesso non autorizzato a questa sezione.");
                 return;
             }
 
