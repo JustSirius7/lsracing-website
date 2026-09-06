@@ -532,7 +532,10 @@
             const giorno = String(now.getDate()).padStart(2, '0');
             const mese = String(now.getMonth() + 1).padStart(2, '0');
             const anno = now.getFullYear();
-            const dataCreazione = `${giorno}/${mese}/${anno}`;
+            const ora = String(now.getHours()).padStart(2, '0');
+            const minuti = String(now.getMinutes()).padStart(2, '0');
+            const secondi = String(now.getSeconds()).padStart(2, '0');
+            const dataCreazione = `${giorno}/${mese}/${anno} ${ora}:${minuti}:${secondi}`;
 
             const newTicket = { codice, giri: giri, giriResidui: giri, giorni, nota, stato: 'ATTIVO', data: dataCreazione };
             ticketsList.unshift(newTicket);
@@ -726,7 +729,10 @@
             const giorno = String(now.getDate()).padStart(2, '0');
             const mese = String(now.getMonth() + 1).padStart(2, '0');
             const anno = now.getFullYear();
-            const dataCreazione = `${giorno}/${mese}/${anno}`;
+            const ora = String(now.getHours()).padStart(2, '0');
+            const minuti = String(now.getMinutes()).padStart(2, '0');
+            const secondi = String(now.getSeconds()).padStart(2, '0');
+            const dataCreazione = `${giorno}/${mese}/${anno} ${ora}:${minuti}:${secondi}`;
 
             const nuovoOp = { nome, discordId, data: dataCreazione };
             operatoriList.push(nuovoOp);
