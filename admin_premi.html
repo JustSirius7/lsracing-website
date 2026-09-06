@@ -661,7 +661,7 @@
 
         async function markAsRitirato(vincitaIndex) {
             const vincita = vinciteList[vincitaIndex];
-            
+    
             if (vincita.stato === 'RITIRATO') {
                 alert(`Errore: Questo premio è stato già ritirato da ${vincita.operatore || 'un altro operatore'}.`);
                 return;
@@ -677,6 +677,7 @@
             const minuti = String(now.getMinutes()).padStart(2, '0');
             const secondi = String(now.getSeconds()).padStart(2, '0');
 
+            // Formato forzato giorno/mese/anno ora:minuti:secondi
             const dataRiscatto = `${giorno}/${mese}/${anno} ${ora}:${minuti}:${secondi}`;
 
             try {
@@ -693,9 +694,9 @@
                 });
 
                 const data = await response.json();
-                
+        
                 if (!response.ok || data.error) {
-                    alert(`Errore: ${data.error || "Operazione non consentita. Il premio potrebbe essere già stato confermato."}`);
+                    alert(`Errore: ${data.error || "Operazione non consentita."}`);
                     await loadAllDataFromServer();
                     return;
                 }
