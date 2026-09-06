@@ -146,14 +146,29 @@ export default async (req) => {
                 await store.setJSON("tickets", savedTickets);
             }
 
+            const nowWin = new Date();
+            const gW = String(nowWin.getDate()).padStart(2, '0');
+            const mW = String(nowWin.getMonth() + 1).padStart(2, '0');
+            const yW = nowWin.getFullYear();
+            const hW = String(nowWin.getHours()).padStart(2, '0');
+            const minW = String(nowWin.getMinutes()).padStart(2, '0');
+            const sW = String(nowWin.getSeconds()).padStart(2, '0');
+            const dataCreazioneWin = `${gW}/${mW}/${yW} ${hW}:${minW}:${sW}`;
+
+            const scadenzaDate = new Date(nowWin.getTime() + 7*24*60*60*1000);
+            const gS = String(scadenzaDate.getDate()).padStart(2, '0');
+            const mS = String(scadenzaDate.getMonth() + 1).padStart(2, '0');
+            const yS = scadenzaDate.getFullYear();
+            const dataScadenzaStr = `${gS}/${mS}/${yS}`;
+
             const nuovaVincita = {
                 player: nomeVisualizzato,
                 premio: premio || "Premio",
                 codice: 'WIN-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
                 ticketUsato: ticketClean || 'N/D',
                 stato: 'ATTESA',
-                data: new Date().toLocaleDateString(),
-                scadenza: new Date(Date.now() + 7*24*60*60*1000).toLocaleDateString()
+                data: dataCreazioneWin,
+                scadenza: dataScadenzaStr
             };
             savedVincite.unshift(nuovaVincita);
             await store.setJSON("vincite", savedVincite);
@@ -228,7 +243,6 @@ export default async (req) => {
             savedVincite[targetIndex].stato = 'RITIRATO';
             savedVincite[targetIndex].operatore = opName || "Operatore";
             
-            // Accetta la data formattata con l'ora inviata dal client, altrimenti la genera direttamente sul server
             if (dataRiscatto) {
                 savedVincite[targetIndex].dataRiscatto = dataRiscatto;
             } else {
