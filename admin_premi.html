@@ -267,7 +267,6 @@
         let currentVinciteFilter = 'TUTTI';
         let currentOperatorName = "Operatore";
         let draggedIndex = null;
-        // Variabile globale per memorizzare il ruolo dell'utente corrente
         let currentUserRole = ''; 
 
         window.onload = async function() {
@@ -299,15 +298,14 @@
                 document.getElementById('admin-section').classList.remove('hidden');
                 document.getElementById('top-user-bar').classList.remove('hidden');
                 
-                // Determina il ruolo iniziale da localStorage se disponibile
                 if (localStorage.getItem('ls_ruota_only') === 'true') {
                     currentUserRole = 'ruota';
                 } else if (localStorage.getItem('ls_ruota_only') === 'false') {
                     currentUserRole = 'admin';
                 }
 
-                applyRolePermissions();
                 await loadAllDataFromServer();
+                applyRolePermissions();
 
                 let savedId = localStorage.getItem('ls_logged_discord_id');
                 let matchedOp = operatoriList.find(op => op.discordId === savedId);
@@ -339,27 +337,28 @@
             window.location.reload();
         }
 
-        // Funzione per applicare i permessi in base al ruolo dell'utente
         function applyRolePermissions() {
             const btnPremi = document.getElementById('tab-btn-premi');
+            const btnTicket = document.getElementById('tab-btn-ticket');
+            const btnVincite = document.getElementById('tab-btn-vincite');
             const btnOperatori = document.getElementById('tab-btn-operatori');
 
-            // Se l'utente possiede solo il ruolo "Ruota"
             if (currentUserRole === 'ruota') {
                 if (btnPremi) btnPremi.style.display = 'none';
                 if (btnOperatori) btnOperatori.style.display = 'none';
+                if (btnTicket) btnTicket.style.display = 'inline-block';
+                if (btnVincite) btnVincite.style.display = 'inline-block';
 
-                // Forza l'utente a visualizzare solo Ticket o Vincite come default
                 switchTab('ticket');
             } else {
-                // Per Direzione e Responsabile Eventi, assicurati che i tab siano visibili
                 if (btnPremi) btnPremi.style.display = 'inline-block';
+                if (btnTicket) btnTicket.style.display = 'inline-block';
+                if (btnVincite) btnVincite.style.display = 'inline-block';
                 if (btnOperatori) btnOperatori.style.display = 'inline-block';
             }
         }
 
         function switchTab(tabName) {
-            // Controllo di sicurezza bloccante se un utente "Ruota" prova ad accedere a Premi o Operatori
             if ((tabName === 'premi' || tabName === 'operatori') && currentUserRole === 'ruota') {
                 alert("Accesso non autorizzato a questa sezione.");
                 return;
@@ -393,7 +392,6 @@
                     vinciteList = data.vincite || [];
                     operatoriList = data.operatori || [];
                     
-                    // Se il server restituisce esplicitamente il ruolo o lo stato ruotaOnly, aggiornalo
                     if (data.ruoloUtente) {
                         currentUserRole = data.ruoloUtente;
                     } else if (data.ruotaOnly !== undefined) {
