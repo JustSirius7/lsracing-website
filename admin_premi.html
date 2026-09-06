@@ -275,11 +275,15 @@
             const autenticato = urlParams.get('autenticato');
             const errore = urlParams.get('errore');
             const discordIdParam = urlParams.get('discordId');
+            const ruotaOnlyParam = urlParams.get('ruotaOnly');
 
             if (autenticato === 'true') {
                 localStorage.setItem('ls_discord_logged', 'true');
                 if (discordIdParam) {
                     localStorage.setItem('ls_logged_discord_id', discordIdParam);
+                }
+                if (ruotaOnlyParam) {
+                    localStorage.setItem('ls_ruota_only', ruotaOnlyParam);
                 }
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
@@ -295,6 +299,14 @@
                 document.getElementById('admin-section').classList.remove('hidden');
                 document.getElementById('top-user-bar').classList.remove('hidden');
                 
+                // Determina il ruolo iniziale da localStorage se disponibile
+                if (localStorage.getItem('ls_ruota_only') === 'true') {
+                    currentUserRole = 'ruota';
+                } else if (localStorage.getItem('ls_ruota_only') === 'false') {
+                    currentUserRole = 'admin';
+                }
+
+                applyRolePermissions();
                 await loadAllDataFromServer();
 
                 let savedId = localStorage.getItem('ls_logged_discord_id');
@@ -323,6 +335,7 @@
             localStorage.removeItem('ls_discord_logged');
             localStorage.removeItem('ls_logged_discord_id');
             localStorage.removeItem('ls_logged_operator_name');
+            localStorage.removeItem('ls_ruota_only');
             window.location.reload();
         }
 
@@ -331,13 +344,17 @@
             const btnPremi = document.getElementById('tab-btn-premi');
             const btnOperatori = document.getElementById('tab-btn-operatori');
 
-            // Se l'utente possiede il ruolo "Ruota" ma NON Direzione o Resp. Eventi
-            if (currentUserRole === 'ruota' || (window.userRoles && userRoles.includes('Ruota') && !userRoles.includes('Direzione'))) {
+            // Se l'utente possiede solo il ruolo "Ruota"
+            if (currentUserRole === 'ruota') {
                 if (btnPremi) btnPremi.style.display = 'none';
                 if (btnOperatori) btnOperatori.style.display = 'none';
 
                 // Forza l'utente a visualizzare solo Ticket o Vincite come default
                 switchTab('ticket');
+            } else {
+                // Per Direzione e Responsabile Eventi, assicurati che i tab siano visibili
+                if (btnPremi) btnPremi.style.display = 'inline-block';
+                if (btnOperatori) btnOperatori.style.display = 'inline-block';
             }
         }
 
@@ -376,8 +393,14 @@
                     vinciteList = data.vincite || [];
                     operatoriList = data.operatori || [];
                     
-                    // Assegna il ruolo ricevuto dal server e applica i filtri visivi
-                    currentUserRole = data.ruoloUtente || 'ruota'; 
+                    // Se il server restituisce esplicitamente il ruolo o lo stato ruotaOnly, aggiornalo
+                    if (data.ruoloUtente) {
+                        currentUserRole = data.ruoloUtente;
+                    } else if (data.ruotaOnly !== undefined) {
+                        currentUserRole = data.ruotaOnly ? 'ruota' : 'admin';
+                        localStorage.setItem('ls_ruota_only', data.ruotaOnly);
+                    }
+                    
                     applyRolePermissions();
 
                     let savedId = localStorage.getItem('ls_logged_discord_id');
