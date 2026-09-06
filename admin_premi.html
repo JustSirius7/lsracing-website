@@ -627,7 +627,12 @@
                 if (v.stato === 'ATTESA') {
                     azioneHtml = `<button onclick="markAsRitirato(${realIdx})" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-xl text-xs font-semibold transition">Segna Ritirato</button>`;
                 } else if (v.stato === 'RITIRATO' && v.operatore) {
-                    azioneHtml = `<span class="text-[11px] text-gray-400">Consegnato da: <strong class="text-white">${v.operatore}</strong></span>`;
+                    azioneHtml = `
+                        <div class="text-right">
+                            <span class="text-[11px] text-gray-400 block">Consegnato da: <strong class="text-white">${v.operatore}</strong></span>
+                            <span class="text-[10px] text-gray-500 block">${v.dataRiscatto || 'Data non disponibile'}</span>
+                        </div>
+                    `;
                 }
 
                 container.innerHTML += `
@@ -658,6 +663,9 @@
 
             if (!confirm(`Confermi la consegna del premio a ${vincita.player || 'questo giocatore'}?`)) return;
 
+            const now = new Date();
+            const dataRiscatto = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+
             try {
                 const response = await fetch('/.netlify/functions/ruota-api', {
                     method: 'POST',
@@ -666,7 +674,8 @@
                         action: 'mark-ritirato', 
                         codiceVincita: vincita.codice || vincita.ticketUsato,
                         index: vincitaIndex,
-                        operatore: currentOperatorName 
+                        operatore: currentOperatorName,
+                        dataRiscatto: dataRiscatto
                     })
                 });
 
