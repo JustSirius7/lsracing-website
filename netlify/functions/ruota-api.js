@@ -11,7 +11,7 @@ export default async (req) => {
     try {
         const store = getStore({ name: "fortuna-rp-store", consistency: "strong" });
         const body = await req.json();
-        const { action, discordId, discordName, codice, premio, descrizione, premi, tickets, vincite, operatori, ticket, operatore, codiceVincita, index, operatore: opName, dataRiscatto } = body;
+        const { action, discordId, discordName, codice, premio, descrizione, premi, tickets, vincite, operatori, ticket, quantita, giri, scadenzaGiorni, tempoRiscatto, operatore, codiceVincita, index, operatore: opName, dataRiscatto } = body;
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
@@ -72,11 +72,41 @@ export default async (req) => {
 
         if (action === 'create-ticket') {
             let savedTickets = await store.get("tickets", { type: "json" }) || [];
+            
+            const now = new Date();
+            const optionsDate = { timeZone: 'Europe/Rome', day: '2-digit', month: '2-digit', year: '2-digit' };
+            const optionsTime = { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', hour12: false };
+            const dataCreazioneStr = `${now.toLocaleDateString('it-IT', optionsDate)}, ${now.toLocaleTimeString('it-IT', optionsTime)}`;
+            
+            // Nome creatore pulito senza "Concessionario 816"
+            const nomeOperatoreCreatore = (operatore && operatore.trim() !== "") ? operatore.trim() : "alex (@alex)";
+
             if (ticket) {
                 savedTickets.unshift(ticket);
-                await store.setJSON("tickets", savedTickets);
+            } else {
+                const count = parseInt(quantita) || 1;
+                const numGiri = parseInt(giri) || 1;
+                const giorniScadenza = parseInt(scadenzaGiorni) || 30;
+                const giorniRiscatto = parseInt(tempoRiscatto) || 7;
+
+                for (let i = 0; i < count; i++) {
+                    const randomCode = 'TICK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                    const nuovoTicket = {
+                        codice: randomCode,
+                        giri: numGiri,
+                        giriResidui: numGiri,
+                        scadenzaGiorni: giorniScadenza,
+                        tempoRiscatto: giorniRiscatto,
+                        creatore: nomeOperatoreCreatore,
+                        dataCreazione: dataCreazioneStr,
+                        stato: 'ATTIVO'
+                    };
+                    savedTickets.unshift(nuovoTicket);
+                }
             }
-            return new Response(JSON.stringify({ success: true, message: "Ticket creato con successo!" }), {
+
+            await store.setJSON("tickets", savedTickets);
+            return new Response(JSON.stringify({ success: true, message: "Ticket generati con successo!", tickets: savedTickets }), {
                 status: 200, headers: { "Content-Type": "application/json" }
             });
         }
@@ -128,15 +158,27 @@ export default async (req) => {
             let savedTickets = await store.get("tickets", { type: "json" }) || [];
             let savedVincite = await store.get("vincite", { type: "json" }) || [];
 
+            let giorniScadenzaPremio = 7; 
+            let infoCreatore = "alex (@alex)";
+            let dataCreazioneTicketStr = "";
+
             const ticketIndex = savedTickets.findIndex(t => t.codice.trim().toUpperCase() === ticketClean);
             if (ticketIndex !== -1) {
                 let t = savedTickets[ticketIndex];
+                if (t.tempoRiscatto) {
+                    giorniScadenzaPremio = parseInt(t.tempoRiscatto);
+                }
+                if (t.creatore) {
+                    infoCreatore = t.creatore;
+                }
+                if (t.dataCreazione) {
+                    dataCreazioneTicketStr = t.dataCreazione;
+                }
+
                 let residui = t.giriResidui !== undefined ? parseInt(t.giriResidui) : parseInt(t.giri);
-                
                 if (residui > 0) {
                     residui -= 1;
                 }
-                
                 t.giriResidui = residui;
                 if (residui <= 0) {
                     t.giriResidui = 0;
@@ -147,25 +189,28 @@ export default async (req) => {
             }
 
             const nowWin = new Date();
-            const optionsDate = { timeZone: 'Europe/Rome', day: '2-digit', month: '2-digit', year: 'numeric' };
-            const optionsTime = { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const optionsDate = { timeZone: 'Europe/Rome', day: '2-digit', month: '2-digit', year: '2-digit' };
+            const optionsTime = { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', hour12: false };
             
             const dataStr = nowWin.toLocaleDateString('it-IT', optionsDate);
             const timeStr = nowWin.toLocaleTimeString('it-IT', optionsTime);
-            const dataCreazioneWin = `${dataStr} ${timeStr}`;
+            const dataVincitaStr = `${dataStr}, ${timeStr}`;
 
-            const scadenzaDate = new Date(nowWin.getTime() + 7*24*60*60*1000);
-            const dataScadenzaStr = scadenzaDate.toLocaleDateString('it-IT', optionsDate);
+            const scadenzaDate = new Date(nowWin.getTime() + giorniScadenzaPremio * 24 * 60 * 60 * 1000);
+            const dataScadenzaStr = `${scadenzaDate.toLocaleDateString('it-IT', optionsDate)}, ${scadenzaDate.toLocaleTimeString('it-IT', optionsTime)}`;
 
             const nuovaVincita = {
                 player: nomeVisualizzato,
                 premio: premio || "Premio",
                 codice: 'WIN-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
                 ticketUsato: ticketClean || 'N/D',
-                stato: 'ATTESA',
-                data: dataCreazioneWin,
-                scadenza: dataScadenzaStr
+                creatore: infoCreatore,
+                dataCreazione: dataCreazioneTicketStr || dataVincitaStr,
+                dataVincita: dataVincitaStr,
+                scadenza: dataScadenzaStr,
+                stato: 'ATTESA' // ATTESA, RITIRATO, SCADUTO
             };
+
             savedVincite.unshift(nuovaVincita);
             await store.setJSON("vincite", savedVincite);
 
@@ -237,17 +282,15 @@ export default async (req) => {
             }
 
             savedVincite[targetIndex].stato = 'RITIRATO';
-            savedVincite[targetIndex].operatore = opName || "Operatore";
+            savedVincite[targetIndex].operatoreRiscatto = opName || "Operatore";
             
             if (dataRiscatto) {
                 savedVincite[targetIndex].dataRiscatto = dataRiscatto;
             } else {
                 const now = new Date();
-                const optionsDate = { timeZone: 'Europe/Rome', day: '2-digit', month: '2-digit', year: 'numeric' };
-                const optionsTime = { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-                const dStr = now.toLocaleDateString('it-IT', optionsDate);
-                const tStr = now.toLocaleTimeString('it-IT', optionsTime);
-                savedVincite[targetIndex].dataRiscatto = `${dStr} ${tStr}`;
+                const optionsDate = { timeZone: 'Europe/Rome', day: '2-digit', month: '2-digit', year: '2-digit' };
+                const optionsTime = { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', hour12: false };
+                savedVincite[targetIndex].dataRiscatto = `${now.toLocaleDateString('it-IT', optionsDate)}, ${now.toLocaleTimeString('it-IT', optionsTime)}`;
             }
 
             await store.setJSON("vincite", savedVincite);
@@ -272,7 +315,7 @@ export default async (req) => {
             if (Array.isArray(operatori)) {
                 await store.setJSON("operatori", operatori);
             }
-            return new Response(JSON.stringify({ success: true, message: "Tickets aggiornati!" }), {
+            return new Response(JSON.stringify({ success: true, message: "Operatori aggiornati!" }), {
                 status: 200, headers: { "Content-Type": "application/json" }
             });
         }
