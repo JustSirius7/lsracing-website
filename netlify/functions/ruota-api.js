@@ -11,7 +11,7 @@ export default async (req) => {
     try {
         const store = getStore({ name: "fortuna-rp-store", consistency: "strong" });
         const body = await req.json();
-        const { action, discordId, discordName, codice, premio, descrizione, premi, tickets, vincite, operatori, ticket, operatore, codiceVincita, index, operatore: opName } = body;
+        const { action, discordId, discordName, codice, premio, descrizione, premi, tickets, vincite, operatori, ticket, operatore, codiceVincita, index, operatore: opName, dataRiscatto } = body;
 
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1544692129530642473/lNf8BNVGfVSeOTMIBe3Rcp083GmMXpRYh-G_TByH6a6hxqu1rm_pBEsfRFPGUmid-8TK";
 
@@ -227,6 +227,20 @@ export default async (req) => {
 
             savedVincite[targetIndex].stato = 'RITIRATO';
             savedVincite[targetIndex].operatore = opName || "Operatore";
+            
+            // Accetta la data formattata con l'ora inviata dal client, altrimenti la genera direttamente sul server
+            if (dataRiscatto) {
+                savedVincite[targetIndex].dataRiscatto = dataRiscatto;
+            } else {
+                const now = new Date();
+                const g = String(now.getDate()).padStart(2, '0');
+                const m = String(now.getMonth() + 1).padStart(2, '0');
+                const y = now.getFullYear();
+                const h = String(now.getHours()).padStart(2, '0');
+                const min = String(now.getMinutes()).padStart(2, '0');
+                const s = String(now.getSeconds()).padStart(2, '0');
+                savedVincite[targetIndex].dataRiscatto = `${g}/${m}/${y} ${h}:${min}:${s}`;
+            }
 
             await store.setJSON("vincite", savedVincite);
 
