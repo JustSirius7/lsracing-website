@@ -174,7 +174,7 @@
                     </div>
                     <div class="relative w-full sm:w-72">
                         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-xs text-gray-500"></i>
-                        <input type="text" id="vincite-search" oninput="filterVincite()" placeholder="Cerca giocatore o codice..." class="w-full bg-[#0b0b0e] border border-[#232333] ...">
+                        <input type="text" id="vincite-search" oninput="filterVincite()" placeholder="Cerca giocatore o codice..." class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl pl-9 pr-4 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500">
                     </div>
                 </div>
                 <div class="flex items-center gap-2 mb-6 overflow-x-auto flex-shrink-0">
@@ -393,6 +393,40 @@
             if (targetBtn) targetBtn.className = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-black";
         }
 
+        function checkAndUpdateExpiredVincite() {
+            const now = new Date();
+            let updated = false;
+
+            vinciteList.forEach(v => {
+                if (v.stato === 'ATTESA' && v.scadenzaData) {
+                    const parts = v.scadenzaData.split(', ');
+                    if (parts.length === 2) {
+                        const dateParts = parts[0].split('/');
+                        const timeParts = parts[1].split(':');
+                        
+                        if (dateParts.length === 3 && timeParts.length === 2) {
+                            const day = parseInt(dateParts[0], 10);
+                            const month = parseInt(dateParts[1], 10) - 1;
+                            const year = 2000 + parseInt(dateParts[2], 10);
+                            const hours = parseInt(timeParts[0], 10);
+                            const minutes = parseInt(timeParts[1], 10);
+
+                            const expirationDate = new Date(year, month, day, hours, minutes);
+
+                            if (now > expirationDate) {
+                                v.stato = 'SCADUTO';
+                                updated = true;
+                            }
+                        }
+                    }
+                }
+            });
+
+            if (updated) {
+                sendUpdateToServer('update-vincite', { vincite: vinciteList });
+            }
+        }
+
         async function loadAllDataFromServer() {
             try {
                 const response = await fetch('/.netlify/functions/ruota-api', {
@@ -408,6 +442,8 @@
                     vinciteList = data.vincite || [];
                     operatoriList = data.operatori || [];
                     
+                    checkAndUpdateExpiredVincite();
+
                     if (data.ruoloUtente) {
                         currentUserRole = data.ruoloUtente;
                     } else if (data.ruotaOnly !== undefined) {
