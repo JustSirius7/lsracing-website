@@ -1,5 +1,41 @@
 import { getStore } from "@netlify/blobs";
 
+// Funzione di utilità per verificare e aggiornare le vincite scadute direttamente sul server
+async function processExpiredVincite(store, vinciteList) {
+    const now = new Date();
+    let updated = false;
+
+    vinciteList.forEach(v => {
+        if (v.stato === 'ATTESA' && v.scadenzaData) {
+            const parts = v.scadenzaData.split(', ');
+            if (parts.length === 2) {
+                const dateParts = parts[0].split('/');
+                const timeParts = parts[1].split(':');
+                
+                if (dateParts.length === 3 && timeParts.length === 2) {
+                    const day = parseInt(dateParts[0], 10);
+                    const month = parseInt(dateParts[1], 10) - 1;
+                    const year = 2000 + parseInt(dateParts[2], 10);
+                    const hours = parseInt(timeParts[0], 10);
+                    const minutes = parseInt(timeParts[1], 10);
+
+                    const expirationDate = new Date(year, month, day, hours, minutes);
+
+                    if (now > expirationDate) {
+                        v.stato = 'SCADUTO';
+                        updated = true;
+                    }
+                }
+            }
+        }
+    });
+
+    if (updated) {
+        await store.setJSON("vincite", vinciteList);
+    }
+    return vinciteList;
+}
+
 export default async (req) => {
     if (req.method !== 'POST') {
         return new Response(JSON.stringify({ success: false, message: "Metodo non consentito" }), {
@@ -36,8 +72,10 @@ export default async (req) => {
             }
 
             const savedTickets = await store.get("tickets", { type: "json" }) || [];
-            const savedVincite = await store.get("vincite", { type: "json" }) || [];
+            let savedVincite = await store.get("vincite", { type: "json" }) || [];
             const savedOperatori = await store.get("operatori", { type: "json" }) || [];
+
+            savedVincite = await processExpiredVincite(store, savedVincite);
 
             return new Response(JSON.stringify({
                 success: true,
@@ -253,7 +291,8 @@ export default async (req) => {
         }
 
         if (action === 'get-vincite') {
-            const savedVincite = await store.get("vincite", { type: "json" }) || [];
+            let savedVincite = await store.get("vincite", { type: "json" }) || [];
+            savedVincite = await processExpiredVincite(store, savedVincite);
             return new Response(JSON.stringify({ success: true, vincite: savedVincite }), {
                 status: 200, headers: { "Content-Type": "application/json" }
             });
