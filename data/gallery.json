@@ -2,15 +2,29 @@
     {
         "title": "Officina Principale",
         "category": "officina",
-        "image": "assets/img/gallery/officina/officina1.webp",
+        "image": "assets/img/gallery/officina/principale.webp",
         "description": "La nostra officina principale."
     },
 
     {
         "title": "Banco Motori",
         "category": "officina",
-        "image": "assets/img/gallery/officina/officina2.webp",
+        "image": "assets/img/gallery/officina/officina1.webp",
         "description": "Area elaborazioni."
+    },
+
+    {
+        "title": "Reception",
+        "category": "officina",
+        "image": "assets/img/gallery/officina/reception.webp",
+        "description": "Accoglienza clienti."
+    },
+
+    {
+        "title": "Perfdormance Area",
+        "category": "officina",
+        "image": "assets/img/gallery/officina/officina2.webp",
+        "description": "La sala principale della nostra officina completamente attrezzata."
     },
 
     {
