@@ -1,25 +1,35 @@
 [
   {
-    "nome": "JustPino",
+    "nome": "Gabriel Mendoza",
     "ruolo": "Proprietario",
     "sezione": "proprieta",
-    "foto": "assets/img/team/justpino.webp"
+    "foto": "assets/img/team/gm.webp"
   },
+
   {
     "nome": "Mario",
     "ruolo": "Direttore",
     "sezione": "direzione",
     "foto": "assets/img/team/mario.webp"
   },
+
+  {
+    "nome": "Mario",
+    "ruolo": "Responsabile Eventi",
+    "sezione": "direzione",
+    "foto": "assets/img/team/mario.webp"
+  },
+
   {
     "nome": "Luca",
     "ruolo": "Vice Direttore",
     "sezione": "direzione",
     "foto": "assets/img/team/luca.webp"
   },
+
   {
     "nome": "Andrea",
-    "ruolo": "Meccanico",
+    "ruolo": "Capo Meccanico",
     "sezione": "officina",
     "foto": "assets/img/team/andrea.webp"
   }
