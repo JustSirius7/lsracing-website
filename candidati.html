@@ -92,9 +92,9 @@
                                     required 
                                     placeholder="Es. 289371289371298312"
                                     pattern="[0-9]{17,20}"
-                                    title="Inserisci SOLO il tuo ID numerico di Discord (17-20 cifre). Non usare il nickname o la @"
+                                    title="ID Discord verificato automaticamente"
                                 >
-                                <small style="color: #aaa; font-size: 0.8rem; margin-top: 5px; display: block; line-height: 1.4;">
+                                <small id="discordHelpText" style="color: #aaa; font-size: 0.8rem; margin-top: 5px; display: block; line-height: 1.4;">
                                     ⚠️ <b>Inserisci solo numeri</b> (no nickname o @).<br>
                                     💡 <b>Come trovare il tuo ID:</b> Vai su Discord in <i>Impostazioni > Avanzate</i> e attiva la <b>"Modalità Sviluppatore"</b>. Fai tasto destro sul tuo profilo e clicca <i>"Copia ID utente"</i>.
                                 </small>
@@ -191,6 +191,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const autenticato = urlParams.get('autenticato');
         const errore = urlParams.get('errore');
+        const discordId = urlParams.get('discord_id');
 
         const authSection = document.getElementById('discord-auth-section');
         const formContainer = document.getElementById('form-container');
@@ -198,6 +199,24 @@
         if (autenticato === 'true') {
             authSection.style.display = 'none';
             formContainer.style.display = 'block';
+
+            // Autocompilazione e blocco del campo ID Discord
+            if (discordId) {
+                const discordInput = document.getElementById('discordTag');
+                const discordHelpText = document.getElementById('discordHelpText');
+                
+                if (discordInput) {
+                    discordInput.value = discordId;
+                    discordInput.readOnly = true;
+                    discordInput.style.backgroundColor = '#1a1a1a';
+                    discordInput.style.color = '#888';
+                    discordInput.style.cursor = 'not-allowed';
+                }
+                if (discordHelpText) {
+                    discordHelpText.innerHTML = '✅ <b>ID Discord verificato e associato automaticamente tramite login.</b>';
+                    discordHelpText.style.color = '#57F287';
+                }
+            }
         } else if (errore === 'non_nel_server') {
             authSection.innerHTML = `
                 <h3 style="color: #ff4d4d; margin-bottom: 10px;"><i class="fa-solid fa-triangle-exclamation"></i> Accesso Negato</h3>
