@@ -89,10 +89,10 @@
             <div>
                 <span class="text-[10px] tracking-widest text-amber-500 font-semibold uppercase">Server Roleplay • Estrazione Ufficiale</span>
                 <h2 class="text-3xl font-black text-white tracking-wide mt-1">RUOTA DELLA FORTUNA</h2>
-                <p class="text-xs text-gray-400 mt-1">Inserisci il tuo Nickname, verifica il tuo ID Discord, inserisci il codice ticket e gira la ruota.</p>
+                <p class="text-xs text-gray-400 mt-1">Verificati con Discord, inserisci il codice ticket, gira la ruota e vinci premi esclusivi in gioco.</p>
             </div>
             <div class="mt-4 md:mt-0">
-                <a href="admin_premi.html" class="border border-amber-500/35 hover:border-amber-500/60 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-4 py-2 rounded-xl text-xs font-semibold transition inline-flex items-center gap-2">
+                <a href="admin_premi.html" class="border border-amber-500/30 hover:border-amber-500/60 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-4 py-2 rounded-xl text-xs font-semibold transition inline-flex items-center gap-2">
                     <i class="fa-solid fa-user-shield"></i> Area Operatori
                 </a>
             </div>
@@ -114,22 +114,17 @@
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">ID Discord</label>
-                            
-                            <!-- Pulsante di Verifica Discord -->
-                            <div id="discord-verify-container">
-                                <a href="/.netlify/functions/discord-login-ruota" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-2.5 px-3 rounded-xl text-xs transition duration-200 flex items-center justify-center gap-2 shadow-md">
-                                    <i class="fa-brands fa-discord text-sm"></i> Verifica con Discord
-                                </a>
-                            </div>
-
-                            <!-- Input ID Discord (nascosto inizialmente, compare compilato e bloccato dopo il login) -->
-                            <input type="text" id="discord-id" name="discordTag" style="display: none;" readonly class="w-full bg-[#1a1a1a] border border-[#232333] rounded-xl px-3 py-2 text-[#888] text-xs focus:outline-none cursor-not-allowed">
+                            <!-- Tasto Verifica con Discord -->
+                            <a href="/.netlify/functions/discord-login" id="discord-login-btn" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-medium py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-md">
+                                <i class="fa-brands fa-discord text-sm"></i> Verifica con Discord
+                            </a>
+                            <input type="hidden" id="discord-id">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Codice Ticket</label>
                             <input type="text" id="ticket-code" autocomplete="off" placeholder="TICKET-XYZ" class="w-full bg-[#0b0b0e] border border-[#232333] rounded-xl px-3 py-2 text-white text-xs font-mono uppercase focus:outline-none focus:border-amber-500 placeholder-gray-600">
                         </div>
-                        <button onclick="verifyAndStart()" class="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2 mt-2">
+                        <button onclick="verifyAndStart()" class="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2 mt-2 cursor-pointer">
                             <i class="fa-solid fa-dice"></i> Verifica e Gira
                         </button>
                     </div>
@@ -143,7 +138,7 @@
                     <span class="text-[10px] uppercase tracking-wider text-gray-400 block">Utente Verificato</span>
                     <span id="display-user" class="text-xs text-amber-400 font-bold block mt-1"></span>
                     <div class="text-[11px] text-gray-300 mt-2">Giri Residui: <strong id="info-giri" class="text-green-400">0</strong></div>
-                    <button onclick="resetVerification()" class="mt-4 text-[10px] text-gray-500 hover:text-gray-300 underline">Cambia Ticket</button>
+                    <button onclick="resetVerification()" class="mt-4 text-[10px] text-gray-500 hover:text-gray-300 underline cursor-pointer">Cambia Ticket</button>
                 </div>
 
             </div>
@@ -198,25 +193,23 @@
         let currentTicketCode = "";
 
         window.onload = async function() {
-            // Gestione del ritorno dal login Discord
+            // Gestione ritorno da Discord OAuth se presenti parametri nell'URL
             const urlParams = new URLSearchParams(window.location.search);
-            const discordId = urlParams.get('discord_id') || urlParams.get('discordId');
+            const discordUser = urlParams.get('username') || urlParams.get('discord_name');
+            const discordIdVal = urlParams.get('discord_id');
 
-            if (discordId) {
-                const verifyContainer = document.getElementById('discord-verify-container');
-                const discordInput = document.getElementById('discord-id');
-
-                if (verifyContainer) verifyContainer.style.display = 'none';
-                if (discordInput) {
-                    discordInput.style.display = 'block';
-                    discordInput.value = discordId;
-                }
+            if (discordUser && discordIdVal) {
+                document.getElementById('player-name').value = discordUser;
+                document.getElementById('discord-id').value = discordIdVal;
+                
+                const discordBtn = document.getElementById('discord-login-btn');
+                discordBtn.innerHTML = `<i class="fa-solid fa-check text-sm"></i> Connesso (${discordUser})`;
+                discordBtn.className = "w-full bg-green-600 text-white font-medium py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 pointer-events-none";
             } else {
+                document.getElementById('player-name').value = "";
                 document.getElementById('discord-id').value = "";
+                document.getElementById('ticket-code').value = "";
             }
-
-            document.getElementById('player-name').value = "";
-            document.getElementById('ticket-code').value = "";
 
             await fetchPrizes();
             await fetchUltimiVincitori();
@@ -315,7 +308,7 @@
             }
 
             if (!discordId) {
-                msgEl.textContent = "Effettua la verifica con Discord prima di procedere.";
+                msgEl.textContent = "Effettua prima la verifica con Discord.";
                 msgEl.className = "text-xs mt-3 text-red-400 font-medium text-center";
                 msgEl.classList.remove('hidden');
                 return;
@@ -378,15 +371,7 @@
             currentTicketCode = "";
             document.getElementById('verified-box').classList.add('hidden');
             document.getElementById('ticket-section').classList.remove('hidden');
-            document.getElementById('ticket-code').value = "";
-            document.getElementById('player-name').value = "";
-            document.getElementById('ticket-message').classList.add('hidden');
-            
-            const spinBtn = document.getElementById('spin-btn');
-            spinBtn.disabled = true;
-            spinBtn.className = "bg-gray-800 text-gray-500 cursor-not-allowed font-black text-sm py-3 px-8 rounded-full shadow transition duration-200 uppercase tracking-wider border border-gray-700";
-            spinBtn.textContent = "Inserisci Ticket per Girare";
-            document.getElementById('win-result').textContent = "";
+            window.location.href = window.location.pathname; // Pulisce i parametri URL di Discord
         }
 
         function spinWheel() {
@@ -477,7 +462,7 @@
                         } else if (result.giriResidui !== undefined) {
                             document.getElementById('info-giri').textContent = result.giriResidui;
                             if (result.giriResidui > 0) {
-                                document.getElementById('spin-btn'].disabled = false;
+                                document.getElementById('spin-btn').disabled = false;
                                 document.getElementById('spin-btn').className = "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:to-yellow-400 text-black font-black text-sm py-3 px-8 rounded-full shadow-[0_0_25px_rgba(245,158,11,0.5)] transition duration-200 uppercase tracking-wider border border-yellow-300 cursor-pointer";
                                 document.getElementById('spin-btn').textContent = "Gira di nuovo!";
                             } else {

@@ -1,20 +1,17 @@
-<div class="input-group">
-    <label for="discordTag">ID DISCORD</label>
+exports.handler = async function(event, context) {
+    const clientId = process.env.DISCORD_CLIENT_ID || "IL_TUO_CLIENT_ID";
+    // Recupera l'URL del sito dinamico su Netlify o usa localhost per i test locali
+    const baseUrl = process.env.URL || "http://localhost:8888";
+    const redirectUri = `${baseUrl}/.netlify/functions/discord-callback-ruota`;
     
-    <!-- Pulsante di verifica (visibile finché l'utente non ha fatto il login) -->
-    <div id="discord-verify-container">
-        <a href="/.netlify/functions/discord-login-ruota" style="display: flex; align-items: center; justify-content: center; gap: 8px; background-color: #5865F2; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: background 0.3s; width: 100%;">
-            <i class="fa-brands fa-discord"></i> Verifica con Discord
-        </a>
-    </div>
-
-    <!-- Campo input ID Discord (inizialmente nascosto, viene mostrato, compilato e bloccato dopo il login) -->
-    <input 
-        type="text" 
-        id="discordTag" 
-        name="discordTag" 
-        style="display: none;" 
-        readonly 
-        placeholder="12345678912345678"
-    >
-</div>
+    const discordOAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify`;
+    
+    return {
+        statusCode: 302,
+        headers: {
+            Location: discordOAuthUrl,
+            "Cache-Control": "no-cache"
+        },
+        body: ""
+    };
+};
