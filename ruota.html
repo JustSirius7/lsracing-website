@@ -193,6 +193,13 @@
         let currentTicketCode = "";
 
         window.onload = async function() {
+            // Imposta dinamicamente il link di ritorno per Discord basato sulla pagina attuale
+            const discordBtn = document.getElementById('discord-login-btn');
+            if (discordBtn && !discordBtn.classList.contains('pointer-events-none')) {
+                const currentPath = window.location.pathname;
+                discordBtn.href = `/.netlify/functions/discord-login?redirect=${encodeURIComponent(currentPath)}`;
+            }
+
             // Gestione ritorno da Discord OAuth se presenti parametri nell'URL
             const urlParams = new URLSearchParams(window.location.search);
             const discordUser = urlParams.get('username') || urlParams.get('discord_name');
@@ -202,9 +209,10 @@
                 document.getElementById('player-name').value = discordUser;
                 document.getElementById('discord-id').value = discordIdVal;
                 
-                const discordBtn = document.getElementById('discord-login-btn');
-                discordBtn.innerHTML = `<i class="fa-solid fa-check text-sm"></i> Connesso (${discordUser})`;
-                discordBtn.className = "w-full bg-green-600 text-white font-medium py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 pointer-events-none";
+                if (discordBtn) {
+                    discordBtn.innerHTML = `<i class="fa-solid fa-check text-sm"></i> Connesso (${discordUser})`;
+                    discordBtn.className = "w-full bg-green-600 text-white font-medium py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 pointer-events-none";
+                }
             } else {
                 document.getElementById('player-name').value = "";
                 document.getElementById('discord-id').value = "";
