@@ -4,7 +4,7 @@ exports.handler = async (event, context) => {
   
   const allowedPages = {
     'candidati': 'candidati.html',
-    'ruota': 'ruota.html',
+    'ruota': 'ruota.html', // Mantenuto il nome originale corretto
     'prenota': 'prenota.html',
     'admin': 'admin_premi.html',
     'operatori': 'operatori.html'
@@ -63,6 +63,9 @@ exports.handler = async (event, context) => {
       headers: { Authorization: `Bot ${BOT_TOKEN}` },
     });
 
+    // Cattura il nome utente da passare nel redirect
+    const username = encodeURIComponent(userData.global_name || userData.username);
+
     if (memberRes.status === 200) {
       const memberData = await memberRes.json();
       const userRoles = memberData.roles || [];
@@ -75,13 +78,13 @@ exports.handler = async (event, context) => {
         }
       }
 
-      // Determina se l'utente ha solo il ruolo Ruota (senza ruoli amministrativi di Direzione/Resp. Eventi)
+      // Determina se l'utente ha solo il ruolo Ruota
       const hasAdminRole = userRoles.some(roleId => ADMIN_ROLE_IDS.includes(roleId));
       const isRuotaOnly = !hasAdminRole && userRoles.some(roleId => RUOTA_ROLE_IDS.includes(roleId));
 
       return { 
         statusCode: 302, 
-        headers: { Location: `https://lsracing.top/${targetPage}?autenticato=true&discord_id=${userData.id}&discordId=${userData.id}&ruotaOnly=${isRuotaOnly}` }, 
+        headers: { Location: `https://lsracing.top/${targetPage}?autenticato=true&username=${username}&discord_id=${userData.id}&discordId=${userData.id}&ruotaOnly=${isRuotaOnly}` }, 
         body: "" 
       };
     } else {
