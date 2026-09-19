@@ -201,7 +201,7 @@
             const discordIdVal = urlParams.get('discord_id');
 
             if (discordUser && discordIdVal) {
-                document.getElementById('player-name').value = discordUser;
+                // Lasciamo vuoto il campo player-name in modo che resti pulito e modificabile dall'utente
                 document.getElementById('discord-id').value = discordIdVal;
                 
                 if (discordBtn) {
@@ -496,7 +496,7 @@
             if (!container) return;
 
             if (!vinciteList || !vinciteList.length) {
-                container.innerHTML = `<div class="text-xs text-gray-500 text-center py-4">Nessuna vincita recente</div>`;
+                container.containerHTML = `<div class="text-xs text-gray-500 text-center py-4">Nessuna vincita recente</div>`;
                 return;
             }
 
