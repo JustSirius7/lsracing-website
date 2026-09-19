@@ -81,7 +81,7 @@ exports.handler = async (event, context) => {
 
       return { 
         statusCode: 302, 
-        headers: { Location: `https://lsracing.top/${targetPage}?autenticato=true&discordId=${userData.id}&ruotaOnly=${isRuotaOnly}` }, 
+        headers: { Location: `https://lsracing.top/${targetPage}?autenticato=true&discord_id=${userData.id}&discordId=${userData.id}&ruotaOnly=${isRuotaOnly}` }, 
         body: "" 
       };
     } else {
