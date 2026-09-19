@@ -116,7 +116,7 @@
                             <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">ID Discord</label>
                             <!-- Tasto Verifica con Discord -->
                             <a href="/.netlify/functions/discord-login?next=ruota" id="discord-login-btn" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-medium py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-md">
-                                    <i class="fa-brands fa-discord text-sm"></i> Verifica con Discord
+                                <i class="fa-brands fa-discord text-sm"></i> Verifica con Discord
                             </a>
                             <input type="hidden" id="discord-id">
                         </div>
@@ -193,12 +193,7 @@
         let currentTicketCode = "";
 
         window.onload = async function() {
-            // Imposta dinamicamente il link di ritorno per Discord basato sulla pagina attuale
             const discordBtn = document.getElementById('discord-login-btn');
-            if (discordBtn && !discordBtn.classList.contains('pointer-events-none')) {
-                const currentPath = window.location.pathname;
-                discordBtn.href = `/.netlify/functions/discord-login?redirect=${encodeURIComponent(currentPath)}`;
-            }
 
             // Gestione ritorno da Discord OAuth se presenti parametri nell'URL
             const urlParams = new URLSearchParams(window.location.search);
