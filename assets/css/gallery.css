@@ -76,10 +76,10 @@
 }
 
 .main-logo{
-    width: 900px;
-    max-width: 90%;
+    width: 650px;
+    max-width: 75%;
     display: block;
-    margin: 40px auto;
+    margin: 85px auto 40px;
 }
 
 /* FILTRI */
