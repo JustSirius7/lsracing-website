@@ -248,3 +248,25 @@ section {
         border-radius: var(--radius);
     }
 }
+
+
+/* ==========================================
+   FIX DEFINITIVO LOGO NAVBAR (DESKTOP & APP)
+========================================== */
+
+/* Regola globale per Desktop / Browser */
+#navbar header img, 
+#navbar .logo-navbar img {
+    height: 52px !important;
+    width: auto !important;
+    transform: translateY(6px) !important;
+}
+
+/* Regola specifica per Mobile / App */
+@media screen and (max-width: 992px) {
+    #navbar header img, 
+    #navbar .logo-navbar img {
+        height: 48px !important;
+        transform: translateY(8px) !important;
+    }
+}
