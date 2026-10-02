@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
     try {
-        const response = await fetch("components/navbar.html");
+        const response = await fetch("components/navbar.html?v=" + new Date().getTime());
 
         if (!response.ok) {
             throw new Error("Impossibile caricare la navbar.");
