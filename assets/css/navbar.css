@@ -36,10 +36,10 @@ header.scrolled {
 }
 
 .logo-navbar img {
-    height: 52px;
+    height: 40px;
     width: auto;
     transition: .35s ease;
-    transform: translateY(6px);
+    transform: translateY(10px);
     filter: drop-shadow(0 0 14px rgba(255, 85, 0, .4));
 }
 
@@ -140,7 +140,7 @@ header.scrolled {
 
     .logo-navbar img {
         height: 48px; /* Mantenuta la misura originale di 48px */
-        transform: translateY(4px); /* Abbassato leggermente */
+        transform: translateY(8px); /* Abbassato leggermente */
     }
 
     /* Mostra il pulsante Hamburger ☰ */
