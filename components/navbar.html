@@ -1,3 +1,29 @@
+<style>
+    /* ==========================================
+       STILI LOGO NAVBAR (DESKTOP / BROWSER)
+    ========================================== */
+    #mainHeader .logo-navbar img {
+        height: 52px !important;            /* Rimpicciolito per Browser PC */
+        width: auto !important;
+        transform: translateY(6px) !important; /* Abbassato per Browser PC */
+        transition: transform 0.3s ease, filter 0.3s ease;
+    }
+
+    #mainHeader .logo-navbar img:hover {
+        transform: translateY(6px) scale(1.05) !important;
+    }
+
+    /* ==========================================
+       STILI LOGO NAVBAR (MOBILE / APP)
+    ========================================== */
+    @media screen and (max-width: 992px) {
+        #mainHeader .logo-navbar img {
+            height: 48px !important;            /* Dimensione per App/Mobile */
+            transform: translateY(8px) !important; /* Abbassato solo per App/Mobile */
+        }
+    }
+</style>
+
 <header id="mainHeader">
     <!-- Logo -->
     <a href="index.html" class="logo-navbar">
