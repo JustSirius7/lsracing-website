@@ -29,23 +29,10 @@ header.scrolled {
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 35px rgba(255, 85, 0, 0.2);
 }
 
-/* Logo */
+/* Logo Contenitore */
 .logo-navbar {
     display: flex;
     align-items: center;
-}
-
-.logo-navbar img {
-    height: 40px;
-    width: auto;
-    transition: .35s ease;
-    transform: translateY(10px);
-    filter: drop-shadow(0 0 14px rgba(255, 85, 0, .4));
-}
-
-.logo-navbar img:hover {
-    transform: translateY(6px) scale(1.05);
-    filter: drop-shadow(0 0 22px rgba(255, 183, 0, .6));
 }
 
 /* Menu Link Desktop */
@@ -101,7 +88,7 @@ header.scrolled {
 }
 
 .nav-highlight::after {
-    display: none !important; /* Disabilita la linea sotto al bottone */
+    display: none !important;
 }
 
 .nav-highlight:hover {
@@ -138,17 +125,12 @@ header.scrolled {
         width: 95%;
     }
 
-    .logo-navbar img {
-        height: 48px; /* Mantenuta la misura originale di 48px */
-        transform: translateY(8px); /* Abbassato leggermente */
-    }
-
     /* Mostra il pulsante Hamburger ☰ */
     .nav-hamburger {
         display: block;
     }
 
-    /* Nasconde i link standard e crea il menu a tendina */
+    /* Menu a tendina mobile */
     .nav-links {
         display: none;
         position: absolute;
@@ -167,13 +149,12 @@ header.scrolled {
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 0 25px rgba(255, 85, 0, 0.15);
     }
 
-    /* Quando il menu si apre con il click */
     .nav-links.active {
         display: flex;
     }
 }
 
-/* --- Stile Menu a Tendina (Dropdown) Corretto --- */
+/* Dropdown Info */
 .nav-item.dropdown {
     position: relative;
     display: inline-block;
@@ -196,11 +177,10 @@ header.scrolled {
     padding: 10px 0;
     min-width: 160px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    margin-top: 0; /* Azzerato per evitare il distacco */
+    margin-top: 0;
     z-index: 999;
 }
 
-/* TRUCCO DEL CUSCINETTO: Crea un ponte invisibile che impedisce al menu di chiudersi in volo */
 .nav-item.dropdown::after {
     content: '';
     position: absolute;
@@ -224,12 +204,10 @@ header.scrolled {
     padding-left: 25px;
 }
 
-/* Mostra al passaggio del mouse */
 .nav-item.dropdown:hover .dropdown-content {
     display: block;
 }
 
-/* Adattamento Mobile */
 @media screen and (max-width: 992px) {
     .dropdown-content {
         position: static;
@@ -241,6 +219,6 @@ header.scrolled {
     }
     
     .nav-item.dropdown::after {
-        display: none; /* Non serve su mobile */
+        display: none;
     }
 }
